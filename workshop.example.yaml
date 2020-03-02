@@ -1,0 +1,38 @@
+workshop:
+
+  # A name for the workshop, used to uniquely identify individual resources
+  name: <My Workshop Name>
+ 
+  # The number of people attending the workshop ssh password
+  participant_count: 2
+  participant_password: <VM OS Password>
+
+  #
+  # workshop-core
+  #
+  core:
+
+    # The workshop cloud provider & VM configuration
+    cloud_provider: gcp
+    credentials_file_path: <path to credentials file>
+    region: europe-west2
+    region_zone: europe-west2-c
+    project: <gcp project name>
+    vm_type: n1-standard-4
+
+    # The workshop Confluent Cloud configuration
+    ccloud_bootstrap_servers: <CCloud Bootstrap Server>
+    ccloud_api_key: <CCloud API Key>
+    ccloud_api_secret: <CCloud API Secret>
+
+    # List of ccloud topics to pre-create
+    ccloud_topics: sales_orders,sales_order_details,purchase_orders,purchase_order_details,customers,suppliers,products
+
+  #
+  # workshop extensions
+  #
+  extensions:
+  
+    google-cloud-storage:
+      gcs_project: <gcp project name>
+      gcs_region: europe-west2

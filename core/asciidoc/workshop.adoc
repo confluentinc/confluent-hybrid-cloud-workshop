@@ -1,0 +1,19 @@
+= Hybrid Cloud:pass:q[<br>] KSQL Realtime Supply & Demand Workshop 
+:doctype: book
+:toc:
+:toclevels: 5
+:sectnums:
+:experimental:
+:icon: font
+:githubreponame: partner-workshops
+:cloudprovider: GCP
+:externalip: localhost
+:dc: dc
+
+include::intro.adoc[]
+
+include::main.adoc[]
+
+#EXTENSIONS_PLACEHOLDER#
+
+include::outro.adoc[]
