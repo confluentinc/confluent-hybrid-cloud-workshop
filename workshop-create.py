@@ -66,11 +66,10 @@ if os.path.exists(docker_staging):
 # Create staging directory and copy the required docker files into it
 os.mkdir(docker_staging)
 os.mkdir(os.path.join(docker_staging, "extensions"))
-#shutil.copyfile("./core/docker/docker-compose.yaml", os.path.join(docker_staging, "docker-compose.yaml"))
 copy_tree("./core/docker/", docker_staging)
 
 # Copy asciidoc directory to .docker_staging
-copy_tree(os.path.join(args.dir, "./core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
+copy_tree(os.path.join("./core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
 
 # Deal with extensions
 if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
