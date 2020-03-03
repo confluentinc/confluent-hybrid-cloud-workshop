@@ -13,7 +13,6 @@ sudo apt-get install \
     gnupg-agent \
     software-properties-common -y
 
-
 echo "--- Installing Docker ---"
 curl -L https://download.docker.com/linux/static/stable/x86_64/docker-19.03.4.tgz -o docker.tgz
 sudo tar xvf docker.tgz -C /usr/bin --wildcards 'docker/*' --strip 1
@@ -21,7 +20,6 @@ rm docker.tgz
 sudo groupadd docker
 sudo usermod -aG docker ${dc}
 sudo nohup dockerd >/dev/null 2>&1 &
-
 
 echo "--- Installing Docker Compose ---"
 sudo chmod +wx /usr/local/bin/
