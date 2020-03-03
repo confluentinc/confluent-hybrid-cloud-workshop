@@ -206,8 +206,16 @@ services:
       CONTROL_CENTER_KAFKA_CCLOUD_SASL_MECHANISM: PLAIN
       CONTROL_CENTER_KAFKA_CCLOUD_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
       CONTROL_CENTER_KAFKA_CCLOUD_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONTROL_CENTER_REST_AUTHENTICATION_METHOD: BASIC
+      CONTROL_CENTER_REST_AUTHENTICATION_REALM: c3
+      CONTROL_CENTER_REST_AUTHENTICATION_ROLES: Administrators,Restricted
+      CONTROL_CENTER_AUTH_RESTRICTED_ROLES: Restricted
+      CONTROL_CENTER_OPTS: "-Djava.security.auth.login.config=/tmp/c3/propertyfile.jaas"
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
+    volumes:
+      - /tmp/c3:/tmp/c3
+
 
   ksql-server-ccloud:
     image: confluentinc/cp-ksql-server:5.4.0
