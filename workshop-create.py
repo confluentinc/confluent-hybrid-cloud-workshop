@@ -8,7 +8,6 @@ import shutil
 import fileinput
 import re 
 import glob
-from distutils.dir_util import copy_tree
 
 argparse = argparse.ArgumentParser()
 argparse.add_argument('--dir', help="Workshop directory", required=True)
@@ -24,19 +23,32 @@ with open( os.path.join(args.dir, "workshop.yaml"), 'r') as yaml_file:
     except yaml.YAMLError as exc:
         print(exc)
 
+def copytree(src, dst):
+  if not os.path.exists(dst):
+    os.makedirs(dst)
+    shutil.copystat(src, dst)
+  lst = os.listdir(src)
+  for item in lst:
+    s = os.path.join(src, item)
+    d = os.path.join(dst, item)
+    if os.path.isdir(s):
+      copytree(s, d)
+    else:
+      shutil.copy2(s, d)
+
 #----------------------------------------
 # Create the Terraform staging directory 
 #----------------------------------------
 
 # Copy core terraform files to terraform staging
-copy_tree(os.path.join("./core/terraform", config['workshop']['core']['cloud_provider']), terraform_staging)
-copy_tree("./core/terraform/common", os.path.join(terraform_staging, "common"))
+copytree(os.path.join("./core/terraform", config['workshop']['core']['cloud_provider']), terraform_staging)
+copytree("./core/terraform/common", os.path.join(terraform_staging, "common"))
 
 # Copy extension terraform files to terraform staging
 if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
     for extension in config['workshop']['extensions']:
         if os.path.exists(os.path.join("./extensions", extension, "terraform")):
-            copy_tree(os.path.join("./extensions", extension, "terraform"), terraform_staging)
+            copytree(os.path.join("./extensions", extension, "terraform"), terraform_staging)
 
 # Create Terraform tfvars file 
 with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_file:
@@ -66,10 +78,10 @@ if os.path.exists(docker_staging):
 # Create staging directory and copy the required docker files into it
 os.mkdir(docker_staging)
 os.mkdir(os.path.join(docker_staging, "extensions"))
-copy_tree("./core/docker/", docker_staging)
+copytree("./core/docker/", docker_staging)
 
 # Copy asciidoc directory to .docker_staging
-copy_tree(os.path.join("./core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
+copytree(os.path.join("./core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
 
 # Deal with extensions
 if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
@@ -88,17 +100,17 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
     # Add extension includes to core workshop.adoc 
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/workshop.adoc"), inplace=True):
         line=re.sub("^#EXTENSIONS_PLACEHOLDER#",include_str,line)   
-        print line.rstrip() 
+        print(line.rstrip())
     
     # Copy extension asciidoc files to docker staging
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
-            copy_tree(os.path.join("./extensions", extension, "asciidoc"), os.path.join(docker_staging, "extensions", extension, "asciidoc"))
+            copytree(os.path.join("./extensions", extension, "asciidoc"), os.path.join(docker_staging, "extensions", extension, "asciidoc"))
 
     # Copy extension docker files to docker staging and create docker .env file
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "docker")):
-            copy_tree(os.path.join("./extensions", extension, "docker"), os.path.join(docker_staging, "extensions", extension, "docker"))
+            copytree(os.path.join("./extensions", extension, "docker"), os.path.join(docker_staging, "extensions", extension, "docker"))
             # Create .env file for docker
             if config['workshop']['extensions'][extension] != None:
                 for var in config['workshop']['extensions'][extension]:
