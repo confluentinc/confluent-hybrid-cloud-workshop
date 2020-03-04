@@ -26,6 +26,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_cluster_endpoint = "${var.ccloud_bootstrap_servers}"
     ccloud_api_key          = "${var.ccloud_api_key}"
     ccloud_api_secret       = "${var.ccloud_api_secret}"
+    ccloud_topics           = "${var.ccloud_topics}"
   }
 }
 
@@ -159,7 +160,7 @@ resource "null_resource" "vm_provisioners" {
   // Copy docker folder to the VM
   provisioner "file" {
     source      = "../.docker_staging"
-    destination = "."
+    destination = ".workshop/docker"
 
     connection {
       user     = "${format("dc%02d", count.index + 1)}"

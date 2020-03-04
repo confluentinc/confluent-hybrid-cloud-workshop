@@ -49,3 +49,7 @@ variable "ccloud_api_key" {
 variable "ccloud_api_secret" {
   description = "Confluent Cloud Provider"
 }
+
+variable "ccloud_topics" {
+  description = "Confluent Cloud topics to precreate"
+}
