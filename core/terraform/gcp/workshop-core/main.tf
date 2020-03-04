@@ -9,6 +9,7 @@ data "template_file" "bootstrap_vm" {
   count    = "${var.participant_count}"
   vars = {
     dc = "${format("dc%02d", count.index + 1)}"
+    participant_password = "${var.participant_password}"
   }
 }
 
@@ -80,10 +81,6 @@ sudo useradd -m -s /bin/bash ${format("dc%02d", count.index + 1)}
 sudo echo "${format("dc%02d", count.index + 1)} ALL = NOPASSWD : ALL" >> /etc/sudoers
 sudo usermod -aG sudo ${format("dc%02d", count.index + 1)}
 sudo echo "${format("dc%02d", count.index + 1)}:${var.participant_password}" | chpasswd
-sudo mkdir /tmp/c3
-sudo echo "${format("dc%02d", count.index + 1)}: ${var.participant_password},Administrators" > /tmp/c3/login.properties
-sudo echo "disallowed: no_access" >> /tmp/c3/login.properties
-sudo echo 'c3 { org.eclipse.jetty.jaas.spi.PropertyFileLoginModule required file="/tmp/c3/login.properties"; };' > /tmp/c3/propertyfile.jaas
 SCRIPT
 
   // Copy bootstrap script to the VM
