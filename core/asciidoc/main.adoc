@@ -342,6 +342,16 @@ Now that the MySQL source connector is up and running, we will be able to see me
 
 We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank] to confirm this. 
 
+Use the following and username and password to authenticate to Confluent Control Center
+
+[source,bash]
+----
+Username: {dc}
+Password: <your workshop password>
+----
+
+image::./images/c3_05.png[]
+
 On the landing page we can see that Confluent Control Center is monitoring two Kafka Clusters, our on-premise cluster and a Confluent Cloud Cluster
 
 image::./images/c3_10.png[]
