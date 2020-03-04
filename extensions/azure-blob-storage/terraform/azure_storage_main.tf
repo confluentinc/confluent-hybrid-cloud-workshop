@@ -26,7 +26,7 @@ data "azurerm_storage_account" "instance" {
 // Azure storage containers
 resource "azurerm_storage_container" "instance" {
   name                  = "${format("dc%02d", count.index + 1)}"
-  count                 = "${var.participant_count}"
+  #count                 = "${var.participant_count}"
   storage_account_name  = "${azurerm_storage_account.instance.name}"
   container_access_type = "private"
 }
@@ -39,7 +39,7 @@ resource "null_resource" "add_vars_azure_storage" {
     inline = [
       "echo 'AZURE_STORAGE_ACCOUNT_NAME=${data.azurerm_storage_account.instance.name}' >> ~/.workshop/docker/.env",
       "echo 'AZURE_STORAGE_ACCOUNT_KEY=${data.azurerm_storage_account.instance.primary_access_key}' >> ~/.workshop/docker/.env",
-      "echo 'AZURE_STORAGE_CONTAINER=${element(azurerm_storage_container.instance.*.name, count.index)}' >> ~/.workshop/docker/.env"
+      "echo 'AZURE_STORAGE_CONTAINER=${azurerm_storage_container.instance.name}' >> ~/.workshop/docker/.env"
     ]
 
     connection {
