@@ -14,6 +14,7 @@ data "template_file" "bootstrap_vm" {
   count    = "${var.participant_count}"
   vars = {
     dc = "${format("dc%02d", count.index + 1)}"
+    participant_password = "${var.participant_password}"
   }
 }
 

@@ -25,7 +25,7 @@ data "azurerm_storage_account" "instance" {
 
 // Azure storage containers
 resource "azurerm_storage_container" "instance" {
-  name                  = "${format("dc%02d", count.index + 1)}"
+  name                  = "container"
   #count                 = "${var.participant_count}"
   storage_account_name  = "${azurerm_storage_account.instance.name}"
   container_access_type = "private"
