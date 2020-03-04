@@ -20,4 +20,6 @@ module "workshop-core" {
   ccloud_bootstrap_servers  = "${var.ccloud_bootstrap_servers}"
   ccloud_api_key            = "${var.ccloud_api_key}"
   ccloud_api_secret         = "${var.ccloud_api_secret}"
+  ccloud_topics            = "${var.ccloud_topics}"
 }
+
