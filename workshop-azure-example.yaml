@@ -1,0 +1,36 @@
+workshop:
+
+  # A name for the workshop, used to uniquely identify individual resources
+  name: <My Workshop Name>
+ 
+  # The number of people attending the workshop ssh password
+  participant_count: 1
+  participant_password: <VM OS Password>
+
+  #
+  # workshop-core
+  #
+  core:
+
+    # The workshop cloud provider & VM configuration
+    cloud_provider: azure
+    subscription_id:  <Azure Subscription Id>
+    client_id:        <Azure Client Id>
+    client_secret:    <Azure Client Secret>
+    tenant_id:        <Azure Tenant Id>
+    location:         westeurope
+    vm_type: Standard_DS3_v2
+
+    # The workshop Confluent Cloud configuration
+    ccloud_bootstrap_servers: <CCloud Bootstrap Server>
+    ccloud_api_key: <CCloud API Key>
+    ccloud_api_secret: <CCloud API Secret>
+
+    # List of ccloud topics to pre-create
+    ccloud_topics: sales_orders,sales_order_details,purchase_orders,purchase_order_details,customers,suppliers,products
+
+  #
+  # workshop extensions
+  #
+  extensions:
+    azure-blob-storage:
