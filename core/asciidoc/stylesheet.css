@@ -1,5 +1,70 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
+
+
+/* latin-ext */
+@font-face {
+  font-family: "MarkOT";
+  font-style: normal;
+  font-weight: normal;
+  src: local("Mark OT"), local("Mark-OT"), url("https://cdn.confluent.io/fonts/MarkOT/MarkOT.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: italic;
+  font-weight: normal;
+  src: local("Mark OT"), local("Mark-OT"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: normal;
+  font-weight: 500;
+  src: local("Mark OT"), local("Mark-OT"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: italic;
+  font-weight: 500;
+  src: local("Mark OT"), local("Mark-OT"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-MediumItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: normal;
+  font-weight: bold;
+  src: local("Mark OT Bold"), local("Mark-OT-Bold"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: italic;
+  font-weight: bold;
+  src: local("Mark OT Bold"), local("Mark-OT-Bold"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Mark OT Narrow Light"), local("Mark-OT-Narrow-Light"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-NarrowLight.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "MarkOT";
+  font-style: italic;
+  font-weight: 300;
+  src: local("Mark OT Narrow Light"), local("Mark-OT-Narrow-Light"),
+    url("https://cdn.confluent.io/fonts/MarkOT/MarkOT-NarrowLightItalic.woff2") format("woff2");
+}
+
+
 /*! normalize.css v2.1.2 | MIT License | git.io/normalize */
 /* ========================================================================== HTML5 display definitions ========================================================================== */
 /** Correct `block` display not defined in IE 8/9. */
@@ -18,7 +83,7 @@ script { display: none !important; }
 
 /* ========================================================================== Base ========================================================================== */
 /** 1. Set default font family to sans-serif. 2. Prevent iOS text size adjust after orientation change, without disabling user zoom. */
-html { font-family: sans-serif; /* 1 */ -ms-text-size-adjust: 100%; /* 2 */ -webkit-text-size-adjust: 100%; /* 2 */ }
+html { font-family: MarkOT; /* 1 */ -ms-text-size-adjust: 100%; /* 2 */ -webkit-text-size-adjust: 100%; /* 2 */ }
 
 /** Remove default margin. */
 body { margin: 0;  }
@@ -133,7 +198,7 @@ meta.foundation-mq-large { font-family: "only screen and (min-width:1440px)"; wi
 
 html, body { font-size: 100%; }
 
-body { background: #ffffff; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
+body { background: #ffffff; color: #222222; padding: 0; margin: 0; font-family: "MarkOT", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
 
 a:hover { cursor: pointer; }
 
@@ -186,11 +251,11 @@ a:hover, a:focus { color: #4597CB; }
 a img { border: none; }
 
 /* Default paragraph styles */
-p { font-family: 'Roboto', "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif; font-weight: normal; font-size: 0.9375em; line-height: 1.6; margin-bottom: 1.375em; text-rendering: optimizeLegibility; }
+p { font-family: 'MarkOT', "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif; font-weight: normal; font-size: 0.9375em; line-height: 1.6; margin-bottom: 1.375em; text-rendering: optimizeLegibility; }
 p aside { font-size: 0.875em; line-height: 1.35; font-style: italic; }
 
 /* Default header styles */
-h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold; font-style: normal; color: #00004B; text-rendering: optimizeLegibility; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2125em; }
+h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { font-family: "MarkOT", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold; font-style: normal; color: #00004B; text-rendering: optimizeLegibility; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2125em; }
 h1 small, h2 small, h3 small, #toctitle small, .sidebarblock > .content > .title small, h4 small, h5 small, h6 small { font-size: 60%; color: #4d4d4d; line-height: 0; }
 
 h1 { font-size: 2.125em; }
@@ -217,7 +282,7 @@ small { font-size: 60%; line-height: inherit; }
 code { font-family:Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace; font-weight: normal; color: #3b3b3b; }
 
 /* Lists */
-ul, ol, dl { font-size: 0.9375em; line-height: 1.4; margin-bottom: 1.375em; list-style-position: outside; font-family: "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif; }
+ul, ol, dl { font-size: 0.9375em; line-height: 1.4; margin-bottom: 1.375em; list-style-position: outside; font-family: "MarkOT", Helvetica, "Liberation Sans", Arial, sans-serif; }
 
 ul, ol { margin-left: 1.625em; }
 ul.no-bullet, ol.no-bullet { margin-left: 1.625em; }
@@ -345,7 +410,7 @@ b.button:after { content: "]"; padding: 0 2px 0 3px; }
 #toc > ul { margin-left: 0.125em; }
 #toc ul.sectlevel0 > li > a { font-style: italic; }
 #toc ul.sectlevel0 ul.sectlevel1 { margin: 0.5em 0; }
-#toc ul { font-family: Overpass, "Helvetica Neue", Helvetica, Arial, sans-serif; list-style-type: none; }
+#toc ul { font-family: "MarkOT", "Helvetica Neue", Helvetica, Arial, sans-serif; list-style-type: none; }
 #toc li { line-height: 1.3334; margin-top: 0.3334em; }
 #toc a { text-decoration: none; }
 #toc a:active { text-decoration: underline; }
@@ -406,7 +471,7 @@ table.tableblock #preamble > .sectionbody > [class="paragraph"]:first-of-type p 
 .admonitionblock > table { border-collapse: separate; border: 0; background: none; width: 100%; }
 .admonitionblock > table td.icon { text-align: center; width: 80px; }
 .admonitionblock > table td.icon img { max-width: none; }
-.admonitionblock > table td.icon .title { font-weight: bold; font-family: Overpass, "Helvetica Neue", Helvetica, Arial, sans-serif; text-transform: uppercase; }
+.admonitionblock > table td.icon .title { font-weight: bold; font-family: "MarkOT", "Helvetica Neue", Helvetica, Arial, sans-serif; text-transform: uppercase; }
 .admonitionblock > table td.content { padding-left: 1.125em; padding-right: 1.25em; border-left: 1px solid #dddddd; color: #333333; }
 .admonitionblock > table td.content > :last-child > :last-child { margin-bottom: 0; }
 
