@@ -344,7 +344,7 @@ We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank
 
 Use the following and username and password to authenticate to Confluent Control Center
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 Username: {dc}
 Password: <your workshop password>
