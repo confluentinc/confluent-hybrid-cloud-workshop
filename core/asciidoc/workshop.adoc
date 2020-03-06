@@ -1,4 +1,4 @@
-= Hybrid Cloud:pass:q[<br>] KSQL Realtime Supply & Demand Workshop 
+= Hybrid-Cloud Streaming Workshop
 :doctype: book
 :toc:
 :toclevels: 5

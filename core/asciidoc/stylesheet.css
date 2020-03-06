@@ -100,7 +100,7 @@ a:active, a:hover { outline: 0; }
 
 /* ========================================================================== Typography ========================================================================== */
 /** Address variable `h1` font-size and margin within `section` and `article` contexts in Firefox 4+, Safari 5, and Chrome. */
-h1 { font-size: 2em; margin: 0.67em 0; }
+h1 { font-size: 1.9em; margin: 0.67em 0; }
 
 /** Address styling not present in IE 8/9, Safari 5, and Chrome. */
 abbr[title] { border-bottom: 1px dotted; }
@@ -238,7 +238,7 @@ object, svg { display: inline-block; vertical-align: middle; }
 
 .stretch { width: 100%; }
 
-p.lead { font-size: 1.15625em; line-height: 1.6; }
+p.lead { font-size: 1.15625em; line-height: 1.69; }
 
 .subheader, .admonitionblock td.content > .title, .audioblock > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .stemblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, table.tableblock > .title, .verseblock > .title, .videoblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title { line-height: 1.4; color: #4d4d4d; font-weight: 300; margin-top: 0.2em; margin-bottom: 0.5em; }
 
@@ -251,11 +251,11 @@ a:hover, a:focus { color: #4597CB; }
 a img { border: none; }
 
 /* Default paragraph styles */
-p { font-family: 'MarkOT', "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif; font-weight: normal; font-size: 0.9375em; line-height: 1.6; margin-bottom: 1.375em; text-rendering: optimizeLegibility; }
+p { font-family: 'MarkOT', "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif; font-weight: normal; font-size: 1.0em; line-height: 1.69; margin-bottom: 1.375em; text-rendering: optimizeLegibility; }
 p aside { font-size: 0.875em; line-height: 1.35; font-style: italic; }
 
 /* Default header styles */
-h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { font-family: "MarkOT", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold; font-style: normal; color: #00004B; text-rendering: optimizeLegibility; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2125em; }
+h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { font-family: "MarkOT", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold; font-style: normal; color: #173361; text-rendering: optimizeLegibility; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2125em; }
 h1 small, h2 small, h3 small, #toctitle small, .sidebarblock > .content > .title small, h4 small, h5 small, h6 small { font-size: 60%; color: #4d4d4d; line-height: 0; }
 
 h1 { font-size: 2.125em; }
@@ -279,7 +279,7 @@ strong, b { font-weight: bold; line-height: inherit; }
 
 small { font-size: 60%; line-height: inherit; }
 
-code { font-family:Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace; font-weight: normal; color: #3b3b3b; }
+code { font-family: monospace; font-size: 1.1em; font-weight: normal; color: #000000; line-height: 1.69; }
 
 /* Lists */
 ul, ol, dl { font-size: 0.9375em; line-height: 1.4; margin-bottom: 1.375em; list-style-position: outside; font-family: "MarkOT", Helvetica, "Liberation Sans", Arial, sans-serif; }
@@ -350,7 +350,7 @@ a:hover, a:focus { text-decoration: underline; }
 :not(pre) > code.nobreak { word-wrap: normal; }
 :not(pre) > code.nowrap { white-space: nowrap; }
 
-pre { color: #3b3b3b; font-family: Menlo, Monaco, "Liberation Mono", Consolas, monospace; line-height: 1.6; }
+pre { color: #000000; font-family: monospace,Menlo, Monaco, "Liberation Mono", Consolas; line-height: 1.69; -webkit-font-smoothing: antialiased; font-weight: normal; }
 pre code, pre pre { color: inherit; font-size: inherit; line-height: inherit; }
 pre > code { display: block; }
 
@@ -391,9 +391,9 @@ b.button:after { content: "]"; padding: 0 2px 0 3px; }
 
 #content:before { content: none; }
 
-#header > h1:first-child { background:#ffffff; color: #000000; margin-top: 2.25rem; margin-bottom: 0; }
+#header > h1:first-child { background:#ffffff; color: #173361; margin-top: 2.25rem; margin-bottom: 0; }
 #header > h1:first-child + #toc { margin-top: 8px; border-top: 1px solid #666666; }
-#header > h1:only-child, body.toc2 #header > h1:nth-last-child(2) { border-bottom: 1px solid #dddddd; padding-bottom: 8px; }
+#header > h1:only-child, body.toc2 #header > h1:nth-last-child(2) { border-bottom: 1px solid #829494; padding-bottom: 8px; }
 #header .details { border-bottom: 1px solid #dddddd; line-height: 1.45; padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 0.25em; color: #333333; display: -ms-flexbox; display: -webkit-flex; display: flex; -ms-flex-flow: row wrap; -webkit-flex-flow: row wrap; flex-flow: row wrap; }
 #header .details span:first-child { margin-left: -0.125em; }
 #header .details span.email a { color: #404040; }
@@ -491,7 +491,7 @@ table.tableblock #preamble > .sectionbody > [class="paragraph"]:first-of-type p 
 @media only screen and (min-width: 1280px) { .literalblock pre, .listingblock > .content > pre { font-size: 1em; } }
 
 /* Code blocks */
-.literalblock pre, .listingblock > .content > pre:not(.highlight), .listingblock > .content > pre[class="highlight"], .listingblock > .content > pre[class^="highlight "] { border:1px #e6e6e6 solid; background: #F4F4F4; }
+.literalblock pre, .listingblock > .content > pre:not(.highlight), .listingblock > .content > pre[class="highlight"], .listingblock > .content > pre[class^="highlight "] { border:1px #f9f9fa solid; background: #f9f9fa; border-radius: 4px; font-family:monospace; font-size:1.1em}
 
 .literalblock.output pre { color: #eff1f1; background-color: #3b3b3b; }
 
@@ -790,7 +790,7 @@ b.conum * { color: inherit !important; }
 #header { margin-bottom: 0; }
 #header > h1 { border-bottom: none; }
 
-.literalblock pre, .listingblock pre { background: #eff1f1; }
+.literalblock pre, .listingblock pre { background: #f9f9fa; }
 
 #footnotes { margin-bottom: 2em; }
 
