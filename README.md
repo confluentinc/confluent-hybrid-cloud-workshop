@@ -26,7 +26,7 @@ Create an empty directory somewhere that will contain your workshop configuratio
 mkdir ~/myworkshop
 ```
 
-Copy `workshop-<cloud provider>-example.yaml` to `workshop.yaml` in the directory you just created.
+Copy `workshop-example-<cloud provider>.yaml` to `workshop.yaml` in the directory you just created.
 
 ```
 cp workshop-<cloud provider>-example.yaml ~/myworkshop/workshop.yaml
