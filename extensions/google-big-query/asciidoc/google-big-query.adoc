@@ -1,0 +1,82 @@
+== Stream Sales & Purchases to Google Big Query
+
+We can use the BigQuery Sink Connector to stream changes from a topics to Google BigQuery.
+
+Another preview feature of KSQL 5.4 is the ability to create connectors directly within KSQL.
+
+Start a KSQL CLI session
+[source,bash,subs=attributes]
+----
+docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+----
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to Google BigQuery:-
+
+[source,bash,subs=attributes]
+----
+{dc}_sales_orders
+{dc}_sales_order_details
+{dc}_purchase_orders
+{dc}_purchase_order_details
+{dc}_products
+{dc}_customers
+{dc}_suppliers 
+----
+
+[source,bash,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_gbq_sink WITH (
+  'connector.class'='com.wepay.kafka.connect.bigquery.BigQuerySinkConnector',
+  'schemaRetriever'='com.wepay.kafka.connect.bigquery.schemaregistry.schemaretriever.SchemaRegistrySchemaRetriever',
+  'schemaRegistryLocation'= 'http://schema-registry:8081',
+  'topics'= '{dc}_sales_orders,{dc}_sales_order_details,{dc}_purchase_orders,{dc}_purchase_order_details,{dc}_products,{dc}_customers,{dc}_suppliers',
+  'tasks.max'='1',
+  'sanitizeTopics'='true',
+  'autoCreateTables'='true',
+  'autoUpdateSchemas'='true',
+  'project'='${file:/secrets.properties:GBQ_PROJECT}',
+  'datasets'='.*=${file:/secrets.properties:GBQ_DATASET}',
+  'keyfile'='${file:/secrets.properties:GBQ_CREDENTIALS_PATH}'
+);
+----
+
+We can list our current connectors using the following command
+
+[source,bash,subs=attributes]
+----
+show connectors;
+----
+
+[source,bash,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ DC01_GBQ_SINK             | SINK   | com.wepay.kafka.connect.bigquery.BigQuerySinkConnector
+ replicator-dc01-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,bash,subs=attributes]
+----
+describe connector DC01_GBQ_SINK;
+----
+[source,bash,subs=attributes]
+----
+Name                 : DC01_GBQ_SINK
+Class                : com.wepay.kafka.connect.bigquery.BigQuerySinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the GCP account where the BigQuery dataset is held.
+
+
