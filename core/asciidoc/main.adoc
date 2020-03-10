@@ -432,7 +432,7 @@ Server: Jetty(9.4.20.v20190813)
 ...
 ----
 
-=== Confirm that Messages are being Received in your Confluent Cloud Cluster
+=== Confirm that Messages are Arriving in Confluent Cloud
 
 Jump back to link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
