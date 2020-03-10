@@ -1,7 +1,8 @@
 workshop:
 
   # A name for the workshop, used to uniquely identify individual resources
-  name: <My Workshop Name>
+  # IMPORTANT: can only contain of lowercase letters and numbers and a max of 15 characters
+  name: <My Workshop Name>  
  
   # The number of people attending the workshop ssh password
   participant_count: 1
