@@ -5,7 +5,6 @@ resource "google_bigquery_dataset" "dataset" {
   description                 = "Workshop Dataset"
   project                     = "${var.gbq_project}"
   location                    = "${var.gbq_location}"
-  default_table_expiration_ms = 3600000
   delete_contents_on_destroy  = true
 
   access {
