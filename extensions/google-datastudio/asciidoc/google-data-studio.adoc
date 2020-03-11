@@ -6,6 +6,11 @@ Open link:https://datastudio.google.com[Goodle Data Studio, window=_blank] and c
 Add new Datasources and select BigQuery. 
 You can use the queries below for your convenience (look for the Custom Query in the left sidebar).
 
+In the queries replace the following according to your environment: 
+
+* `gcp-project-id`: your GCP project ID, where BigQuery stores the data
+* `bigquery_dataset`: Your Big Query dataset name
+
 Product Query
 [source,sql,subs=attributes]
 ----
