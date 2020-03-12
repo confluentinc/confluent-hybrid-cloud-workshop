@@ -432,7 +432,7 @@ Server: Jetty(9.4.20.v20190813)
 ...
 ----
 
-=== Confirm that Messages are being Received in your Confluent Cloud Cluster
+=== Confirm that Messages are Arriving in Confluent Cloud
 
 Jump back to link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
@@ -662,7 +662,7 @@ Name                 : SALES_ORDER_DETAILS
 For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
 ----
 
-=== Querying data in KSQL
+==== Querying Streams
 
 There are two types of query in KSQL, *Push* queries and *Pull* queries.
 
@@ -788,7 +788,7 @@ ksql>
 
 ----
 
-=== Filtering Streams with KSQL
+==== Filtering Streams
 
 Since KSQL is based on SQL, you can do many of the standard SQL things you'd expect to be able to do, including predicates and projections. In the following query we are streaming only the latest messages by explicitly setting `'auto.offset.reset'='latest'` and within the query we are filtering the results so that only messages where the `quantity` is greater than `3` are returned.
 
@@ -963,7 +963,7 @@ Now that we have our `customers_rekeyed` stream created let's rekey the `supplie
 *PARTITION BY* id;
 ----
 
-Another way to confirm that a stream is keyed correctly is to query it directly and inspect the system `ROWKEY` and check that it is the same as the column you are wanting to join on, in our case we want to join on the `ID` column for each of the streams we have just rekeyed.
+Another way to confirm a stream is keyed correctly, is to query it and compare the system `ROWKEY` column to your join column, they should be identical.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1045,7 +1045,7 @@ We'll use these tables soon and join them to our streams.
 
 We can join two streams together in KSQL using a windowed join. When using a windowed join, you must specify a windowing scheme by using the `WITHIN` clause. A new input record on one side produces a join output for each matching record on the other side, and there can be multiple such matching records within a join window.
 
-In the example below you can see that we have specified a window of 10 seconds using the `WITHIN` clause. The mock retail application creates sales orders and their associated sales order detail rows at the same time, so 10 seconds will be plenty of time to ensure that a join takes place.
+In the example below you can see that we have specified a window of 1 seconds using the `WITHIN` clause. The source application creates sales orders and their associated sales order detail rows at the same time, so a second will be plenty of time to ensure that a join takes place.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1058,7 +1058,7 @@ In the example below you can see that we have specified a window of 10 seconds u
     od.quantity,
     od.price
 *FROM* sales_orders o
-*INNER JOIN* sales_order_details od *WITHIN* 10 SECONDS *ON* (o.id = od.sales_order_id);
+*INNER JOIN* sales_order_details od *WITHIN* 1 SECONDS *ON* (o.id = od.sales_order_id);
 ----
 
 If we query this new stream... 
@@ -1198,7 +1198,7 @@ Join the `purchase_orders` stream to the `purchase_order_details` stream
     od.quantity,
     od.cost
 *FROM* purchase_orders o
-*INNER JOIN* purchase_order_details od *WITHIN* 10 SECONDS *ON* (o.id = od.purchase_order_id);
+*INNER JOIN* purchase_order_details od *WITHIN* 1 SECONDS *ON* (o.id = od.purchase_order_id);
 ----
 
 If we query this new stream... 
@@ -1392,7 +1392,7 @@ Let's have a quick look at the first few rows of this stream
 *LIMIT* 20;
 ----
 
-This stream is showing a history of all product sales and their effect on the stock levels.
+This query shows a history of all sales and their affect on stock levels. 
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1423,7 +1423,7 @@ Limit Reached
 Query terminated
 ----
 
-What we need to do now is also include all product purchases in the same stream. We can do this using an `INSERT INTO` statement. The `INSERT INTO` statement streams the result of the SELECT query into an existing stream and its underlying topic.
+What we need to do now is also include all product purchases in the same stream. We can do this using an `INSERT INTO` statement. The `INSERT INTO` statement streams the result of a SELECT query into an existing stream and its underlying topic.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1571,7 +1571,7 @@ As you can see, the KSQL Server's REST endpoint will return a JSON message with 
 ]
 ----
 
-=== Tables with Windowed Aggregates
+=== Calculating Product Demand
 
 Now that we know the current stock level is for each product, we can use this information to send an event to the mock retail application and ask it to create purchase orders to replenish the stock, but how much should we stock should we order? we could just order enough to satisfy the current backlog but we'd quickly run out of stock again. 
 
@@ -1606,10 +1606,11 @@ If we query this table for a single product...
         demand_last_3mins
 *FROM*  product_demand_last_3mins_tbl
 *WHERE* product_id = 1
-*EMIT CHANGES*;
+*EMIT CHANGES*
+;
 ----
 
-...you'll see a the start and end times of each three minute window along with the product demand generated within that 3 minute window. Notice how the window start times are staggered by one minute, this is the advance interval in action. As new sales events occur a new message will be displayed with an update to the window(s) total.
+...you'll see the start and end times for each three minute window, along with the product demand for those 3 minutes. Notice how the window start times are staggered by one minute, this is the advance interval in action. As new sales events occur a new message will be displayed with an update to the window(s) total.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1724,9 +1725,9 @@ When we query the `out_of_stock_events` stream...
 ...
 ----
 
-== Replicate Events from Confluent Cloud to On-premise
+== Replicate Events Back to the Data Center
 
-The next step is to push the `out_of_stock_events` stream to the mock retail application so it can create some purchase orders for us. To do this we'll need to replicate the `{dc}_out_of_stock_events` topic from Confluent Cloud back to our on-premise Kafka cluster.
+The next step is to push the `out_of_stock_events` stream to our application so it can create some purchase orders for us. To do this we'll need to replicate the `{dc}_out_of_stock_events` topic from Confluent Cloud back to our on-premise Kafka cluster.
 
 image::./images/5_replicate_to_onprem.png[]
 
@@ -1797,7 +1798,7 @@ image::./images/c3_100.png[]
 
 == Send Events to MySQL
 
-The final piece of plumping we need to do in our data pipeline is to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the mock retail application will then process these events and create purchase order for us.
+Finally we need to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the on-premise application will then process these events and create purchase order for us.
 
 image::./images/6_jdbc_sink.png[]
 

@@ -165,7 +165,7 @@ services:
         apt-get install -y confluent-kafka-connect-replicator=5.4.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt confluentinc/kafka-connect-gcs-source:1.1.0-preview
-        confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.1.2
+        confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
         confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.0-preview
         confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:0.2
         confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
@@ -241,7 +241,7 @@ services:
       KSQL_SASL_MECHANISM: PLAIN
       KSQL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
       KSQL_KSQL_CONNECT_URL: http://kafka-connect-ccloud:18084
-      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "latest"
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
       KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
       KSQL_KSQL_SERVICE_ID: ${DC}-ksqlserver_
       KSQL_KSQL_STREAMS_PRODUCER_RETRIES: 2147483647
