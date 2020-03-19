@@ -13,7 +13,7 @@ From a physical architecture point of view, each component, except for Confluent
 ## Prerequisites
 
 * macOS or Linux
-* Terraform
+* Terraform 0.12.20 or later
 * Python + [Yaml](https://pyyaml.org/wiki/PyYAML)
 * A GCP or Azure account with the appropriate privileges
 * A Confluent Cloud Account
