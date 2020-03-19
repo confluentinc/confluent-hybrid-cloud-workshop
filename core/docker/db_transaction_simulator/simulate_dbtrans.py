@@ -7,9 +7,9 @@ import random
 tick_seconds = 5
 o, od, p, pd = 0, 0, 0, 0
 
-most_frequent_product  = random.randint(1, 30)
-most_frequent_customer = random.randint(1, 30)
-most_frequent_supplier = random.randint(1, 30)
+most_frequent_product  = 15 #random.randint(1, 30)
+most_frequent_customer = 15 #random.randint(1, 30)
+most_frequent_supplier = 15 #random.randint(1, 30)
 
 db = MySQLdb.connect(host="mysql",
                      user="mysqluser",
