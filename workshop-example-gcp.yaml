@@ -32,12 +32,25 @@ workshop:
   #
   # workshop extensions
   #
+  # Uncomment the required extensions
   extensions:
   
-    google-cloud-storage:
-      gcs_project: <gcp project name>
-      gcs_region: europe-west2
+    # google-cloud-storage:
+    #   gcs_project: <gcp project name>
+    #   gcs_region: europe-west2
 
-    google-big-query:
-      gbq_project: <gcp project name>
-      gbq_location: EU
+    # google-big-query:
+    #   gbq_project: <gcp project name>
+    #   gbq_location: EU
+      
+    # mongodbatlas:
+    #   mongodbatlas_public_key: <MongoDB Atlas public key>
+    #   mongodbatlas_private_key: <MongoDB Atlas public key>
+    #   mongodbatlas_project_id: <MongoDB Project ID>
+    #   mongodbatlas_provider_name: GCP
+    #   mongodbatlas_provider_instance_size_name: M10
+    #   mongodbatlas_provider_region_name: WESTERN_EUROPE
+    #   mongodbatlas_disk_size_gb: 2
+    #   mongodbatlas_mongo_db_major_version: 4.0
+    #   mongodbatlas_dbuser_username: confluent
+    #   mongodbatlas_dbuser_password: <MongoDB DB Password>

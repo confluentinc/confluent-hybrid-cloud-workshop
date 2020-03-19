@@ -75,7 +75,7 @@ WorkerId             : kafka-connect:18084
 Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
 
 .Further Reading
-[NOTE]
+[TIP]
 ====
 * link:https://docs.confluent.io/current/connect/kafka-connect-gcs/index.html#google-cloud-storage-sink-connector-for-cp[Google Cloud Storage Sink Connector]
 * link:https://docs.confluent.io/current/connect/kafka-connect-gcs/configuration_options.html[Google Cloud Storage Sink Connector Configuration Properties]
