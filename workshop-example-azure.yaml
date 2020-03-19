@@ -41,8 +41,8 @@ workshop:
     # mongodbatlas:
     #   mongodbatlas_public_key: <MongoDB Atlas public key>
     #   mongodbatlas_private_key: <MongoDB Atlas public key>
-    #   mongodbatlas_project_id: <MongoDB Atlas public key>
-    #   mongodbatlas_provider_name: GCP
+    #   mongodbatlas_project_id: <MongoDB Project ID>
+    #   mongodbatlas_provider_name: Azure
     #   mongodbatlas_provider_instance_size_name: M10
     #   mongodbatlas_provider_region_name: WESTERN_EUROPE
     #   mongodbatlas_disk_size_gb: 2
