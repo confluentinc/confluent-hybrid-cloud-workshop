@@ -2,13 +2,17 @@
 
 ## Overview
 
-This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider. Each workshop participant receives their own virtual machine instance that is intended to act as a psuedo on-premise datacenter. A single Confluent Cloud cluster is shared by all workshop participants.
+This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider (GCP or Azure currently). Each workshop participant connects to their own virtual machine and is intended to act as a psuedo on-premise datacenter. A single Confluent Cloud cluster is shared by all workshop participants.
 
 For a single workshop participant, the logical architecture looks like this.
 
 ![workshop](core/asciidoc/images/architecture.png)
 
 From a physical architecture point of view, each component, except for Confluent Cloud, is hosted on the participant's virtual machine. 
+
+Each workshop participant will work through a series of Labs to create the following KSQL Supply & Demand Application.
+
+![workshop](core/asciidoc/images/KSQL_topology.png)
 
 ## Prerequisites
 
