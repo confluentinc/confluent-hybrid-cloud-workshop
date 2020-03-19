@@ -1,6 +1,6 @@
 == Lab 1: Connecting to your Workshop Environment
 
-Your environment represents a mock on-premise data center and consists of a virtual machine hosted in the cloud running several docker containers. In a real world implementation, some of the components would be deployed differently but the logical data flow that we will be working on would remain the same.
+Your environment represents an on-premise data center and consists of a virtual machine hosted in the cloud running several docker containers. In a real world implementation, some of the components would be deployed differently but the logical data flow that we will be working on would remain the same.
 
 To login to your virtual data center open a terminal session and use the credentials that were assigned to you
 
@@ -453,12 +453,17 @@ image::./images/c3_70.png[]
 * link:https://docs.confluent.io/current/connect/kafka-connect-replicator/index.html[Confluent Replicator]
 * link:https://docs.confluent.io/current/connect/kafka-connect-replicator/configuration_options.html[Confluent Replicator Configuration Properties]
 ====
+== Lab 5: Building a Realtime Supply & Demand Application using KSQL
 
-== Lab 5: Creating KSQL Streams
-
-We now have all the data we need being streamed in real time to Confluent Cloud. The next task is to use KSQL to do something useful with these topics. We have a KSQL Server running in a docker container that is configured to point to our Confluent Cloud cluster. In a real world deployment, it is likely that this KSQL Server would be running closer to Confluent Cloud but for the purposes of this workshop it is not important.
+We now have all the data we need being streamed, in real time, to Confluent Cloud. You have a KSQL Server running inside a docker container that is configured to point to our Confluent Cloud cluster. In a real world deployment, it is likely that this KSQL Server would be running closer to Confluent Cloud but for the purposes of this workshop it is not important.
 
 image::./images/4_ksql_application.png[]
+
+Below is an illustration of the completed Supply & Demand KSQL Application, over the next few labs you will be building this step-by-step.
+
+image::./images/KSQL_topology.png[]
+
+== Lab 6: Getting Started with KSQL
 
 You can interact with KSQL Server using either the https://docs.confluent.io/current/ksql/docs/installation/installing.html#starting-the-ksql-cli[KSQL CLI,window=_blank], https://docs.confluent.io/current/control-center/ksql.html#[Confluent Control Center] or the https://docs.confluent.io/current/ksql/docs/developer-guide/api.html[REST API,window=_blank]. This workshop will focus on the KSQL CLI but if you'd rather use Confluent Control Center then read the next section.
 
@@ -682,7 +687,7 @@ For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-stream[CREATE STREAM Syntax]
 ====
 
-== Lab 6: Querying Streams using KSQL
+== Lab 7: Querying Streams using KSQL
 
 There are two types of query in KSQL, *Push* queries and *Pull* queries.
 
@@ -852,7 +857,7 @@ Press `ctrl-c` to stop
 * link:https://docs.confluent.io/current/ksql/docs/installation/server-config/config-reference.html#ksql-streams-auto-offset-reset[KSQL Offset Management]
 ====
 
-== Lab 7: Creating KSQL tables
+== Lab 8: Creating KSQL tables
 
 KSQL tables allow you to work the data in topics as key/value pairs, with a single value for each key. KSQL tables can be created from an existing topic or from the query results from other tables or streams. You can read more about this https://docs.confluent.io/current/streams/concepts.html#duality-of-streams-and-tables[here].
 
@@ -1080,7 +1085,7 @@ We'll use these tables soon and join them to our streams.
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#key-requirements[Message Key Requirements]
 ====
 
-== Lab 8: KSQL Stream-to-Stream Joins
+== Lab 9: KSQL Stream-to-Stream Joins
 
 We can join two streams together in KSQL using a windowed join. When using a windowed join, you must specify a windowing scheme by using the `WITHIN` clause. A new input record on one side produces a join output for each matching record on the other side, and there can be multiple such matching records within a join window.
 
@@ -1146,7 +1151,7 @@ Query terminated
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/join-streams-and-tables.html#stream-stream-joins[Stream-Stream Joins]
 ====
 
-== Lab 9: KSQL Stream-to-Table Joins
+== Lab 10: KSQL Stream-to-Table Joins
 
 We can take this a step further by joining this new stream to a couple of the KSQL tables we created earlier. 
 
@@ -1424,7 +1429,7 @@ Notice that the query returns the first 30 purchase order lines and then stops; 
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/join-streams-and-tables.html#stream-table-joins[Stream-Table Joins]
 ====
 
-== Lab 10: Streaming Stock Levels
+== Lab 11: Streaming Stock Levels
 Before we can create an out of stock event stream, we need to work out the current stock levels for each product. We can do this by combining the `sales_enriched` stream with the `purchases_enriched` stream and summing the `sales_enriched.quantity` column (stock decrements) and the `purchases_enriched.quantity` column (stock increments).
 
 Let's have a go at this now by creating a new stream called `product_supply_and_demand`. This stream is consuming messages from the `sales_enriched` stream and included the `product_id` and `quantity` column converted to a negative value, we do this because sales events are our _demand_ and hence decrement stock.
@@ -1591,7 +1596,7 @@ Depending on how long it took you to get to this point in the workshop, you may 
 ====
 
 
-== Lab 11: Pull Queries
+== Lab 12: Pull Queries
 
 We can now run our first Pull query. Pull queries are a preview feature in KSQL 5.4 and currently can only be used against tables with aggregates and can only query a single key.
 
@@ -1653,7 +1658,7 @@ As you can see, the KSQL Server's REST endpoint will return a JSON message with 
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/api.html#run-a-ksql-statement[KSQL REST API]
 ====
 
-== Lab 12: Streaming Recent Product Demand
+== Lab 13: Streaming Recent Product Demand
 
 Now that we know the current stock level is for each product, we can use this information to send an event to the orders application and ask it to create purchase orders to replenish the stock, but how much should we stock should we order? we could just order enough to satisfy the current backlog but we'd quickly run out of stock again. 
 
@@ -1739,7 +1744,7 @@ image::./images/ksql_017.png[align="center"]
 * link:https://docs.confluent.io/current/ksql/docs/concepts/time-and-windows-in-ksql-queries.html#windows-in-ksql-queries[Windows in KSQL Queries]
 ====
 
-== Lab 13: Streaming _"Out of Stock"_ Events
+== Lab 14: Streaming _"Out of Stock"_ Events
 
 Now that we have the `current_stock` table and `product_demand_last_3mins` stream, we can create a `out_of_stock_events` stream by joining the two together and calculating the required purchase order quantity. We calculate the `purchase_qty` from adding the inverse of the current stock level to the last 3 minutes of demand. The stream is filtered to only include products that have no stock and therefore need purchase orders raising for them.
 
@@ -1808,7 +1813,7 @@ When we query the `out_of_stock_events` stream...
 ...
 ----
 
-== Lab 14: Replicate Events to On-Premise Kafka
+== Lab 15: Replicate Events to On-Premise Kafka
 
 The next step is to push the `out_of_stock_events` stream to our application so it can create some purchase orders for us. To do this we'll need to replicate the `{dc}_out_of_stock_events` topic from Confluent Cloud back to our on-premise Kafka cluster.
 
@@ -1886,7 +1891,7 @@ image::./images/c3_100.png[]
 * link:https://docs.confluent.io/current/connect/kafka-connect-replicator/configuration_options.html[Confluent Replicator Configuration Properties]
 ====
 
-== Lab 15: Sink Events into MySQL
+== Lab 16: Sink Events into MySQL
 
 Finally we need to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the on-premise application will then process these events and create purchase order for us.
 
