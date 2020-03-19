@@ -107,6 +107,12 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
             copytree(os.path.join("./extensions", extension, "asciidoc"), os.path.join(docker_staging, "extensions", extension, "asciidoc"))
 
+    # Copy extension images to docker staging
+    for extension in config['workshop']['extensions']:
+        print( extension)
+        if os.path.isdir(os.path.join("./extensions", extension, "asciidoc/images")):
+            copytree(os.path.join("./extensions", extension, "asciidoc/images"), os.path.join(docker_staging, "asciidoc/images"))
+
     # Copy extension docker files to docker staging and create docker .env file
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "docker")):

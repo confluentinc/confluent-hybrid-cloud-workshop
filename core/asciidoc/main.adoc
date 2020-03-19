@@ -1,4 +1,4 @@
-== Your Workshop Environment
+== Lab 1: Connecting to your Workshop Environment
 
 Your environment represents a mock on-premise data center and consists of a virtual machine hosted in the cloud running several docker containers. In a real world implementation, some of the components would be deployed differently but the logical data flow that we will be working on would remain the same.
 
@@ -33,25 +33,25 @@ b0f2aefb2042        zookeeper                 7 minutes ago       Up 7 minutes
 ee2983ac4bcc        workshop-docs-webserver   7 minutes ago       Up 7 minutes
 ----
 
-== Getting Started
+== Lab 2: Getting Started
 
-The data source for this workshop will be a MySQL database running in your data center. Connected to this database is a mock retail application which we will discuss shortly.
+The data source for this workshop will be a MySQL database running in your data center. Connected to this database is a orders application which we will discuss shortly.
 
 image::./images/1_mysql.png[]
 
-=== Retail Schema
+=== Database Schema
 
-The MySQL database contains a simple retail schema that includes _Customer_, _Supplier_, _Product_, _Sales Order_ and _Purchase Order_ information. 
+The MySQL database contains a simple schema that includes _Customer_, _Supplier_, _Product_, _Sales Order_ and _Purchase Order_ information. 
 
 The idea behind this schema is simple, customers order products from a company and sales orders get created, the company then sends purchase orders to their suppliers so that product demand can be met by maintaining sensible stock levels.
 
-image::./images/mysql_schema.png[MySQL retail schema]
+image::./images/mysql_schema.png[MySQL schema]
 
 We can inspect this schema further by logging into the MySQL CLI.
 
 [source,bash]
 ----
-docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database retail'
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database orders'
 ----
 
 You should see the following
@@ -72,11 +72,10 @@ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 mysql>
 ----
 
-Switch to the `retail` database and view your tables.
+To view your tables.
 
 [source,bash]
 ----
-use retail;
 show tables;
 ----
 
@@ -85,7 +84,7 @@ There's an extra table here called `{dc}_out_of_stock_events` that not in the sc
 [source,bash,subs="attributes"]
 ----
 +--------------------------+
-| Tables_in_retail         |
+| Tables_in_orders         |
 +--------------------------+
 | customers                |
 | {dc}_out_of_stock_events |
@@ -188,11 +187,11 @@ as you can see, we have ordered 100 of each product, this reflects our initial a
 
 Type `exit` to leave the MySQL CLI
 
-=== Starting the Mock Retail Application
+=== Starting the Orders Application
 
-In order to start generating some sales orders we need to start the mock retail application. This application will continuously create new sales orders to simulate product demand. The application will also raise purchase orders when told to do so, we'll cover this aspect later on in the workshop.
+To start generating some sales orders we need to start the orders application. This application will continuously create new sales orders to simulate product demand. The application will also raise purchase orders when told to do so, we'll cover this aspect later on in the workshop.
 
-Start the mock retail application by running the following command.
+Start the orders application by running the following command.
 
 [source,bash]
 ----
@@ -230,17 +229,10 @@ To confirm this, start the MySQL CLI again
 
 [source,bash]
 ----
-docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database orders'
 ----
 
-Switch to the `retail` database...
-
-[source,bash]
-----
-use retail;
-----
-
-...and re-run the row count script multiple times to confirm that the number of sales orders and sales order detail row counts are increasing.
+Re-run the row count script multiple times to confirm that the number of sales orders and sales order detail row counts are increasing.
 
 [source,bash]
 ----
@@ -278,7 +270,7 @@ SELECT * from (
 
 Type `exit` to leave the MySQL CLI
 
-== Streaming Database Changes to your Local Kafka Cluster
+== Lab 3: Stream CDC events to your Local Kafka Cluster
 
 Now that we have data being automatically created in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
 
@@ -304,8 +296,8 @@ curl -i -X POST -H "Accept:application/json" \
           "database.password": "mysqlpw",
           "database.server.id": "12345",
           "database.server.name": "{dc}",
-          "database.whitelist": "retail",
-          "table.blacklist": "retail.{dc}_out_of_stock_events",
+          "database.whitelist": "orders",
+          "table.blacklist": "orders.{dc}_out_of_stock_events",
           "database.history.kafka.bootstrap.servers": "broker:29092",
           "database.history.kafka.topic": "debezium_dbhistory" ,
           "include.schema.changes": "true",
@@ -372,7 +364,16 @@ Finally select the Messages tab and observe that messages are being streamed int
 
 image::./images/c3_50.png[]
 
-== Streaming events from On-Premise to Confluent Cloud
+.Further Reading
+[TIP]
+====
+* link:https://debezium.io/documentation/reference/1.1/assemblies/cdc-mysql-connector/as_deploy-the-mysql-connector.html#mysql-connector-configuration-properties_debezium[Debezium MySQL Configuration Options , window=_blank]
+* link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
+* link:https://curl.haxx.se/docs/manpage.html[CURL manpage]
+* link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]
+====
+
+== Lab 4: Stream events to Confluent Cloud
 
 Now that your on-premise Kafka cluster is receiving events from your MySQL Database let's use Confluent Replicator to stream those messages to Confluent Cloud
 
@@ -432,7 +433,7 @@ Server: Jetty(9.4.20.v20190813)
 ...
 ----
 
-=== Confirm that Messages are being Received in your Confluent Cloud Cluster
+=== Confirm that Messages are Arriving in Confluent Cloud
 
 Jump back to link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
@@ -446,7 +447,14 @@ Select the `{dc}_sales_order_details` topic and finally the "Messages" tab under
 
 image::./images/c3_70.png[]
 
-== Building a Supply & Demand Application with KSQL
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/index.html[Confluent Replicator]
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/configuration_options.html[Confluent Replicator Configuration Properties]
+====
+
+== Lab 5: Creating KSQL Streams
 
 We now have all the data we need being streamed in real time to Confluent Cloud. The next task is to use KSQL to do something useful with these topics. We have a KSQL Server running in a docker container that is configured to point to our Confluent Cloud cluster. In a real world deployment, it is likely that this KSQL Server would be running closer to Confluent Cloud but for the purposes of this workshop it is not important.
 
@@ -571,14 +579,14 @@ Format:AVRO
 
 Press `ctrl-c` to stop
 
-[NOTE]
+[TIP]
 ====
 The events streaming from the MySQL database are serialized with Avro and as a result you will see some special characters in the above output, this is because the "PRINT TOPIC" command uses the String deserializer. 
 ====
 
 === KSQL Streams
 
-In order to work with a stream of data in KSQL we first need to register a KSQL Stream on top of an existing topic
+In order to work with a stream of data in KSQL we first need to register a KSQL Stream over an existing topic.
 
 We can do this using a `CREATE STREAM` statement. Run the following command to create your first KSQL stream:-
 
@@ -586,6 +594,8 @@ We can do this using a `CREATE STREAM` statement. Run the following command to c
 ----
 *CREATE STREAM* sales_orders *WITH* (KAFKA_TOPIC='{dc}_sales_orders', VALUE_FORMAT='AVRO');
 ----
+
+image::./images/ksql_001.png[align="center"]
 
 You should see the following output
 
@@ -610,6 +620,8 @@ Create streams for each of your remaining topics
 *CREATE STREAM* customers *WITH* (KAFKA_TOPIC='{dc}_customers', VALUE_FORMAT='AVRO');
 *CREATE STREAM* suppliers *WITH* (KAFKA_TOPIC='{dc}_suppliers', VALUE_FORMAT='AVRO');
 ----
+
+image::./images/ksql_002.png[align="center"]
 
 To view your current streams run the following command:-
 
@@ -662,7 +674,15 @@ Name                 : SALES_ORDER_DETAILS
 For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
 ----
 
-=== Querying data in KSQL
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/index.html[KSQL Overview]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/create-a-stream.html[KSQL Streams]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-stream[CREATE STREAM Syntax]
+====
+
+== Lab 6: Querying Streams using KSQL
 
 There are two types of query in KSQL, *Push* queries and *Pull* queries.
 
@@ -699,7 +719,7 @@ You can override this setting to suit you needs:-
 *SET* 'ksql.streams.auto.offset.reset'='latest';
 ----
 
-Or preferably using the abbreviated property names:-
+Or preferably, using the abbreviated property names:-
 
 [source,bash,subs="quotes,attributes"]
 ----
@@ -752,7 +772,6 @@ Press `ctrl-c` to stop
 Notice that events continue to stream to the console until you explicitly cancel the query, this is because when we are working with streams in KSQL the data set is unbounded and could theoretically continue forever.
 
 To inspect a bounded set of data, you can use the `LIMIT` clause.
-Try it out now:
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -785,14 +804,11 @@ Here we are seeing the first 10 messages that were written to the topic. Notice 
 Limit Reached
 Query terminated
 ksql>
-
 ----
 
-=== Filtering Streams with KSQL
+==== Filtering Streams
 
-Since KSQL is based on SQL, you can do many of the standard SQL things you'd expect to be able to do, including predicates and projections. In the following query we are streaming only the latest messages by explicitly setting `'auto.offset.reset'='latest'` and within the query we are filtering the results so that only messages where the `quantity` is greater than `3` are returned.
-
-Try it now:-
+Since KSQL is based on SQL, you can do many of the standard SQL things you'd expect to be able to do, including predicates and projections. The following query will return a stream of  you the latest sales orders where the `quantity` column is greater than 3.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -828,13 +844,21 @@ You should only see events where the `quantity` column value is greater than `3`
 
 Press `ctrl-c` to stop
 
-=== KSQL Tables
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#push-query[Push Query Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#pull-query[Pull Query Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/installation/server-config/config-reference.html#ksql-streams-auto-offset-reset[KSQL Offset Management]
+====
+
+== Lab 7: Creating KSQL tables
 
 KSQL tables allow you to work the data in topics as key/value pairs, with a single value for each key. KSQL tables can be created from an existing topic or from the query results from other tables or streams. You can read more about this https://docs.confluent.io/current/streams/concepts.html#duality-of-streams-and-tables[here].
 
 We want to create tables over the `customers`, `suppliers` and `products` streams so we can look up the current state for each customer, supplier and product. Later in the workshop we will want to join these tables to other streams. To successfully join to a table in KSQL you need to ensure that the table is keyed on the column you are going to use in the join. To achieve this, we need to make sure the stream that we are creating a table from is keyed correctly.
 
-==== Rekeying Streams
+=== Rekeying Streams
 
 We can see what the current key for stream or table is by using the `DESCRIBE EXTENDED` command.
 
@@ -877,6 +901,8 @@ We can fix this by creating a derived stream that has the correct key.
 *SELECT* * *FROM* customers
 *PARTITION BY* id;
 ----
+
+image::./images/ksql_003.png[align="center"]
 
 This method of creating a derived topic is frequently referred to by the acronym `CSAS` -> `CREATE STREAM … AS SELECT` where we create a new topic based on the contents of another. Unlike CSAS statements in a traditional RDBMS, CSAS statments in KSQL create _continuous queries_ where data is continuosly streamed from the source topic into the target topic.
 
@@ -963,7 +989,9 @@ Now that we have our `customers_rekeyed` stream created let's rekey the `supplie
 *PARTITION BY* id;
 ----
 
-Another way to confirm that a stream is keyed correctly is to query it directly and inspect the system `ROWKEY` and check that it is the same as the column you are wanting to join on, in our case we want to join on the `ID` column for each of the streams we have just rekeyed.
+image::./images/ksql_004.png[align="center"]
+
+Another way to confirm a stream is keyed correctly, is to query it and compare the system `ROWKEY` column to your join column, they should be identical.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1011,7 +1039,7 @@ Limit Reached
 Query terminated
 ----
 
-==== Creating Tables
+=== Creating Tables
 
 We are now in a position where we can create our first KSQL tables. To do this we need to register tables with KSQL over the newly re-keyed topics. 
 
@@ -1021,6 +1049,8 @@ We are now in a position where we can create our first KSQL tables. To do this w
 *CREATE TABLE* products_tbl *WITH* (KAFKA_TOPIC='{dc}_products_rekeyed', VALUE_FORMAT='AVRO', key='id');
 *CREATE TABLE* suppliers_tbl *WITH* (KAFKA_TOPIC='{dc}_suppliers_rekeyed', VALUE_FORMAT='AVRO', key='id');
 ----
+
+image::./images/ksql_005.png[align="center"]
 
 We can view our current tables using the following command:-
 
@@ -1041,11 +1071,20 @@ SHOW TABLES;
 
 We'll use these tables soon and join them to our streams.
 
-=== Stream to Stream Joins
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-table[CREATE TABLE Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#describe[DESCRIBE Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-stream-as-select[CREATE STREAM AS SELECT Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#key-requirements[Message Key Requirements]
+====
+
+== Lab 8: KSQL Stream-to-Stream Joins
 
 We can join two streams together in KSQL using a windowed join. When using a windowed join, you must specify a windowing scheme by using the `WITHIN` clause. A new input record on one side produces a join output for each matching record on the other side, and there can be multiple such matching records within a join window.
 
-In the example below you can see that we have specified a window of 10 seconds using the `WITHIN` clause. The mock retail application creates sales orders and their associated sales order detail rows at the same time, so 10 seconds will be plenty of time to ensure that a join takes place.
+In the example below you can see that we have specified a window of 1 seconds using the `WITHIN` clause. The source application creates sales orders and their associated sales order detail rows at the same time, so a second will be plenty of time to ensure that a join takes place.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1058,8 +1097,10 @@ In the example below you can see that we have specified a window of 10 seconds u
     od.quantity,
     od.price
 *FROM* sales_orders o
-*INNER JOIN* sales_order_details od *WITHIN* 10 SECONDS *ON* (o.id = od.sales_order_id);
+*INNER JOIN* sales_order_details od *WITHIN* 1 SECONDS *ON* (o.id = od.sales_order_id);
 ----
+
+image::./images/ksql_006.png[align="center"]
 
 If we query this new stream... 
 
@@ -1099,9 +1140,13 @@ Query terminated
 
 ----
 
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/join-streams-and-tables.html#stream-stream-joins[Stream-Stream Joins]
+====
 
-
-=== Stream to Table Joins
+== Lab 9: KSQL Stream-to-Table Joins
 
 We can take this a step further by joining this new stream to a couple of the KSQL tables we created earlier. 
 
@@ -1127,6 +1172,8 @@ To do this we'll need to create a new stream, `sales_enriched_02`, that'll strea
 *INNER JOIN* customers_tbl ct *ON* (se.customer_id = ct.id);
 ----
 
+image::./images/ksql_007.png[align="center"]
+
 And last but not least we can join to our products table by creating our final stream `sales_enriched` which will be the result of joining the `sales_enriched_02` stream to the `products_tbl` table.
 
 [source,sql,subs="quotes,attributes"]
@@ -1149,6 +1196,8 @@ And last but not least we can join to our products table by creating our final s
 *FROM* sales_enriched_02 se
 *INNER JOIN* products_tbl pt *ON* (se.product_id = pt.id);
 ----
+
+image::./images/ksql_008.png[align="center"]
 
 If we run a describe on this stream... 
 
@@ -1198,8 +1247,10 @@ Join the `purchase_orders` stream to the `purchase_order_details` stream
     od.quantity,
     od.cost
 *FROM* purchase_orders o
-*INNER JOIN* purchase_order_details od *WITHIN* 10 SECONDS *ON* (o.id = od.purchase_order_id);
+*INNER JOIN* purchase_order_details od *WITHIN* 1 SECONDS *ON* (o.id = od.purchase_order_id);
 ----
+
+image::./images/ksql_009.png[align="center"]
 
 If we query this new stream... 
 
@@ -1236,9 +1287,7 @@ If we query this new stream...
 |1           |10          |02-03-20    |1           |10          |100         |3.61        |
 Limit Reached
 Query terminated
-
 ----
-
 
 Join the `purchases_enriched_01` stream to the `suppliers_tbl` table...
 
@@ -1259,6 +1308,8 @@ Join the `purchases_enriched_01` stream to the `suppliers_tbl` table...
 *FROM* purchases_enriched_01 pe
 *INNER JOIN* suppliers_tbl st *ON* (pe.supplier_id = st.id);
 ----
+
+image::./images/ksql_010.png[align="center"]
 
 ...and finally join to the `products_tbl` table
 
@@ -1281,6 +1332,8 @@ Join the `purchases_enriched_01` stream to the `suppliers_tbl` table...
 *FROM* purchases_enriched_02 pe
 *INNER JOIN* products_tbl pt *ON* (pe.product_id = pt.id);
 ----
+
+image::./images/ksql_011.png[align="center"]
 
 If we run a describe on this stream...
 
@@ -1326,7 +1379,7 @@ Let's query the `purchases_enriched` stream from the very beginning
 *EMIT CHANGES*;
 ----
 
-Notice that the query returns the first 30 purchase order lines and then stops; this is because no purchase orders are being created by our mock retail application. The mock retail application will raise purchase orders for us when we send it some out of stock events.
+Notice that the query returns the first 30 purchase order lines and then stops; this is because no purchase orders are being created by our orders application. The orders application will raise purchase orders for us when we send it some out of stock events.
 
 [source,bash,subs="quotes,attributes"]
 ----
@@ -1365,8 +1418,13 @@ Notice that the query returns the first 30 purchase order lines and then stops; 
 |30                       |Doilies - 5, Paper                |100                     |
 ----
 
-=== Calculating the Current Stock Levels
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/join-streams-and-tables.html#stream-table-joins[Stream-Table Joins]
+====
 
+== Lab 10: Streaming Stock Levels
 Before we can create an out of stock event stream, we need to work out the current stock levels for each product. We can do this by combining the `sales_enriched` stream with the `purchases_enriched` stream and summing the `sales_enriched.quantity` column (stock decrements) and the `purchases_enriched.quantity` column (stock increments).
 
 Let's have a go at this now by creating a new stream called `product_supply_and_demand`. This stream is consuming messages from the `sales_enriched` stream and included the `product_id` and `quantity` column converted to a negative value, we do this because sales events are our _demand_ and hence decrement stock.
@@ -1380,6 +1438,8 @@ Let's have a go at this now by creating a new stream called `product_supply_and_
 *FROM* sales_enriched;
 ----
 
+image::./images/ksql_012.png[align="center"]
+
 Let's have a quick look at the first few rows of this stream
 
 [source,sql,subs="quotes,attributes"]
@@ -1392,7 +1452,7 @@ Let's have a quick look at the first few rows of this stream
 *LIMIT* 20;
 ----
 
-This stream is showing a history of all product sales and their effect on the stock levels.
+This query shows a history of all sales and their affect on stock levels. 
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1423,7 +1483,7 @@ Limit Reached
 Query terminated
 ----
 
-What we need to do now is also include all product purchases in the same stream. We can do this using an `INSERT INTO` statement. The `INSERT INTO` statement streams the result of the SELECT query into an existing stream and its underlying topic.
+What we need to do now is also include all product purchases in the same stream. We can do this using an `INSERT INTO` statement. The `INSERT INTO` statement streams the result of a SELECT query into an existing stream and its underlying topic.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1432,6 +1492,8 @@ What we need to do now is also include all product purchases in the same stream.
           product_qty "QUANTITY" 
   *FROM*    purchases_enriched;
 ----
+
+image::./images/ksql_013.png[align="center"]
 
 Our `product_supply_and_demand` now includes all product sales as stock decrements and all product purchases as stock increments.
 
@@ -1504,6 +1566,8 @@ We're now is a position where we can calculate the current stock level for each 
 *GROUP BY* product_id;
 ----
 
+image::./images/ksql_014.png[align="center"]
+
 When we query this table with a Push query... 
 
 [source,sql,subs="quotes,attributes"]
@@ -1518,7 +1582,16 @@ When we query this table with a Push query...
 ...each new event that is displayed on the console reflects the current stock level for the associated product, a new event will be emitted  each time a product's stock level changes. 
 Depending on how long it took you to get to this point in the workshop, you may see that all your stock levels are negative. This is because, apart from the initial purchase order for 100 of each product, we have not created any more purchase orders and our customers will have their orders on hold until we acquire more stock, not good, but we'll fix that soon.
 
-=== Pull Queries
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#insert-into[INSERT INTO Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-table-as-select[CREATE TABLE AS SELECT Syntax]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#aggregate-functions[KSQL Aggregate Functions]
+====
+
+
+== Lab 11: Pull Queries
 
 We can now run our first Pull query. Pull queries are a preview feature in KSQL 5.4 and currently can only be used against tables with aggregates and can only query a single key.
 
@@ -1528,6 +1601,8 @@ To run a Pull query we just query the table as normal but drop the `EMIT CHANGES
 ----
 select product_id, stock_level from current_stock where rowkey='1';
 ----
+
+image::./images/ksql_015.png[align="center"]
 
 The query will return the current stock level and immediatly terminate.
 
@@ -1571,9 +1646,16 @@ As you can see, the KSQL Server's REST endpoint will return a JSON message with 
 ]
 ----
 
-=== Tables with Windowed Aggregates
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#pull-query[Pull Queries]
+* link:https://docs.confluent.io/current/ksql/docs/developer-guide/api.html#run-a-ksql-statement[KSQL REST API]
+====
 
-Now that we know the current stock level is for each product, we can use this information to send an event to the mock retail application and ask it to create purchase orders to replenish the stock, but how much should we stock should we order? we could just order enough to satisfy the current backlog but we'd quickly run out of stock again. 
+== Lab 12: Streaming Recent Product Demand
+
+Now that we know the current stock level is for each product, we can use this information to send an event to the orders application and ask it to create purchase orders to replenish the stock, but how much should we stock should we order? we could just order enough to satisfy the current backlog but we'd quickly run out of stock again. 
 
 What we really want to do is order enough to satisfy the backlog _and_ enough to meet future demand, we can make an attempt at predicting what the future demand will be by looking at the past.
 
@@ -1595,6 +1677,8 @@ Hopping windows are based on time intervals. They model fixed-sized, possibly ov
 *GROUP BY* product_id *EMIT CHANGES*;
 ----
 
+image::./images/ksql_016.png[align="center"]
+
 If we query this table for a single product...
 
 [source,sql,subs="quotes,attributes"]
@@ -1605,11 +1689,12 @@ If we query this table for a single product...
         product_id,
         demand_last_3mins
 *FROM*  product_demand_last_3mins_tbl
-*WHERE* product_id = 1
-*EMIT CHANGES*;
+*WHERE* product_id = 15
+*EMIT CHANGES*
+;
 ----
 
-...you'll see a the start and end times of each three minute window along with the product demand generated within that 3 minute window. Notice how the window start times are staggered by one minute, this is the advance interval in action. As new sales events occur a new message will be displayed with an update to the window(s) total.
+...you'll see the start and end times for each three minute window, along with the product demand for those 3 minutes. Notice how the window start times are staggered by one minute, this is the advance interval in action. As new sales events occur a new message will be displayed with an update to the window(s) total.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1637,27 +1722,26 @@ If we query this table for a single product...
 
 ----
 
-We now need to create a stream from this table so that we can rekey it on `product_id`, we'll then be able to join it to the `current_stock` stream
+We will now create a stream from this table and then join it to the `current_stock` table
 
-Create a stream from the table...
+Create a stream from the table's underlying topic...
 
 [source,sql,subs="quotes,attributes"]
 ----
 *CREATE STREAM* product_demand_last_3mins *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', VALUE_FORMAT='AVRO');
 ----
 
-...and rekey it.
+image::./images/ksql_017.png[align="center"]
 
-[source,sql,subs="quotes,attributes"]
-----
-*CREATE STREAM* product_demand_last_3mins_rekeyed 
-*WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins_rekeyed',VALUE_FORMAT='AVRO') 
-*AS  SELECT* * 
-    *FROM* product_demand_last_3mins 
-    *PARTITION BY* product_id;
-----
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/ksql/docs/concepts/time-and-windows-in-ksql-queries.html#windows-in-ksql-queries[Windows in KSQL Queries]
+====
 
-Now that we have the `current_stock` and `product_demand_last_3mins_rekeyed` streams we can create a `out_of_stock_events` stream by joining the two together and calculating the required purchase order quantity. We calculate the `purchase_qty` from adding the inverse of the current stock level to the last 3 minutes of demand. The stream is filtered to only include products that have no stock and therefore need purchase orders raising for them.
+== Lab 13: Streaming _"Out of Stock"_ Events
+
+Now that we have the `current_stock` table and `product_demand_last_3mins` stream, we can create a `out_of_stock_events` stream by joining the two together and calculating the required purchase order quantity. We calculate the `purchase_qty` from adding the inverse of the current stock level to the last 3 minutes of demand. The stream is filtered to only include products that have no stock and therefore need purchase orders raising for them.
 
 [source,sql,subs="quotes,attributes"]
 ----
@@ -1675,6 +1759,7 @@ Now that we have the `current_stock` and `product_demand_last_3mins_rekeyed` str
 *WHERE* stock_level <= 0;
 ----
 
+image::./images/ksql_018.png[align="center"]
 
 When we query the `out_of_stock_events` stream...
 
@@ -1695,38 +1780,37 @@ When we query the `out_of_stock_events` stream...
 
 [source,sql,subs="quotes,attributes"]
 ----
-+----------------+----------------+----------------+----------------+----------------+----------------+
-|PRODUCT_ID      |WINDOW_START_TIM|WINDOW_END_TIME |STOCK_LEVEL     |DEMAND_LAST_3MIN|QUANTITY_TO_PURC|
-|                |E               |                |                |S               |HASE            |
-+----------------+----------------+----------------+----------------+----------------+----------------+
-|28              |13:53:00        |13:56:00        |-85             |12              |97              |
-|28              |13:54:00        |13:57:00        |-85             |1               |86              |
-|28              |13:55:00        |13:58:00        |-85             |1               |86              |
-|4               |13:53:00        |13:56:00        |-128            |26              |154             |
-|4               |13:54:00        |13:57:00        |-128            |11              |139             |
-|4               |13:55:00        |13:58:00        |-128            |11              |139             |
-|5               |13:53:00        |13:56:00        |-73             |15              |88              |
-|5               |13:54:00        |13:57:00        |-73             |15              |88              |
-|5               |13:55:00        |13:58:00        |-73             |15              |88              |
-|28              |13:53:00        |13:56:00        |-85             |18              |103             |
-|28              |13:54:00        |13:57:00        |-91             |7               |98              |
-|28              |13:55:00        |13:58:00        |-91             |7               |98              |
-|14              |13:53:00        |13:56:00        |-156            |31              |187             |
-|14              |13:54:00        |13:57:00        |-156            |15              |171             |
-|14              |13:55:00        |13:58:00        |-156            |6               |162             |
-|5               |13:53:00        |13:56:00        |-73             |25              |98              |
-|5               |13:54:00        |13:57:00        |-83             |25              |108             |
-|5               |13:55:00        |13:58:00        |-83             |25              |108             |
-|12              |13:53:00        |13:56:00        |-197            |25              |222             |
-|12              |13:54:00        |13:57:00        |-197            |21              |218             |
-|12              |13:55:00        |13:58:00        |-200            |3               |203             |
++----------------+------------------+----------------+-------------+-----------------+-------------------+
+|PRODUCT_ID      |WINDOW_START_TIME |WINDOW_END_TIME |STOCK_LEVEL  |DEMAND_LAST_3MINS|QUANTITY_TO_PURCASE|
++----------------+------------------+----------------+-------------+-----------------+-------------------+
+|28              |13:53:00          |13:56:00        |-85          |12               |97                 |
+|28              |13:54:00          |13:57:00        |-85          |1                |86                 |
+|28              |13:55:00          |13:58:00        |-85          |1                |86                 |
+|4               |13:53:00          |13:56:00        |-128         |26               |154                |
+|4               |13:54:00          |13:57:00        |-128         |11               |139                |
+|4               |13:55:00          |13:58:00        |-128         |11               |139                |
+|5               |13:53:00          |13:56:00        |-73          |15               |88                 |
+|5               |13:54:00          |13:57:00        |-73          |15               |88                 |
+|5               |13:55:00          |13:58:00        |-73          |15               |88                 |
+|28              |13:53:00          |13:56:00        |-85          |18               |103                |
+|28              |13:54:00          |13:57:00        |-91          |7                |98                 |
+|28              |13:55:00          |13:58:00        |-91          |7                |98                 |
+|14              |13:53:00          |13:56:00        |-156         |31               |187                |
+|14              |13:54:00          |13:57:00        |-156         |15               |171                |
+|14              |13:55:00          |13:58:00        |-156         |6                |162                |
+|5               |13:53:00          |13:56:00        |-73          |25               |98                 |
+|5               |13:54:00          |13:57:00        |-83          |25               |108                |
+|5               |13:55:00          |13:58:00        |-83          |25               |108                |
+|12              |13:53:00          |13:56:00        |-197         |25               |222                |
+|12              |13:54:00          |13:57:00        |-197         |21               |218                |
+|12              |13:55:00          |13:58:00        |-200         |3                |203                |
 ...
 ...
 ----
 
-== Replicate Events from Confluent Cloud to On-premise
+== Lab 14: Replicate Events to On-Premise Kafka
 
-The next step is to push the `out_of_stock_events` stream to the mock retail application so it can create some purchase orders for us. To do this we'll need to replicate the `{dc}_out_of_stock_events` topic from Confluent Cloud back to our on-premise Kafka cluster.
+The next step is to push the `out_of_stock_events` stream to our application so it can create some purchase orders for us. To do this we'll need to replicate the `{dc}_out_of_stock_events` topic from Confluent Cloud back to our on-premise Kafka cluster.
 
 image::./images/5_replicate_to_onprem.png[]
 
@@ -1795,9 +1879,16 @@ We can confirm that the `{dc}_out_of_stock_events` is being replicated from Conf
 
 image::./images/c3_100.png[]
 
-== Send Events to MySQL
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/index.html[Confluent Replicator]
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/configuration_options.html[Confluent Replicator Configuration Properties]
+====
 
-The final piece of plumping we need to do in our data pipeline is to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the mock retail application will then process these events and create purchase order for us.
+== Lab 15: Sink Events into MySQL
+
+Finally we need to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the on-premise application will then process these events and create purchase order for us.
 
 image::./images/6_jdbc_sink.png[]
 
@@ -1837,7 +1928,7 @@ EMIT CHANGES;
 
 You now have a real time view of the current product stock levels in the first KSQL session and the purchases being made to replenish the stock in second. Not that the second query isn't returning anything yet.
 
-Let's now send the _out of stock events_ to the retail application so we can start generating some purchase orders.
+Let's now send the _out of stock events_ to the orders application so we can start generating some purchase orders.
 
 In a third terminal session, create the JDBC Sink Connector by running the following from the command line.
 
@@ -1850,7 +1941,7 @@ curl -i -X POST -H "Accept:application/json" \
         "config": {
           "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
           "topics": "{dc}_out_of_stock_events",
-          "connection.url": "jdbc:mysql://mysql:3306/retail",
+          "connection.url": "jdbc:mysql://mysql:3306/orders",
           "connection.user": "mysqluser",
           "connection.password": "mysqlpw",
           "insert.mode": "INSERT",
@@ -1863,3 +1954,9 @@ curl -i -X POST -H "Accept:application/json" \
 
 Observe the current stock query in the first KSQL session, when a product has zero or less stock you should see a purchase event appear in the second KSQL session and then the new stock level reflected in the first session. In theory, given a constant demand, each product should run out of stock and get replenished roughly every 3 minutes.
 
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-jdbc/sink-connector/index.html#jdbc-sink-connector-for-cp[JDBC Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-jdbc/sink-connector/sink_config_options.html[JDBC Sink Connector Configuration Properties]
+====

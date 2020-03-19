@@ -7,10 +7,14 @@ import random
 tick_seconds = 5
 o, od, p, pd = 0, 0, 0, 0
 
+most_frequent_product  = random.randint(1, 30)
+most_frequent_customer = random.randint(1, 30)
+most_frequent_supplier = random.randint(1, 30)
+
 db = MySQLdb.connect(host="mysql",
                      user="mysqluser",
                      passwd="mysqlpw",
-                     db="retail")
+                     db="orders")
 
 cursor = db.cursor()
 
@@ -42,12 +46,9 @@ while True:
   #
 
   # select a random customer
-  cursor.execute("SELECT id FROM customers order by RAND() LIMIT 1")
-  customer_id = cursor.fetchone()[0]
   now = datetime.now()
-
   sql = "INSERT INTO sales_orders (id, order_date, customer_id) VALUES (%s, %s, %s)"
-  val = (sales_order_id + o, now, customer_id )
+  val = (sales_order_id + o, now, random.triangular(1, 31, most_frequent_customer) )
   cursor.execute(sql, val)
 
   print "Sales Order " + str(sales_order_id + o) + " Created"
@@ -57,8 +58,12 @@ while True:
   #
 
   # select some random products
-  sql = "SELECT id, price FROM products order by RAND() LIMIT " + str(random.randint(1,5))
-  cursor.execute(sql)
+  product_ids = []
+  for i in range(1,6):
+    n = random.triangular(1, 31, most_frequent_product)
+    product_ids.append(int(n))
+  product_ids_str = ','.join(['%s'] * len(product_ids))
+  cursor.execute("SELECT id, price FROM products WHERE id IN (%s)" % product_ids_str, tuple(product_ids))
   random_products = cursor.fetchall()
 
   # add each product to sale order details
@@ -88,12 +93,9 @@ while True:
     #
 
     # select a random supplier
-    cursor.execute("SELECT id FROM suppliers order by RAND() LIMIT 1")
-    supplier_id = cursor.fetchone()[0]
     now = datetime.now()
-
     sql = "INSERT INTO purchase_orders (id, order_date, supplier_id) VALUES (%s, %s, %s)"
-    val = (purchase_order_id + p, now, supplier_id )
+    val = (purchase_order_id + p, now, random.triangular(1, 31, most_frequent_supplier) )
     cursor.execute(sql, val)
     
     print "Purchase Order " + str(purchase_order_id + p) + " Created"
