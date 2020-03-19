@@ -1,6 +1,6 @@
-== Stream Sales & Purchases to MongoDB Atlas
+== Optional Lab: Stream Sales & Purchases to MongoDB Atlas
 
-We can use the MongoDB Sink Connector to stream changes from a topics to MongoDB Atlas, from here the data can be leveraged in queries and leverage the MongoDB ecosystem.
+We can use the MongoDB Sink Connector to stream changes from Confluent Cloud to MongoDB Atlas, from here the data can be leveraged in the wider MongoDB ecosystem.
 
 Another preview feature of KSQL 5.4 is the ability to create connectors directly within KSQL.
 
@@ -75,3 +75,9 @@ Depending on who's hosting the workshop, you may or may not have access to the M
 
 image::./images/mongodb-orders-collection.png[]
 
+.Further Reading
+[TIP]
+====
+* link:https://www.mongodb.com/cloud/atlas[MongoDB Atlas]
+* link:https://github.com/mongodb/mongo-kafka[MongoDB Kafka Connector]
+====
