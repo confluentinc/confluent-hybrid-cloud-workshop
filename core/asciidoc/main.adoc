@@ -278,9 +278,9 @@ image::./images/2_mysql_source_connector.png[]
 
 === Create the MySQL source connector
 
-We have a Kafka Connect worker already up and running in a docker container called `kafka-connect-onprem`. This Kafka Connect worker is configured to connect to your on-premise Kafka cluster and has a internal REST server listening on port `18083`.
+We have a Kafka Connect worker already up and running in a docker container called `kafka-connect-onprem`. This Kafka Connect worker is configured to connect to your on-premise Kafka cluster and has a internal REST server listening on port `18083`. We can create a connector from the command line using the cURL command. The cURL command allows us to send an HTTP POST request to the REST server, the '-H' option specifies the header of the request and includes the target host and port information, the `-d` option specifies the data we will send, in this case its the configuration options for the connector. You can of course create and manage connectors using any tool or language capable of issuing HTTP requests.
 
-To create the Debezium MySQL Source connector instance on this worker run the following command:-
+To create the Debezium MySQL Source connector instance run the following command:-
 
 [source,bash,subs="attributes"]
 ----
@@ -369,7 +369,7 @@ image::./images/c3_50.png[]
 ====
 * link:https://debezium.io/documentation/reference/1.1/assemblies/cdc-mysql-connector/as_deploy-the-mysql-connector.html#mysql-connector-configuration-properties_debezium[Debezium MySQL Configuration Options , window=_blank]
 * link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
-* link:https://curl.haxx.se/docs/manpage.html[CURL manpage]
+* link:https://curl.haxx.se/docs/manpage.html[cURL manpage]
 * link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]
 ====
 
