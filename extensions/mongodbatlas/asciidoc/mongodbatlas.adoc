@@ -1,0 +1,77 @@
+== Stream Sales & Purchases to MongoDB Atlas
+
+We can use the MongoDB Sink Connector to stream changes from a topics to MongoDB Atlas, from here the data can be leveraged in queries and leverage the MongoDB ecosystem.
+
+Another preview feature of KSQL 5.4 is the ability to create connectors directly within KSQL.
+
+Start a KSQL CLI session
+[source,bash,subs=attributes]
+----
+docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+----
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to MongoDB.
+
+[source,bash,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_mongodb_sink WITH (
+  'name'= '{dc}_mongodb_sink',
+  'connector.class'='com.mongodb.kafka.connect.MongoSinkConnector',
+  'tasks.max'='1',
+  'topics'='{dc}_sales_enriched,{dc}_purchases_enriched',
+  'connection.uri'='${file:/secrets.properties:MONGODBATLAS_SRV_ADDRESS}',
+  'database'='demo',
+  'collection'='{dc}',
+  'topic.override.{dc}_sales_enriched.collection'='{dc}_sales',
+  'topic.override.{dc}_purchases_enriched.collection'='{dc}_purchases',
+  'key.converter'='org.apache.kafka.connect.storage.StringConverter',
+  'transforms'='WrapKey',
+  'transforms.WrapKey.type'='org.apache.kafka.connect.transforms.HoistField$Key',
+  'transforms.WrapKey.field'='ROWKEY',
+  'document.id.strategy'='com.mongodb.kafka.connect.sink.processor.id.strategy.UuidStrategy',
+  'post.processor.chain'='com.mongodb.kafka.connect.sink.processor.DocumentIdAdder',
+  'max.batch.size'='20'
+);
+
+----
+
+We can list our current connectors using the following command
+
+[source,bash,subs=attributes]
+----
+show connectors;
+----
+
+[source,bash,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_MONGODB_SINK         | SINK   | com.mongodb.kafka.connect.MongoSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,bash,subs=attributes]
+----
+describe connector {dc}_MONGODB_SINK;
+----
+[source,bash,subs=attributes]
+----
+Name                 : {dc}_MONGODB_SINK
+Class                : com.mongodb.kafka.connect.MongoSinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the MongoDB Atlas account where the database is held.
+
+image::./images/mongodb-orders-collection.png[]
+
