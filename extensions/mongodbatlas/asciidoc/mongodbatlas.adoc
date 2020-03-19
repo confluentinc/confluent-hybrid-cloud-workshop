@@ -15,7 +15,6 @@ And run the following `CREATE SINK CONNECTOR` command. This will create a connec
 [source,bash,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_mongodb_sink WITH (
-  'name'= '{dc}_mongodb_sink',
   'connector.class'='com.mongodb.kafka.connect.MongoSinkConnector',
   'tasks.max'='1',
   'topics'='{dc}_sales_enriched,{dc}_purchases_enriched',
