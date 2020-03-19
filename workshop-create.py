@@ -109,7 +109,6 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
     # Copy extension images to docker staging
     for extension in config['workshop']['extensions']:
-        print( extension)
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc/images")):
             copytree(os.path.join("./extensions", extension, "asciidoc/images"), os.path.join(docker_staging, "asciidoc/images"))
 
