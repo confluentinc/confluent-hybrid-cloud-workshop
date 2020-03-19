@@ -1,4 +1,4 @@
-== Stream Sales & Purchases to Google Big Query
+== Optional Lab: Stream Sales & Purchases to Google Big Query
 
 We can use the BigQuery Sink Connector to stream changes from a topics to Google BigQuery.
 
@@ -79,7 +79,7 @@ WorkerId             : kafka-connect:18084
 
 Depending on who's hosting the workshop, you may or may not have access to the GCP account where the BigQuery dataset is held.
 
-== Visualize your Data in Google Data Studio (Optional)
+=== Visualize your Data in Google Data Studio 
 
 Now that your Data is in BigQuery, you can use Google Datastudio to visualize it.
 
@@ -138,9 +138,13 @@ O.sourcedc="dc01"
 GROUP BY supplier_name
 ----
 
+This is an example of a report you can build:
 
-This is an example of the report you can build:
+image::./images/datastudio_report.png[Google DataStudio Report]
 
-image::../images/datastudio_report.png[Google DataStudio Report]
-
-
+.Further Reading
+[NOTE]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/index.html[Google BigQuery Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/kafka_connect_bigquery_config.html[Google BigQuery Sink Connector Configuration Properties]
+====
