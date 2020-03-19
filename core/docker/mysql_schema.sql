@@ -1,8 +1,8 @@
 GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT  ON *.* TO 'mysqluser' IDENTIFIED BY 'mysqlpw';
-DROP DATABASE IF EXISTS retail;
-CREATE DATABASE retail;
-GRANT ALL PRIVILEGES ON retail.* TO 'mysqluser'@'%';
-USE retail;
+DROP DATABASE IF EXISTS orders;
+CREATE DATABASE orders;
+GRANT ALL PRIVILEGES ON orders.* TO 'mysqluser'@'%';
+USE orders;
 
 /* Customers */
 DROP TABLE IF EXISTS customers;
