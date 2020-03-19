@@ -1,4 +1,4 @@
-== Stream Sales & Purchases to Google Cloud Storage
+== Optional Lab: Stream Sales & Purchases to Google Cloud Storage
 
 We can use the Google Cloud Storage Sink Connector to stream changes from a topics to Google Cloud Storage, from here the data can be consumed other Google Cloud Platform services.
 
@@ -74,4 +74,9 @@ WorkerId             : kafka-connect:18084
 
 Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
 
-
+.Further Reading
+[NOTE]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-gcs/index.html#google-cloud-storage-sink-connector-for-cp[Google Cloud Storage Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-gcs/configuration_options.html[Google Cloud Storage Sink Connector Configuration Properties]
+====

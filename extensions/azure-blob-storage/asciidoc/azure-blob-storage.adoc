@@ -1,4 +1,4 @@
-== Stream Sales & Purchases to Azure Blob Storage
+== Optional Lab: Stream Sales & Purchases to Azure Blob Storage
 
 We can use the Azure Blob Storage Sink Connector to stream changes from a topics to Azure Blob Storage, from here the data can be consumed other Azure services.
 
@@ -71,4 +71,10 @@ WorkerId             : kafka-connect:18084
 
 Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
 
+.Further Reading
+[NOTE]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/index.html[Azure Blob Storage Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/configuration_options.html#configuration-properties[Azure Blob Storage Sink Connector Configuration Properties]
+====
 

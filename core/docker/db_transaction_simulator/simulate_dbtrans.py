@@ -14,7 +14,7 @@ most_frequent_supplier = random.randint(1, 30)
 db = MySQLdb.connect(host="mysql",
                      user="mysqluser",
                      passwd="mysqlpw",
-                     db="retail")
+                     db="orders")
 
 cursor = db.cursor()
 

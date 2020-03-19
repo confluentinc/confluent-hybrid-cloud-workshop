@@ -1,14 +1,16 @@
 = Hybrid-Cloud Streaming Workshop
 :doctype: book
 :toc:
-:toclevels: 5
-:sectnums:
+:toc-title: Table of Contents
+:toclevels: 1
 :experimental:
-:icon: font
+:icons: font
+:imagesdir: .
 :githubreponame: partner-workshops
 :cloudprovider: GCP
 :externalip: localhost
 :dc: dc
+
 
 include::intro.adoc[]
 
