@@ -72,7 +72,7 @@ WorkerId             : kafka-connect:18084
 Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
 
 .Further Reading
-[NOTE]
+[TIP]
 ====
 * link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/index.html[Azure Blob Storage Sink Connector]
 * link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/configuration_options.html#configuration-properties[Azure Blob Storage Sink Connector Configuration Properties]

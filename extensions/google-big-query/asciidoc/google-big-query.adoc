@@ -143,7 +143,7 @@ This is an example of a report you can build:
 image::./images/datastudio_report.png[Google DataStudio Report]
 
 .Further Reading
-[NOTE]
+[TIP]
 ====
 * link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/index.html[Google BigQuery Sink Connector]
 * link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/kafka_connect_bigquery_config.html[Google BigQuery Sink Connector Configuration Properties]
