@@ -47,8 +47,8 @@ show connectors;
 ----
  Connector Name            | Type   | Class
 ------------------------------------------------------------------------------------------------
- DC01_GCS_SINK             | SINK   | io.confluent.connect.gcs.GcsSinkConnector
- replicator-dc01-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+ {dc}_GCS_SINK             | SINK   | io.confluent.connect.gcs.GcsSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
 ------------------------------------------------------------------------------------------------
 ----
 
@@ -56,11 +56,11 @@ We can also describe a connector and view its status using the `describe connect
 
 [source,bash,subs=attributes]
 ----
-describe connector DC01_GCS_SINK;
+describe connector {dc}_GCS_SINK;
 ----
 [source,bash,subs=attributes]
 ----
-Name                 : DC01_GCS_SINK
+Name                 : {dc}_GCS_SINK
 Class                : io.confluent.connect.gcs.GcsSinkConnector
 Type                 : sink
 State                : RUNNING
