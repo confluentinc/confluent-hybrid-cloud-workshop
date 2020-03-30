@@ -54,4 +54,5 @@ variable "ccloud_topics" {
 
 variable "feedback_form_url" {
   description = "Feedback Form Url"
+  default = ""
 }
