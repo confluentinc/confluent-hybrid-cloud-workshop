@@ -339,7 +339,7 @@ Use the following and username and password to authenticate to Confluent Control
 [source,bash,subs="attributes"]
 ----
 Username: {dc}
-Password: <your workshop password>
+Password: your workshop password
 ----
 
 image::./images/c3_05.png[]
@@ -1668,6 +1668,14 @@ In the following query we are creating a table that will calculate the demand fo
 
 Hopping windows are based on time intervals. They model fixed-sized, possibly overlapping windows. A hopping window is defined by two properties: the window’s duration and its advance, or “hop”, interval. The advance interval specifies how far a window moves forward in time relative to the previous window. In our query we we have a window with a duration of three minutes and an advance interval of one minute. Because hopping windows can overlap, a record can belong to more than one such window.
 
+Start the KSQL CLI if you haven't already
+[source,bash,subs=attributes+]
+----
+docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+----
+
+Create the windowed query
+
 [source,sql,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
@@ -1825,7 +1833,7 @@ Select your on-premise cluster from the left-hand navigation bar, select _"topic
 
 image::./images/c3_80.png[]
 
-Name the topic `{dc}_out_of_stock_events` and click _"Create with defaults"_
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create with defaults"_
 
 image::./images/c3_90.png[]
 
