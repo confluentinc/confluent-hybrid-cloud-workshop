@@ -748,7 +748,7 @@ Let's start by running a Push query and consume all messages from the beginning 
 
 You should see something similar to this:-
 ```
-ksql> SELECT id, sales_order_id, product_id, quantity, price FROM dc01_sales_order_details EMIT CHANGES;
+ksql> SELECT id, sales_order_id, product_id, quantity, price FROM sales_order_details EMIT CHANGES;
 +-----------------+-----------------+-----------------+-----------------+-----------------+
 |ID               |SALES_ORDER_ID   |PRODUCT_ID       |QUANTITY         |PRICE            |
 +-----------------+-----------------+-----------------+-----------------+-----------------+
