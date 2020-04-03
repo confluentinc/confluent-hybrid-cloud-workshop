@@ -703,14 +703,14 @@ To see the current values for _all_ properties run the following command
 SHOW PROPERTIES;
 ----
 
-Look out for a property called `ksql.streams.auto.offset.reset`, it should be set to `latest` as this is the default setting configured on the KSQL server.
+Look out for a property called `ksql.streams.auto.offset.reset`, it should currently be set to `earliest`.
 
 [source,bash,subs="attributes"]
 ----
  Property                                               | Default override | Effective Value                                                                 
 --------------------------------------------------------------------------------------------
  ...          
- ksql.streams.auto.offset.reset                         |                  | latest
+ ksql.streams.auto.offset.reset                         |                  | earliest
  ...                                             
 --------------------------------------------------------------------------------------------
 ksql>
