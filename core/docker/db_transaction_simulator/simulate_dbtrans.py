@@ -48,7 +48,7 @@ while True:
   # select a random customer
   now = datetime.now()
   sql = "INSERT INTO sales_orders (id, order_date, customer_id) VALUES (%s, %s, %s)"
-  val = (sales_order_id + o, now, random.triangular(1, 31, most_frequent_customer) )
+  val = (sales_order_id + o, now, int(random.triangular(1, 31, most_frequent_customer)) )
   cursor.execute(sql, val)
 
   print "Sales Order " + str(sales_order_id + o) + " Created"
@@ -95,7 +95,7 @@ while True:
     # select a random supplier
     now = datetime.now()
     sql = "INSERT INTO purchase_orders (id, order_date, supplier_id) VALUES (%s, %s, %s)"
-    val = (purchase_order_id + p, now, random.triangular(1, 31, most_frequent_supplier) )
+    val = (purchase_order_id + p, now, int(random.triangular(1, 31, most_frequent_supplier)) )
     cursor.execute(sql, val)
     
     print "Purchase Order " + str(purchase_order_id + p) + " Created"
