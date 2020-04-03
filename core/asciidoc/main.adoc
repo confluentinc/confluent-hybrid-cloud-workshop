@@ -195,7 +195,7 @@ Start the orders application by running the following command.
 
 [source,bash]
 ----
-docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1"
+docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1 2>&1"
 ----
 
 Confirm that the simulator is working as expected
