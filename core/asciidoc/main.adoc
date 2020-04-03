@@ -1837,7 +1837,7 @@ Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create 
 
 image::./images/c3_90.png[]
 
-We are now ready to replicate this topic from Confluent Cloud to you on-premise cluster.
+We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
 
 === Submit the Replicator Connector Config
 
