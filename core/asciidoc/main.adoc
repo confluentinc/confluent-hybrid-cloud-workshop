@@ -195,7 +195,7 @@ Start the orders application by running the following command.
 
 [source,bash]
 ----
-docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1"
+docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1 2>&1"
 ----
 
 Confirm that the simulator is working as expected
@@ -703,14 +703,14 @@ To see the current values for _all_ properties run the following command
 SHOW PROPERTIES;
 ----
 
-Look out for a property called `ksql.streams.auto.offset.reset`, it should be set to `latest` as this is the default setting configured on the KSQL server.
+Look out for a property called `ksql.streams.auto.offset.reset`, it should currently be set to `earliest`.
 
 [source,bash,subs="attributes"]
 ----
  Property                                               | Default override | Effective Value                                                                 
 --------------------------------------------------------------------------------------------
  ...          
- ksql.streams.auto.offset.reset                         |                  | latest
+ ksql.streams.auto.offset.reset                         |                  | earliest
  ...                                             
 --------------------------------------------------------------------------------------------
 ksql>
@@ -1837,7 +1837,7 @@ Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create 
 
 image::./images/c3_90.png[]
 
-We are now ready to replicate this topic from Confluent Cloud to you on-premise cluster.
+We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
 
 === Submit the Replicator Connector Config
 
