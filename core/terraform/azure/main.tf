@@ -22,5 +22,6 @@ module "workshop-core" {
   ccloud_api_key            = "${var.ccloud_api_key}"
   ccloud_api_secret         = "${var.ccloud_api_secret}"
   ccloud_topics            = "${var.ccloud_topics}"
+  feedback_form_url         = "${var.feedback_form_url}"
 }
 

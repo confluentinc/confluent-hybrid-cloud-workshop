@@ -51,3 +51,8 @@ variable "ccloud_api_secret" {
 variable "ccloud_topics" {
   description = "Confluent Cloud topics to precreate"
 }
+
+variable "feedback_form_url" {
+  description = "Feedback Form Url"
+  default = ""
+}

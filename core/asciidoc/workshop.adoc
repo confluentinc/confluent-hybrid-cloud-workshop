@@ -10,6 +10,7 @@
 :cloudprovider: GCP
 :externalip: localhost
 :dc: dc
+:feedbackformurl: 
 
 
 include::intro.adoc[]

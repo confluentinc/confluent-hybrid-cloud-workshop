@@ -195,7 +195,7 @@ Start the orders application by running the following command.
 
 [source,bash]
 ----
-docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1"
+docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1 2>&1"
 ----
 
 Confirm that the simulator is working as expected
@@ -339,7 +339,7 @@ Use the following and username and password to authenticate to Confluent Control
 [source,bash,subs="attributes"]
 ----
 Username: {dc}
-Password: <your workshop password>
+Password: your workshop password
 ----
 
 image::./images/c3_05.png[]
@@ -419,13 +419,13 @@ curl -i -X POST -H "Accept:application/json" \
 
 You should see something similar...
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 HTTP/1.1 100 Continue
 
 HTTP/1.1 201 Created
 Date: Sun, 09 Feb 2020 15:07:22 GMT
-Location: http://localhost:18084/connectors/replicator-dc01-to-ccloud
+Location: http://localhost:18084/connectors/replicator-{dc}-to-ccloud
 Content-Type: application/json
 Content-Length: 1342
 Server: Jetty(9.4.20.v20190813)
@@ -562,24 +562,24 @@ You should see something similar:-
 
 [source,json,subs="attributes"]
 ----
-ksql> PRINT dc01_sales_orders;
+ksql> PRINT {dc}_sales_orders;
 Format:AVRO
 2/20/20 1:23:55 PM UTC,
-�, {"id": 466, "order_date": 1582205036000, "customer_id": 12, "sourcedc": "dc01"}
+�, {"id": 466, "order_date": 1582205036000, "customer_id": 12, "sourcedc": "{dc}"}
 2/20/20 1:23:59 PM UTC,
-�, {"id": 467, "order_date": 1582205040000, "customer_id": 27, "sourcedc": "dc01"}
+�, {"id": 467, "order_date": 1582205040000, "customer_id": 27, "sourcedc": "{dc}"}
 2/20/20 1:24:03 PM UTC,
-�, {"id": 468, "order_date": 1582205044000, "customer_id": 20, "sourcedc": "dc01"}
+�, {"id": 468, "order_date": 1582205044000, "customer_id": 20, "sourcedc": "{dc}"}
 2/20/20 1:24:07 PM UTC,
-�, {"id": 469, "order_date": 1582205048000, "customer_id": 7, "sourcedc": "dc01"}
+�, {"id": 469, "order_date": 1582205048000, "customer_id": 7, "sourcedc": "{dc}"}
 2/20/20 1:24:11 PM UTC,
-�, {"id": 470, "order_date": 1582205052000, "customer_id": 30, "sourcedc": "dc01"}
+�, {"id": 470, "order_date": 1582205052000, "customer_id": 30, "sourcedc": "{dc}"}
 2/20/20 1:24:15 PM UTC,
-�, {"id": 471, "order_date": 1582205056000, "customer_id": 27, "sourcedc": "dc01"}
+�, {"id": 471, "order_date": 1582205056000, "customer_id": 27, "sourcedc": "{dc}"}
 2/20/20 1:24:20 PM UTC,
-�, {"id": 472, "order_date": 1582205060000, "customer_id": 8, "sourcedc": "dc01"}
+�, {"id": 472, "order_date": 1582205060000, "customer_id": 8, "sourcedc": "{dc}"}
 2/20/20 1:24:24 PM UTC,
-�, {"id": 473, "order_date": 1582205064000, "customer_id": 8, "sourcedc": "dc01"}
+�, {"id": 473, "order_date": 1582205064000, "customer_id": 8, "sourcedc": "{dc}"}
 ----
 
 Press `ctrl-c` to stop
@@ -641,13 +641,13 @@ Notice that each stream is mapped to an underlying Kafka topic and that the form
 ----
  Stream Name            | Kafka Topic                 | Format
 ---------------------------------------------------------------
- CUSTOMERS              | dc01_customers              | AVRO
- PRODUCTS               | dc01_products               | AVRO
- PURCHASE_ORDERS        | dc01_purchase_orders        | AVRO
- PURCHASE_ORDER_DETAILS | dc01_purchase_order_details | AVRO
- SALES_ORDERS           | dc01_sales_orders           | AVRO
- SALES_ORDER_DETAILS    | dc01_sales_order_details    | AVRO
- SUPPLIERS              | dc01_suppliers              | AVRO
+ CUSTOMERS              | {dc}_customers              | AVRO
+ PRODUCTS               | {dc}_products               | AVRO
+ PURCHASE_ORDERS        | {dc}_purchase_orders        | AVRO
+ PURCHASE_ORDER_DETAILS | {dc}_purchase_order_details | AVRO
+ SALES_ORDERS           | {dc}_sales_orders           | AVRO
+ SALES_ORDER_DETAILS    | {dc}_sales_order_details    | AVRO
+ SUPPLIERS              | {dc}_suppliers              | AVRO
 ---------------------------------------------------------------
 ----
 
@@ -703,14 +703,14 @@ To see the current values for _all_ properties run the following command
 SHOW PROPERTIES;
 ----
 
-Look out for a property called `ksql.streams.auto.offset.reset`, it should be set to `latest` as this is the default setting configured on the KSQL server.
+Look out for a property called `ksql.streams.auto.offset.reset`, it should currently be set to `earliest`.
 
 [source,bash,subs="attributes"]
 ----
  Property                                               | Default override | Effective Value                                                                 
 --------------------------------------------------------------------------------------------
  ...          
- ksql.streams.auto.offset.reset                         |                  | latest
+ ksql.streams.auto.offset.reset                         |                  | earliest
  ...                                             
 --------------------------------------------------------------------------------------------
 ksql>
@@ -748,7 +748,7 @@ Let's start by running a Push query and consume all messages from the beginning 
 
 You should see something similar to this:-
 ```
-ksql> SELECT id, sales_order_id, product_id, quantity, price FROM dc01_sales_order_details EMIT CHANGES;
+ksql> SELECT id, sales_order_id, product_id, quantity, price FROM sales_order_details EMIT CHANGES;
 +-----------------+-----------------+-----------------+-----------------+-----------------+
 |ID               |SALES_ORDER_ID   |PRODUCT_ID       |QUANTITY         |PRICE            |
 +-----------------+-----------------+-----------------+-----------------+-----------------+
@@ -881,7 +881,7 @@ Key field            :
 Key format           : STRING
 Timestamp field      : Not set - using <ROWTIME>
 Value format         : AVRO
-Kafka topic          : dc01_customers (partitions: 1, replication: 3)
+Kafka topic          : {dc}_customers (partitions: 1, replication: 3)
 
  Field      | Type
 ----------------------------------------
@@ -928,7 +928,7 @@ Key field            : CUSTOMERS_REKEYED.ID
 Key format           : STRING
 Timestamp field      : Not set - using <ROWTIME>
 Value format         : AVRO
-Kafka topic          : dc01_customers_rekeyed (partitions: 1, replication: 3)
+Kafka topic          : {dc}_customers_rekeyed (partitions: 1, replication: 3)
 
  Field      | Type
 ----------------------------------------
@@ -956,7 +956,7 @@ Local runtime statistics
 ------------------------
 messages-per-sec:      0.30   total-messages:        30     last-message: 2020-02-26T12:11:31.227Z
 
-(Statistics of the local KSQL server interaction with the Kafka topic dc01_customers_rekeyed)
+(Statistics of the local KSQL server interaction with the Kafka topic {dc}_customers_rekeyed)
 ----
 
 In the above output also notice the `Queries that write from this STREAM` section, here you can see the query you just ran, this a called a persistant query and runs in the background continuously streaming messages until it is terminated. 
@@ -1068,9 +1068,9 @@ SHOW TABLES;
 ----
  Table Name    | Kafka Topic            | Format | Windowed
 ------------------------------------------------------------
- CUSTOMERS_TBL | dc01_customers_rekeyed | AVRO   | false
- PRODUCTS_TBL  | dc01_products_rekeyed  | AVRO   | false
- SUPPLIERS_TBL | dc01_suppliers_rekeyed | AVRO   | false
+ CUSTOMERS_TBL | {dc}_customers_rekeyed | AVRO   | false
+ PRODUCTS_TBL  | {dc}_products_rekeyed  | AVRO   | false
+ SUPPLIERS_TBL | {dc}_suppliers_rekeyed | AVRO   | false
 ------------------------------------------------------------
 ----
 
@@ -1668,6 +1668,14 @@ In the following query we are creating a table that will calculate the demand fo
 
 Hopping windows are based on time intervals. They model fixed-sized, possibly overlapping windows. A hopping window is defined by two properties: the window’s duration and its advance, or “hop”, interval. The advance interval specifies how far a window moves forward in time relative to the previous window. In our query we we have a window with a duration of three minutes and an advance interval of one minute. Because hopping windows can overlap, a record can belong to more than one such window.
 
+Start the KSQL CLI if you haven't already
+[source,bash,subs=attributes+]
+----
+docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+----
+
+Create the windowed query
+
 [source,sql,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
@@ -1825,11 +1833,11 @@ Select your on-premise cluster from the left-hand navigation bar, select _"topic
 
 image::./images/c3_80.png[]
 
-Name the topic `{dc}_out_of_stock_events` and click _"Create with defaults"_
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create with defaults"_
 
 image::./images/c3_90.png[]
 
-We are now ready to replicate this topic from Confluent Cloud to you on-premise cluster.
+We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
 
 === Submit the Replicator Connector Config
 
@@ -1866,13 +1874,13 @@ curl -i -X POST -H "Accept:application/json" \
 
 You should see something similar...
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 HTTP/1.1 100 Continue
 
 HTTP/1.1 201 Created
 Date: Sun, 09 Feb 2020 15:07:22 GMT
-Location: http://localhost:18084/connectors/replicator-dc01-to-ccloud
+Location: http://localhost:18084/connectors/replicator-ccloud-to-{dc}
 Content-Type: application/json
 Content-Length: 1342
 Server: Jetty(9.4.20.v20190813)

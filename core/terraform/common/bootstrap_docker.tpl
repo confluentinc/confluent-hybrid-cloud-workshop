@@ -25,7 +25,7 @@ sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/mysql_schema.sql
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
-asciidoctor workshop.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc}
+asciidoctor workshop.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
 
 # startup the containers
 cd ~/.workshop/docker/

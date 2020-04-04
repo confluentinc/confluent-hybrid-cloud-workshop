@@ -36,6 +36,20 @@ def copytree(src, dst):
     else:
       shutil.copy2(s, d)
 
+if int(config['workshop']['participant_count']) > 35:
+  print()
+  print("*"*70) 
+  print("WARNING: Make sure your Confluent Cloud cluster has enough free partitions") 
+  print("to support this many participants. Each participant uses ~50 partitions.")
+  print("*"*70) 
+  print()
+  while True:
+    val = input('Do You Want To Continue (y/n)? ')
+    if val == 'y':
+      break
+    elif val =='n':
+      exit()
+
 #----------------------------------------
 # Create the Terraform staging directory 
 #----------------------------------------
@@ -109,7 +123,6 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
     # Copy extension images to docker staging
     for extension in config['workshop']['extensions']:
-        print( extension)
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc/images")):
             copytree(os.path.join("./extensions", extension, "asciidoc/images"), os.path.join(docker_staging, "asciidoc/images"))
 
