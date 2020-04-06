@@ -1510,7 +1510,7 @@ We can see the demand for a single product by filtering on the `product_id` and 
 *SELECT*  product_id, 
         quantity 
 *FROM*    product_supply_and_demand 
-*WHERE* product_id = 1
+*WHERE* product_id = 15
 *AND*   quantity < 0
 *EMIT CHANGES*;
 ----
@@ -1544,7 +1544,7 @@ We can also see the supply for a single product by filtering on the `product_id`
 *SELECT*  product_id, 
         quantity 
 *FROM*    product_supply_and_demand 
-*WHERE* product_id = 1
+*WHERE* product_id = 15
 *AND*   quantity > 0
 *EMIT CHANGES*;
 ----
