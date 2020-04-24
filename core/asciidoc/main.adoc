@@ -367,7 +367,7 @@ image::./images/c3_50.png[]
 .Further Reading
 [TIP]
 ====
-* link:https://debezium.io/documentation/reference/1.1/assemblies/cdc-mysql-connector/as_deploy-the-mysql-connector.html#mysql-connector-configuration-properties_debezium[Debezium MySQL Configuration Options , window=_blank]
+* link:https://debezium.io/documentation/reference/1.1/connectors/mysql.html#mysql-connector-configuration-properties_debezium[Debezium MySQL Configuration Options , window=_blank]
 * link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
 * link:https://curl.haxx.se/docs/manpage.html[cURL manpage]
 * link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]
