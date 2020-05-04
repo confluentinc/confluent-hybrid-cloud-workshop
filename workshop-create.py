@@ -165,4 +165,4 @@ if os.path.exists("workshop_details.out"):
             print('=SPLIT("dc{:02d},http://{}", ",")'.format(id, ip_address))
             #print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
 
-    #os.remove("workshop_details.out")
+    os.remove("workshop_details.out")
