@@ -13,7 +13,6 @@ resource "aws_redshift_cluster" "instance" {
 }
 
 resource "local_file" "redshift_cluster_endpoint" {
-  //content  = "RS_JDBC_URL=jdbc:redshift://${aws_redshift_cluster.instance.endpoint}/${var.name}db"
 
   content  = <<EOF
 RS_JDBC_URL=jdbc:redshift://${aws_redshift_cluster.instance.endpoint}/${var.name}db
