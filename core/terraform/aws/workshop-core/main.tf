@@ -89,6 +89,13 @@ resource "aws_security_group" "instance" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+      from_port   = 5539
+      to_port     = 5539
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
       from_port   = 0
       to_port     = 65535
@@ -105,7 +112,7 @@ resource "null_resource" "vm_provisioners" {
   depends_on = ["aws_instance.instance"]
   count                 = "${var.participant_count}"
 
- // Copy bootstrap script to the VM
+  // Copy bootstrap script to the VM
   provisioner "file" {
     content     = "${element(data.template_file.bootstrap_vm.*.rendered, count.index)}"
     destination = "/tmp/bootstrap_vm.sh"
@@ -173,8 +180,6 @@ resource "null_resource" "vm_provisioners" {
       host     = "${aws_instance.instance[count.index].public_ip}"
     }
   }
-
-
 }
 
 
