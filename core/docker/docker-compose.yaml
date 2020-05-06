@@ -26,6 +26,7 @@ services:
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_RETENTION_HOURS: 6
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -169,6 +170,10 @@ services:
         confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.0-preview
         confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.0.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
+        confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
+        cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
+        curl -k -L "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.41.1065/RedshiftJDBC42-no-awssdk-1.2.41.1065.jar" -o RedshiftJDBC42-no-awssdk-1.2.41.1065.jar
+        
         #
         echo "Launching Kafka Connect worker"
         /etc/confluent/docker/run & 

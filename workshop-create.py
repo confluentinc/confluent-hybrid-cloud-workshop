@@ -160,8 +160,9 @@ if os.path.exists("workshop_details.out"):
         print("*" * 65)
         print("\n WORKSHOP DETAILS\n Copy & paste into Google Sheets and share with the participants\n")
         print("*" * 65)
-        print('=SPLIT("ENVIRONMENT ID,GETTING STARTED URL,PARTICIPANT NAME/EMAIL",",")')
-        for id, ip_address in enumerate(ip_addresses, start=0):
-            print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
+        print('=SPLIT("SSH USERNAME,GETTING STARTED URL,PARTICIPANT NAME/EMAIL",",")')
+        for id, ip_address in enumerate(ip_addresses, start=1):
+            print('=SPLIT("dc{:02d},http://{}", ",")'.format(id, ip_address))
+            #print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
 
     os.remove("workshop_details.out")
