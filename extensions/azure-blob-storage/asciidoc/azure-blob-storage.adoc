@@ -69,7 +69,7 @@ WorkerId             : kafka-connect:18084
 ---------------------------------
 ----
 
-Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
+Depending on who's hosting the workshop, you may or may not have access to the Azure account where the storage bucket is held.
 
 .Further Reading
 [TIP]
