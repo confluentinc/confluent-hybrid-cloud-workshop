@@ -11,6 +11,7 @@ module "workshop-core" {
   participant_password     = "${var.participant_password}"
   region                   = "${var.region}"
   vm_type                  = "${var.vm_type}"
+  ami                      = "${var.ami}"
   ccloud_bootstrap_servers = "${var.ccloud_bootstrap_servers}"
   ccloud_api_key           = "${var.ccloud_api_key}"
   ccloud_api_secret        = "${var.ccloud_api_secret}"

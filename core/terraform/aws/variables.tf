@@ -23,6 +23,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "ami" {
+  description = "Amazon Machine Image"
+}
+
 variable "access_key" {
   description = "AWS Access Key"
 }

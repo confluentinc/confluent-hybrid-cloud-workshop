@@ -32,7 +32,7 @@ data "template_file" "bootstrap_docker" {
 */
 resource "aws_instance" "instance" {
   count         = "${var.participant_count}"
-  ami           = "ami-0eb89db7593b5d434"
+  ami           = "${var.ami}"
   instance_type = "${var.vm_type}"
   vpc_security_group_ids = [aws_security_group.instance.id]
 

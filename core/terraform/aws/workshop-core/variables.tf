@@ -21,6 +21,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "ami" {
+  description = "Amazon Machine Image"
+}
+
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
   description = "Confluent Cloud username"
