@@ -19,6 +19,10 @@ workshop:
     secret_key: <secret key>
     region: eu-west-2
     vm_type: t2.xlarge
+    # EU - does not exist in SG
+    ami: ami-0eb89db7593b5d434
+    # SG - Ubuntu Server 18.04 LTS (HVM), SSD Volume Type
+    #ami: ami-0f7719e8b7ba25c61
 
     # The workshop Confluent Cloud configuration
     ccloud_bootstrap_servers: <CCloud Bootstrap Server>
