@@ -51,8 +51,8 @@ show connectors;
 ----
  Connector Name            | Type   | Class
 ------------------------------------------------------------------------------------------------
- DC01_REDSHIFT_SINK        | SINK   | io.confluent.connect.jdbc.JdbcSinkConnector
- replicator-dc01-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+ {dc}_REDSHIFT_SINK        | SINK   | io.confluent.connect.jdbc.JdbcSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
 ------------------------------------------------------------------------------------------------
 
 ----
@@ -61,11 +61,11 @@ We can also describe a connector and view its status using the `describe connect
 
 [source,bash,subs=attributes]
 ----
-describe connector DC01_REDSHIFT_SINK;
+describe connector {dc}_redshift_sink;
 ----
 [source,bash,subs=attributes]
 ----
-Name                 : DC01_REDSHIFT_SINK
+Name                 : {dc}_REDSHIFT_SINK
 Class                : io.confluent.connect.jdbc.JdbcSinkConnector
 Type                 : sink
 State                : RUNNING
