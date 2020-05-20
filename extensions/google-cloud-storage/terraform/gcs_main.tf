@@ -1,7 +1,7 @@
 resource "google_storage_bucket" "instance" {
   name          = "${var.name}-gcssink-bucket"
-  location      = "${var.gcs_region}"
-  project       = "${var.gcs_project}"
+  location      = var.gcs_region
+  project       = var.gcs_project
   force_destroy = "true"
 
   website {
@@ -15,17 +15,17 @@ resource "google_service_account" "myaccount" {
   display_name = "Workshop Storage Account"
 }
 resource "google_service_account_key" "mykey" {
-  service_account_id = "${google_service_account.myaccount.id}"
+  service_account_id = google_service_account.myaccount.id
 }
 resource "local_file" "myaccountjson" {
-  content  = "${base64decode(google_service_account_key.mykey.private_key)}"
+  content  = base64decode(google_service_account_key.mykey.private_key)
   filename = "${path.module}/gcs_creds.json"
 }
 
 resource "google_storage_bucket_iam_binding" "legacyBucketReaderBinding" {
   bucket = "${var.name}-gcssink-bucket"
   role   = "roles/storage.legacyBucketReader"
-  depends_on = ["module.workshop-core"]
+  depends_on = [module.workshop-core]
 
   members = [
     "serviceAccount:${google_service_account.myaccount.email}"
@@ -35,7 +35,7 @@ resource "google_storage_bucket_iam_binding" "legacyBucketReaderBinding" {
 resource "google_storage_bucket_iam_binding" "legacyBucketWriterBinding" {
   bucket     = "${var.name}-gcssink-bucket"
   role       = "roles/storage.legacyBucketWriter"
-  depends_on = ["module.workshop-core"]
+  depends_on = [module.workshop-core]
 
   members = [
     "serviceAccount:${google_service_account.myaccount.email}"
@@ -43,18 +43,18 @@ resource "google_storage_bucket_iam_binding" "legacyBucketWriterBinding" {
 }
 
 resource "null_resource" "vm_provisioners" {
-   count      = "${var.participant_count}"
-   depends_on = ["module.workshop-core"]
+   count      = var.participant_count
+   depends_on = [module.workshop-core]
 
   provisioner "file" {
     source      = "gcs_creds.json"
     destination = "/tmp/gcs_creds.json"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(module.workshop-core.external_ip_addresses, count.index)}"
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
     }
   }
 
@@ -68,10 +68,10 @@ resource "null_resource" "vm_provisioners" {
     ]
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(module.workshop-core.external_ip_addresses, count.index)}"
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
     }
   }
 }
