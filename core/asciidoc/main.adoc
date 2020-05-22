@@ -1518,6 +1518,8 @@ We are now ready to replicate this topic from Confluent Cloud to your on-premise
 
 Execute the following from the command line to create the Replicator Connector. You can see that we have asked to only replicate the `{dc}_out_of_stock_events` topic by configuring `"topic.whitelist": "{dc}_out_of_stock_events"`
 
+[IMPORTANT]
+====
 [source,subs="attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
@@ -1545,7 +1547,7 @@ curl -i -X POST -H "Accept:application/json" \
         }
     }'
 ----
-
+====
 
 You should see something similar...
 
