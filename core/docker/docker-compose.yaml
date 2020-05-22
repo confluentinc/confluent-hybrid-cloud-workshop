@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.4.0
+    image: confluentinc/cp-zookeeper:5.5.0
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -11,7 +11,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-enterprise-kafka:5.4.0
+    image: confluentinc/cp-enterprise-kafka:5.5.0
     hostname: broker
     container_name: broker
     depends_on:
@@ -34,7 +34,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.4.0
+    image: confluentinc/cp-schema-registry:5.5.0
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
@@ -47,7 +47,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
 
   kafka-connect-onprem:
-    image: confluentinc/cp-kafka-connect:5.4.0
+    image: confluentinc/cp-kafka-connect:5.5.0
     container_name: kafka-connect-onprem
     hostname: kafka-connect-onprem
     depends_on:
@@ -88,7 +88,7 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.4.0-1
+        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
@@ -103,7 +103,7 @@ services:
       - .env:/secrets.properties
 
   kafka-connect-ccloud:
-    image: confluentinc/cp-kafka-connect:5.4.0
+    image: confluentinc/cp-kafka-connect:5.5.0
     container_name: kafka-connect-ccloud
     hostname: kafka-connect-ccloud
     depends_on:
@@ -163,7 +163,7 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.4.0-1
+        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt confluentinc/kafka-connect-gcs-source:1.1.0-preview
         confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
@@ -183,7 +183,7 @@ services:
       - .env:/secrets.properties
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:5.4.0
+    image: confluentinc/cp-enterprise-control-center:5.5.0
     hostname: control-center
     container_name: control-center
     depends_on:
@@ -285,7 +285,7 @@ services:
       - ./asciidoc:/usr/share/nginx/html
  
   create-cloud-topics:
-    image: confluentinc/cp-kafka:5.4.0
+    image: confluentinc/cp-kafka:5.5.0
     hostname: create-cloud-topics
     container_name: create-cloud-topics
     volumes:
