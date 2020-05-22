@@ -4,20 +4,20 @@ Your environment represents an on-premise data center and consists of a virtual 
 
 To login to your virtual data center open a terminal session and use the credentials that were assigned to you
 
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 ssh {dc}@{externalip} 
 ----
 
 Once logged in run the following command to confirm that you have several docker containers running
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 docker ps --format "table {{.ID}}\t{{.Names}}\t{{.RunningFor}}\t{{.Status}}"
 ----
 
 You should see something similar to this:-
 
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 CONTAINER ID        NAMES                     CREATED             STATUS
 d71e05e9b3b5        db-trans-simulator        6 minutes ago       Up 6 minutes
@@ -49,13 +49,13 @@ image::./images/mysql_schema.png[MySQL schema]
 
 We can inspect this schema further by logging into the MySQL CLI.
 
-[source,bash]
+[source]
 ----
 docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database orders'
 ----
 
 You should see the following
-[source,bash]
+[source]
 ----
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 1138
@@ -74,14 +74,14 @@ mysql>
 
 To view your tables.
 
-[source,bash]
+[source]
 ----
 show tables;
 ----
 
 There's an extra table here called `{dc}_out_of_stock_events` that not in the schema diagram above, we'll cover this table separately later on.
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 +--------------------------+
 | Tables_in_orders         |
@@ -100,7 +100,7 @@ There's an extra table here called `{dc}_out_of_stock_events` that not in the sc
 
 ...and get some row counts.
 
-[source,bash]
+[source]
 ----
 SELECT * from (
   SELECT 'customers' as table_name, COUNT(*) FROM customers 
@@ -121,7 +121,7 @@ SELECT * from (
 
 As you can see, we have 30 customers, suppliers and products, 0 sales orders and 1 purchase order. 
 
-[source,bash]
+[source]
 ----
 +------------------------+----------+
 | table_name             | COUNT(*) |
@@ -139,12 +139,12 @@ As you can see, we have 30 customers, suppliers and products, 0 sales orders and
 
 The single purchase order was created so we have something in stock to sell, let's have a look at what was ordered.
 
-[source,sql]
+[source]
 ----
 SELECT * FROM purchase_order_details;
 ----
 
-[source,bash]
+[source]
 ----
 +----+-------------------+------------+----------+------+
 | id | purchase_order_id | product_id | quantity | cost |
@@ -193,20 +193,20 @@ To start generating some sales orders we need to start the orders application. T
 
 Start the orders application by running the following command.
 
-[source,bash]
+[source]
 ----
 docker exec -dit db-trans-simulator sh -c "python -u /simulate_dbtrans.py > /proc/1/fd/1 2>&1"
 ----
 
 Confirm that the simulator is working as expected
 
-[source,bash]
+[source]
 ----
 docker logs -f db-trans-simulator
 ----
 
 You should see an output like this:
-[source,bash]
+[source]
 ----
 Sales Order 1 Created
 Sales Order 2 Created
@@ -282,7 +282,7 @@ We have a Kafka Connect worker already up and running in a docker container call
 
 To create the Debezium MySQL Source connector instance run the following command:-
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
   -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
@@ -316,7 +316,7 @@ curl -i -X POST -H "Accept:application/json" \
 
 The output should resemble something similar to this...
 
-[source,bash]
+[source]
 ----
 HTTP/1.1 201 Created
 Date: Thu, 20 Feb 2020 13:00:57 GMT
@@ -336,7 +336,7 @@ We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank
 
 Use the following and username and password to authenticate to Confluent Control Center
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 Username: {dc}
 Password: your workshop password
@@ -387,7 +387,7 @@ To support this connector, we have another Kafka Connect worker running in a dif
 
 Run the following from the command line to create the Replicator Connector instance, this connector will replicate events from you on-premise Kafka cluster to your Confluent Cloud Cluster.
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
     -H  "Content-Type:application/json" http://localhost:18084/connectors/ \
@@ -419,7 +419,7 @@ curl -i -X POST -H "Accept:application/json" \
 
 You should see something similar...
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 HTTP/1.1 100 Continue
 
@@ -487,7 +487,7 @@ NOTE: **This workshop will focus on the KSQL CLI**
 
 To start the KSQL CLI run the following command:-
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
 ----
@@ -560,7 +560,7 @@ To inspect the contents of a topic run the following:-
 
 You should see something similar:-
 
-[source,json,subs="attributes"]
+[source,subs="attributes"]
 ----
 ksql> PRINT {dc}_sales_orders;
 Format:AVRO
@@ -595,7 +595,7 @@ In order to work with a stream of data in KSQL we first need to register a KSQL 
 
 We can do this using a `CREATE STREAM` statement. Run the following command to create your first KSQL stream:-
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *CREATE STREAM* sales_orders *WITH* (KAFKA_TOPIC='{dc}_sales_orders', VALUE_FORMAT='AVRO');
 ----
@@ -604,7 +604,7 @@ image::./images/ksql_001.png[align="center"]
 
 You should see the following output
 
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
 ksql> CREATE STREAM sales_orders WITH (KAFKA_TOPIC='{dc}_sales_orders', VALUE_FORMAT='AVRO');
 
@@ -616,7 +616,7 @@ ksql> CREATE STREAM sales_orders WITH (KAFKA_TOPIC='{dc}_sales_orders', VALUE_FO
 
 Create streams for each of your remaining topics
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *CREATE STREAM* sales_order_details *WITH* (KAFKA_TOPIC='{dc}_sales_order_details', VALUE_FORMAT='AVRO');
 *CREATE STREAM* purchase_orders *WITH* (KAFKA_TOPIC='{dc}_purchase_orders', VALUE_FORMAT='AVRO');
@@ -630,14 +630,14 @@ image::./images/ksql_002.png[align="center"]
 
 To view your current streams run the following command:-
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 SHOW STREAMS;
 ----
 
 Notice that each stream is mapped to an underlying Kafka topic and that the format is AVRO. 
 
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
  Stream Name            | Kafka Topic                 | Format
 ---------------------------------------------------------------
@@ -653,7 +653,7 @@ Notice that each stream is mapped to an underlying Kafka topic and that the form
 
 To view the details of an individual topic you can you can use the `describe` command:-
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *DESCRIBE* sales_order_details;
 ----
@@ -662,7 +662,7 @@ Notice that all the columns have been created for us and we didn't need to expli
 
 Also notice that KSQL adds the implicit columns `ROWTIME` and `ROWKEY` to every stream and table, which represent the corresponding Kafka message timestamp and message key, respectively. The timestamp has milliseconds accuracy.
 
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
 Name                 : SALES_ORDER_DETAILS
  Field          | Type
@@ -698,14 +698,14 @@ Another important point to understand is where within a topic a query starts to 
 
 To see the current values for _all_ properties run the following command 
  
-[source,bash,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 SHOW PROPERTIES;
 ----
 
 Look out for a property called `ksql.streams.auto.offset.reset`, it should currently be set to `earliest`.
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
  Property                                               | Default override | Effective Value                                                                 
 --------------------------------------------------------------------------------------------
@@ -718,7 +718,7 @@ ksql>
 
 You can override this setting to suit you needs:-
 
-[source,bash,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'ksql.streams.auto.offset.reset'='earliest';
 *SET* 'ksql.streams.auto.offset.reset'='latest';
@@ -726,7 +726,7 @@ You can override this setting to suit you needs:-
 
 Or preferably, using the abbreviated property names:-
 
-[source,bash,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset' = 'latest';
 *SET* 'auto.offset.reset' = 'earliest';
@@ -734,7 +734,7 @@ Or preferably, using the abbreviated property names:-
 
 Let's start by running a Push query and consume all messages from the beginning of a stream.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *SELECT*  id, 
@@ -778,7 +778,7 @@ Notice that events continue to stream to the console until you explicitly cancel
 
 To inspect a bounded set of data, you can use the `LIMIT` clause.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SELECT*  id, 
         sales_order_id, 
@@ -791,7 +791,7 @@ To inspect a bounded set of data, you can use the `LIMIT` clause.
 ----
 
 Here we are seeing the first 10 messages that were written to the topic. Notice that the query automatically terminates when the limit of 10 events is reached.
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
 +-----------------+-----------------+-----------------+-----------------+-----------------+
 |ID               |SALES_ORDER_ID   |PRODUCT_ID       |QUANTITY         |PRICE            |
@@ -815,7 +815,7 @@ ksql>
 
 Since KSQL is based on SQL, you can do many of the standard SQL things you'd expect to be able to do, including predicates and projections. The following query will return a stream of  you the latest sales orders where the `quantity` column is greater than 3.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='latest';
 *SELECT*  id, 
@@ -828,7 +828,7 @@ Since KSQL is based on SQL, you can do many of the standard SQL things you'd exp
 
 You should only see events where the `quantity` column value is greater than `3`.
 
-[source,sql]
+[source]
 ----
 +------------------------------+------------------------------+------------------------------+
 |ID                            |PRODUCT_ID                    |QUANTITY                      |
@@ -989,9 +989,7 @@ Now that we have our `customers_rekeyed` stream created let's rekey the `supplie
 *SELECT* * *FROM* products
 *PARTITION BY* id;
 
-*CREATE STREAM* suppliers_rekeyed *WITH* (KAFKA_TOPIC='{dc}_suppliers_rekeyed', PARTITIONS=1) *AS*
-*SELECT* * *FROM* suppliers
-*PARTITION BY* id;
+[source,subs="quotes,attributes"]
 ----
 
 image::./images/ksql_004.png[align="center"]
@@ -1059,12 +1057,12 @@ image::./images/ksql_005.png[align="center"]
 
 We can view our current tables using the following command:-
 
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
 SHOW TABLES;
 ----
 
-[source,sql,subs="attributes"]
+[source,subs="attributes"]
 ----
  Table Name    | Kafka Topic            | Format | Windowed
 ------------------------------------------------------------
@@ -1091,7 +1089,7 @@ We can join two streams together in KSQL using a windowed join. When using a win
 
 In the example below you can see that we have specified a window of 1 seconds using the `WITHIN` clause. The source application creates sales orders and their associated sales order detail rows at the same time, so a second will be plenty of time to ensure that a join takes place.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *CREATE STREAM* sales_enriched_01 *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_sales_enriched_01') *AS SELECT*
     o.id order_id,
@@ -1206,14 +1204,14 @@ image::./images/ksql_008.png[align="center"]
 
 If we run a describe on this stream... 
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *DESCRIBE* sales_enriched;
 ----
 
 ...you'll see that we have effectively denormalized the `sales_orders`, `sales_order_details`, `customers` and `products` streams/tables into a single event stream.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
  Field            | Type
 ----------------------------------------------
@@ -1239,9 +1237,7 @@ If we run a describe on this stream...
 
 We now need to create an equivilent `purchases_enriched` stream that combines the `purchase_orders`, `purchase_order_details`, `suppliers` and `products` streams/tables. Since the purchases data model is very similar to that of the sales data model the process is the same.
 
-Join the `purchase_orders` stream to the `purchase_order_details` stream
-
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *CREATE STREAM* purchases_enriched_01 *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_purchases_enriched_01') *AS SELECT*
     o.id order_id,
@@ -1342,12 +1338,12 @@ image::./images/ksql_011.png[align="center"]
 
 If we run a describe on this stream...
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *DESCRIBE* purchases_enriched;
 ----
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 Name                 : PURCHASES_ENRICHED
  Field            | Type
@@ -1374,7 +1370,7 @@ Name                 : PURCHASES_ENRICHED
 
 Let's query the `purchases_enriched` stream from the very beginning
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *SELECT* product_id, 
@@ -1386,7 +1382,7 @@ Let's query the `purchases_enriched` stream from the very beginning
 
 Notice that the query returns the first 30 purchase order lines and then stops; this is because no purchase orders are being created by our orders application. The orders application will raise purchase orders for us when we send it some out of stock events.
 
-[source,bash,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +-------------------------+----------------------------------+------------------------+
 |PRODUCT_ID               |PRODUCT_NAME                      |PRODUCT_QTY             |
@@ -1434,7 +1430,7 @@ Before we can create an out of stock event stream, we need to work out the curre
 
 Let's have a go at this now by creating a new stream called `product_supply_and_demand`. This stream is consuming messages from the `sales_enriched` stream and included the `product_id` and `quantity` column converted to a negative value, we do this because sales events are our _demand_ and hence decrement stock.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *CREATE STREAM* product_supply_and_demand *WITH* (PARTITIONS=1, KAFKA_TOPIC='{dc}_product_supply_and_demand') *AS SELECT* 
@@ -1447,7 +1443,7 @@ image::./images/ksql_012.png[align="center"]
 
 Let's have a quick look at the first few rows of this stream
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *SELECT*  product_id, 
@@ -1459,7 +1455,7 @@ Let's have a quick look at the first few rows of this stream
 
 This query shows a history of all sales and their affect on stock levels. 
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
@@ -1490,7 +1486,7 @@ Query terminated
 
 What we need to do now is also include all product purchases in the same stream. We can do this using an `INSERT INTO` statement. The `INSERT INTO` statement streams the result of a SELECT query into an existing stream and its underlying topic.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *INSERT INTO* product_supply_and_demand 
   *SELECT*  product_id, 
@@ -1504,7 +1500,7 @@ Our `product_supply_and_demand` now includes all product sales as stock decremen
 
 We can see the demand for a single product by filtering on the `product_id` and including only events where the `quantity` is less than zero.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *SELECT*  product_id, 
@@ -1515,7 +1511,7 @@ We can see the demand for a single product by filtering on the `product_id` and 
 *EMIT CHANGES*;
 ----
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
@@ -1538,7 +1534,7 @@ We can see the demand for a single product by filtering on the `product_id` and 
 
 We can also see the supply for a single product by filtering on the `product_id` and including only events where the `quantity` is greater than zero.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *SELECT*  product_id, 
@@ -1551,7 +1547,7 @@ We can also see the supply for a single product by filtering on the `product_id`
 
 This query will only return a single event and reflects the initial purchase order line that was raised for this product.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
@@ -1561,7 +1557,7 @@ This query will only return a single event and reflects the initial purchase ord
 
 We're now is a position where we can calculate the current stock level for each product. We can do this by creating a table that groups by the `product_id` and sums up the `quantity` column which contains both stock decrements and stock increments.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *CREATE TABLE* current_stock *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_current_stock') *AS SELECT* 
@@ -1575,7 +1571,7 @@ image::./images/ksql_014.png[align="center"]
 
 When we query this table with a Push query... 
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='latest';
 *SELECT*  product_id,
@@ -1602,7 +1598,7 @@ We can now run our first Pull query. Pull queries are a preview feature in KSQL 
 
 To run a Pull query we just query the table as normal but drop the `EMIT CHANGES` clause. In this query we are asking "*what is the _current_ stock level for product id 1?*"
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 select product_id, stock_level from current_stock where rowkey='1';
 ----
@@ -1611,7 +1607,7 @@ image::./images/ksql_015.png[align="center"]
 
 The query will return the current stock level and immediatly terminate.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +----------------------------------------------------+----------------------------------------------------+
 |PRODUCT_ID                                          |STOCK_LEVEL                                         |
@@ -1624,14 +1620,14 @@ We can also use the KSQL Server's REST endpoint to make Pull queries.
 
 Exit from the KSQL CLI and run the following from the command line.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 curl -s -X "POST" "http://localhost:8088/query" -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" -d $'{ "ksql": "select product_id, stock_level from current_stock where rowkey=\'1\';" }'| jq .
 ----
 
 As you can see, the KSQL Server's REST endpoint will return a JSON message with the `product_id` and its current `stock_level`. This is useful for applications that want access to the current state of the world using a request/response type pattern.
 
-[source,bash,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 [
   {
@@ -1669,14 +1665,14 @@ In the following query we are creating a table that will calculate the demand fo
 Hopping windows are based on time intervals. They model fixed-sized, possibly overlapping windows. A hopping window is defined by two properties: the window’s duration and its advance, or “hop”, interval. The advance interval specifies how far a window moves forward in time relative to the previous window. In our query we we have a window with a duration of three minutes and an advance interval of one minute. Because hopping windows can overlap, a record can belong to more than one such window.
 
 Start the KSQL CLI if you haven't already
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
 ----
 
 Create the windowed query
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='earliest';
 *CREATE TABLE* product_demand_last_3mins_tbl *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_product_demand_last_3mins') 
@@ -1694,7 +1690,7 @@ image::./images/ksql_016.png[align="center"]
 
 If we query this table for a single product...
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset'='latest';
 *SELECT*  window_start_time,
@@ -1709,7 +1705,7 @@ If we query this table for a single product...
 
 ...you'll see the start and end times for each three minute window, along with the product demand for those 3 minutes. Notice how the window start times are staggered by one minute, this is the advance interval in action. As new sales events occur a new message will be displayed with an update to the window(s) total.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +-----------------+-----------------+-----------------+-----------------+
 |WINDOW_START_TIME|WINDOW_END_TIME  |PRODUCT_ID       |DEMAND_LAST_3MINS|
@@ -1739,7 +1735,7 @@ We will now create a stream from this table and then join it to the `current_sto
 
 Create a stream from the table's underlying topic...
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *CREATE STREAM* product_demand_last_3mins *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', VALUE_FORMAT='AVRO');
 ----
@@ -1756,7 +1752,7 @@ image::./images/ksql_017.png[align="center"]
 
 Now that we have the `current_stock` table and `product_demand_last_3mins` stream, we can create a `out_of_stock_events` stream by joining the two together and calculating the required purchase order quantity. We calculate the `purchase_qty` from adding the inverse of the current stock level to the last 3 minutes of demand. The stream is filtered to only include products that have no stock and therefore need purchase orders raising for them.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset' = 'latest';
 *CREATE STREAM* out_of_stock_events *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_out_of_stock_events') 
@@ -1776,7 +1772,7 @@ image::./images/ksql_018.png[align="center"]
 
 When we query the `out_of_stock_events` stream...
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 *SET* 'auto.offset.reset' = 'latest';
 *SELECT* product_id,
@@ -1791,7 +1787,7 @@ When we query the `out_of_stock_events` stream...
 
 ...you'll see a constant stream of _out of stock products_ and the predicted purchase quantity that should be ordered to satisfy any current backlog and also meet the next 3 minutes demand.   
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 +----------------+------------------+----------------+-------------+-----------------+-------------------+
 |PRODUCT_ID      |WINDOW_START_TIME |WINDOW_END_TIME |STOCK_LEVEL  |DEMAND_LAST_3MINS|QUANTITY_TO_PURCASE|
@@ -1843,7 +1839,7 @@ We are now ready to replicate this topic from Confluent Cloud to your on-premise
 
 Execute the following from the command line to create the Replicator Connector. You can see that we have asked to only replicate the `{dc}_out_of_stock_events` topic by configuring `"topic.whitelist": "{dc}_out_of_stock_events"`
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
     -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
@@ -1874,7 +1870,7 @@ curl -i -X POST -H "Accept:application/json" \
 
 You should see something similar...
 
-[source,bash,subs="attributes"]
+[source,subs="attributes"]
 ----
 HTTP/1.1 100 Continue
 
@@ -1907,19 +1903,19 @@ image::./images/6_jdbc_sink.png[]
 
 But before we do that, let's open a couple more terminal sessions and start the KSQL CLI in each.
 
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 ssh {dc}@{externalip}
 ----
 
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
 ----
 
 Execute the following query in the 1st session...
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 SET 'auto.offset.reset'='latest';
 SELECT  product_id,
@@ -1930,7 +1926,7 @@ EMIT CHANGES;
 
 ...and this query in the 2nd session
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 SET 'auto.offset.reset'='latest';
 SELECT  product_id,
@@ -1945,7 +1941,7 @@ Let's now sink the _out of stock events_ to the MySQL database using the JDBC Co
 
 In a third terminal session, create the JDBC Sink Connector by running the following from the command line.
 
-[source,sql,subs="quotes,attributes"]
+[source,subs="quotes,attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
     -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
