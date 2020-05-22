@@ -35,12 +35,20 @@ c2362c0fc8e0        kafka-connect-onprem      3 minutes ago       Up 3 minutes
 
 [IMPORTANT]
 ====
-Whenever you see this icon, it means the associated step is mandatory. Missing one of these steps will mean the data pipeline will not as expected.
+Whenever you see this icon it means the step is mandatory. Missing one of these steps will result in the data pipeline not working as expected.
 ====
+
+[TIP]
+====
+Take advantage of the copy to clipboard button, it will save you some time!
+
+image::./images/copypaste.png[]
+====
+
 
 == Lab 2: Getting Started
 
-The data source for this workshop will be a MySQL database running in your data center. Connected to this database is a orders application which we will discuss shortly.
+The primary data source for this workshop is a MySQL database running in your data center. Connected to this database is a orders application which we will discuss shortly.
 
 image::./images/1_mysql.png[]
 
