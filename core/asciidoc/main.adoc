@@ -31,8 +31,12 @@ c2362c0fc8e0        kafka-connect-onprem      3 minutes ago       Up 3 minutes
 92c955b221f3        zookeeper                 3 minutes ago       Up 3 minutes
 0794f9008bb6        mysql                     3 minutes ago       Up 3 minutes (healthy)
 31c3c1372aa1        workshop-docs-webserver   3 minutes ago       Up 3 minutes
-
 ----
+
+[IMPORTANT]
+====
+Whenever you see this icon, it means the associated step is mandatory. Missing one of these steps will mean the data pipeline will not as expected.
+====
 
 == Lab 2: Getting Started
 
@@ -750,7 +754,7 @@ Query terminated
 ksql>
 ----
 
-==== Filtering Streams
+=== Filtering Streams
 
 Since ksqlDB is based on SQL, you can do many of the standard SQL things you'd expect to be able to do, including predicates and projections. The following query will return a stream of  you the latest sales orders where the `quantity` column is greater than 3.
 
@@ -1608,6 +1612,8 @@ Let's now sink the _out of stock events_ to the MySQL database using the JDBC Co
 
 In a third terminal session, create the JDBC Sink Connector by running the following from the command line.
 
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 curl -i -X POST -H "Accept:application/json" \
@@ -1627,6 +1633,7 @@ curl -i -X POST -H "Accept:application/json" \
        }
     }'
 ----
+====
 
 Observe the current stock query in the first ksqlDB session, when a product has zero or less stock you should see a purchase event appear in the second ksqlDB session and then the new stock level reflected in the first session. In theory, given a constant demand, each product should run out of stock and get replenished roughly every 3 minutes.
 
