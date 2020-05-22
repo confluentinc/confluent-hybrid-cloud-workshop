@@ -383,7 +383,7 @@ b.button:before { content: "["; padding: 0 3px 0 2px; }
 b.button:after { content: "]"; padding: 0 2px 0 3px; }
 
 /* Control max width here */
-#header , #content, #footnotes, #footer {  width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
+#header , #content, #footnotes, #footer {  width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 1150px; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before {content:url(./images/confluent-logo-300.png);} #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { display: table; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
 
