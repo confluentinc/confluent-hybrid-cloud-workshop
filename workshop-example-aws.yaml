@@ -41,6 +41,8 @@ workshop:
   # Uncomment the required extensions
   extensions:
 
+    # aws-s3:
+
     # aws-redshift:
       # https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_USER.html
       # For clear text, the password must meet the following constraints:
