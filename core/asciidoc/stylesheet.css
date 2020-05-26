@@ -785,7 +785,7 @@ b.conum * { color: inherit !important; }
 
 .conum:not([data-value]):empty { display: none; }
 
-#header {padding-top:2.9em ;}, #content, #footnotes { background: white; padding-left: 2.5em; padding-right: 2.5em; }
+#header {padding-top:2.9em;} #content, #footnotes { background: white; padding-left: 2.5em; padding-right: 2.5em; }
 
 #header { margin-bottom: 0; }
 #header > h1 { border-bottom: none; }
