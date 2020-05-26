@@ -40,7 +40,6 @@ resource "null_resource" "redshift_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cp rs_jdbc_url.txt rs_jdbc_url.txt1",
       "cat /tmp/rs_jdbc_url.txt >> ~/.workshop/docker/.env",
       "rm /tmp/rs_jdbc_url.txt"
     ]
