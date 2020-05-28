@@ -1,13 +1,13 @@
 == Optional Lab: Stream Sales & Purchases to AWS Redshift
 
-We can use the JDBC Sink Connector to stream changes from our topics to Google BigQuery.
+We can use the JDBC Sink Connector to stream changes from our topics to AWS Redshift.
 
-To do this we'll use the KSQL CLI to create the connector.
+To do this we'll use the ksqlDB CLI to create the connector.
 
-Start a KSQL CLI session
+Start a ksqlDB CLI session
 [source,bash,subs=attributes]
 ----
-docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS Redshift:-
