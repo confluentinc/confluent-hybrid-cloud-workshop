@@ -135,7 +135,11 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
                 for var in config['workshop']['extensions'][extension]:
                     with open(os.path.join(docker_staging, "extensions", extension, "docker/.env"), 'a') as env_file:
                         env_file.write(var + '=' + config['workshop']['extensions'][extension][var] + "\n")
-                    
+else:  
+    for line in fileinput.input(os.path.join(docker_staging, "asciidoc/workshop.adoc"), inplace=True):
+        line=re.sub("^#EXTENSIONS_PLACEHOLDER#","",line)   
+        print(line.rstrip())
+              
        
 #-----------------
 # Create Workshop
