@@ -10,9 +10,9 @@ For a single workshop participant, the logical architecture looks like this.
 
 From a physical architecture point of view, each component, except for Confluent Cloud, is hosted on the participant's virtual machine. 
 
-Each workshop participant will work through a series of Labs to create the following KSQL Supply & Demand Application.
+Each workshop participant will work through a series of Labs to create the following ksqlDB Supply & Demand Application.
 
-![workshop](core/asciidoc/images/KSQL_topology.png)
+![workshop](core/asciidoc/images/KSQLDB_topology.png)
 
 ## Prerequisites
 
