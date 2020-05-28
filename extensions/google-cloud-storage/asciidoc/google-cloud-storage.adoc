@@ -4,15 +4,20 @@ We can use the Google Cloud Storage Sink Connector to stream changes from a topi
 
 To do this we'll use the ksqlDB CLI to create the connector.
 
+[IMPORTANT]
+====
 Start a ksqlDB CLI session
 [source,bash,subs=attributes]
 ----
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
+====
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to Google Cloud Storage.
 
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+[source,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
   'connector.class' = 'io.confluent.connect.gcs.GcsSinkConnector',
@@ -35,6 +40,7 @@ CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
   'key.converter'= 'org.apache.kafka.connect.storage.StringConverter'
 );
 ----
+====
 
 We can list our current connectors using the following command
 

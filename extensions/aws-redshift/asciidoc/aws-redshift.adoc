@@ -4,11 +4,14 @@ We can use the JDBC Sink Connector to stream changes from our topics to AWS Reds
 
 To do this we'll use the ksqlDB CLI to create the connector.
 
+[IMPORTANT]
+====
 Start a ksqlDB CLI session
 [source,bash,subs=attributes]
 ----
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
+====
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS Redshift:-
 
@@ -23,7 +26,9 @@ And run the following `CREATE SINK CONNECTOR` command. This will create a connec
 {dc}_suppliers 
 ----
 
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+[source,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_redshift_sink WITH (  
   'connector.class'='io.confluent.connect.jdbc.JdbcSinkConnector',
@@ -37,6 +42,7 @@ CREATE SINK CONNECTOR {dc}_redshift_sink WITH (
   'key.converter'='org.apache.kafka.connect.storage.StringConverter',
   'dialect.name'='PostgreSqlDatabaseDialect'
 );
+====
 
 ----
 

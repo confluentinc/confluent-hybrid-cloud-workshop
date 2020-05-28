@@ -4,11 +4,14 @@ We can use the BigQuery Sink Connector to stream changes from a topics to Google
 
 To do this we'll use the ksqlDB CLI to create the connector.
 
+[IMPORTANT]
+====
 Start a ksqlDB CLI session
 [source,bash,subs=attributes]
 ----
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
+====
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to Google BigQuery:-
 
@@ -23,7 +26,9 @@ And run the following `CREATE SINK CONNECTOR` command. This will create a connec
 {dc}_suppliers 
 ----
 
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+[source,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_gbq_sink WITH (
   'connector.class'='com.wepay.kafka.connect.bigquery.BigQuerySinkConnector',
@@ -39,6 +44,7 @@ CREATE SINK CONNECTOR {dc}_gbq_sink WITH (
   'keyfile'='${file:/secrets.properties:GBQ_CREDENTIALS_PATH}'
 );
 ----
+====
 
 We can list our current connectors using the following command
 

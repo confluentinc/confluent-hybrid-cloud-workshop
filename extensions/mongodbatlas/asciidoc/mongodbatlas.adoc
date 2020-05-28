@@ -4,15 +4,20 @@ We can use the MongoDB Sink Connector to stream changes from Confluent Cloud to 
 
 To do this we'll use the ksqlDB CLI to create the connector.
 
+[IMPORTANT]
+====
 Start a ksqlDB CLI session
 [source,bash,subs=attributes]
 ----
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
+====
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to MongoDB.
 
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+[source,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_mongodb_sink WITH (
   'connector.class'='com.mongodb.kafka.connect.MongoSinkConnector',
@@ -31,8 +36,8 @@ CREATE SINK CONNECTOR {dc}_mongodb_sink WITH (
   'post.processor.chain'='com.mongodb.kafka.connect.sink.processor.DocumentIdAdder',
   'max.batch.size'='20'
 );
-
 ----
+====
 
 We can list our current connectors using the following command
 
