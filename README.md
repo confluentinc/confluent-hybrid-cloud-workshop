@@ -12,7 +12,7 @@ From a physical architecture point of view, each component, except for Confluent
 
 Each workshop participant will work through a series of Labs to create the following ksqlDB Supply & Demand Application.
 
-![workshop](core/asciidoc/images/KSQLDB_topology.png)
+![workshop](core/asciidoc/images/ksqlDB_topology.png)
 
 ## Prerequisites
 
