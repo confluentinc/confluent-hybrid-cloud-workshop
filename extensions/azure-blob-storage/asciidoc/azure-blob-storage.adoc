@@ -7,7 +7,7 @@ To do this we'll use the ksqlDB CLI to create the connector.
 [IMPORTANT]
 ====
 Start a ksqlDB CLI session
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
@@ -41,12 +41,12 @@ CREATE SINK CONNECTOR {dc}_azure_blob_sink WITH (
 
 We can list our current connectors using the following command
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 show connectors;
 ----
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
  Connector Name            | Type   | Class
 ------------------------------------------------------------------------------------------------
@@ -57,11 +57,11 @@ show connectors;
 
 We can also describe a connector and view its status using the `describe connector` statement.
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 describe connector {dc}_AZURE_BLOB_SINK;
 ----
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 Name                 : {dc}_AZURE_BLOB_SINK
 Class                : io.confluent.connect.gcs.GcsSinkConnector
