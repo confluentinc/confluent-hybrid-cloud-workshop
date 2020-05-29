@@ -1498,11 +1498,20 @@ When we query the `out_of_stock_events` stream...
 
 == Lab 13: Replicate Events to On-Premise Kafka
 
-The next step is to replicate the `out_of_stock_events` topic to our on-premise cluster, from here, our orders application can take handle the events.
+The next step is to replicate the `out_of_stock_events` topic to our on-premise cluster.
 
 === Submit the Replicator Connector Config
 
-Execute the following from the command line to create the Replicator Connector. You can see that we have asked to only replicate the `{dc}_out_of_stock_events` topic by configuring `"topic.whitelist": "{dc}_out_of_stock_events"`
+Execute the following to create the Replicator Connector.
+
+Exit the ksqlDB cli 
+
+[IMPORTANT]
+====
+exit
+====
+
+Create the connector using the cURL command.
 
 [IMPORTANT]
 ====
@@ -1535,6 +1544,7 @@ curl -i -X POST -H "Accept:application/json" \
 ----
 ====
 
+Notice that we've specified only to replicate the `{dc}_out_of_stock_events` topic by configuring `"topic.whitelist": "{dc}_out_of_stock_events"`
 
 We can confirm that the `{dc}_out_of_stock_events` is being replicated from Confluent Cloud to our on-premise cluster by checking for messages in link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
