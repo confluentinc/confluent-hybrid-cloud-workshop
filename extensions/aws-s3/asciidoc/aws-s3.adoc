@@ -1,0 +1,86 @@
+== Optional Lab: Stream Sales & Purchases to AWS S3
+
+We can use the S3 Sink Connector to stream changes from our topics to Amazon S3.
+
+To do this we'll use the KSQL CLI to create the connector.
+
+Start a KSQL CLI session
+[source,bash,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS S3:-
+
+[source,bash,subs=attributes]
+----
+{dc}_sales_enriched
+{dc}_purchases_enriched
+----
+
+[source,bash,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_s3_sink WITH (  
+  'connector.class' = 'io.confluent.connect.s3.S3SinkConnector',
+  'tasks.max'= '1',
+  's3.region'='${file:/secrets.properties:AWS_S3_REGION}',
+  's3.bucket.name'='${file:/secrets.properties:AWS_S3_BUCKET_NAME}',
+  's3.part.size'='5242880',
+  'aws.accessKeyId'='${file:/secrets.properties:AWS_ACCESS_KEY_ID}',
+  'aws.secretKey'='${file:/secrets.properties:AWS_SECRET_ACCESS_KEY}',
+  'flush.size'= '50',
+  'storage.class'= 'io.confluent.connect.s3.storage.S3Storage',
+  'format.class'= 'io.confluent.connect.s3.format.avro.AvroFormat',
+  'partitioner.class'= 'io.confluent.connect.storage.partitioner.DefaultPartitioner',
+  'schema.compatibility'= 'NONE',
+  'topics' = '{dc}_sales_enriched,{dc}_purchases_enriched',
+  'confluent.topic.bootstrap.servers'= '${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}',
+  'confluent.topic.security.protocol' = 'SASL_SSL',
+  'confluent.topic.sasl.mechanism' = 'PLAIN',
+  'confluent.topic.sasl.jaas.config' = 'org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${file:/secrets.properties:CCLOUD_API_KEY}\" password=\"${file:/secrets.properties:CCLOUD_API_SECRET}\";',
+  'confluent.topic.replication.factor'= '3',
+  'producer.interceptor.classes' = 'io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor',
+  'key.converter'= 'org.apache.kafka.connect.storage.StringConverter'
+);
+
+----
+
+We can list our current connectors using the following command
+
+[source,bash,subs=attributes]
+----
+show connectors;
+----
+
+[source,bash,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_S3_SINK              | SINK   | io.confluent.connect.s3.S3SinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,bash,subs=attributes]
+----
+describe connector {dc}_s3_sink;
+----
+[source,bash,subs=attributes]
+----
+Name                 : {dc}_S3_SINK
+Class                : io.confluent.connect.s3.S3SinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the AWS account where the S3 bucket is hosted.
+
