@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider (GCP or Azure currently). Each workshop participant connects to their own virtual machine and is intended to act as a psuedo on-premise datacenter. A single Confluent Cloud cluster is shared by all workshop participants.
+This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider GCP, AWS or Azure. Each workshop participant connects to their own virtual machine and is intended to act as a psuedo on-premise datacenter. A single Confluent Cloud cluster is shared by all workshop participants.
 
 For a single workshop participant, the logical architecture looks like this.
 
@@ -19,7 +19,7 @@ Each workshop participant will work through a series of Labs to create the follo
 * macOS or Linux
 * Terraform 0.12.20 or later
 * Python + [Yaml](https://pyyaml.org/wiki/PyYAML)
-* A GCP or Azure account with the appropriate privileges
+* A GCP/AWS/Azure account with the appropriate privileges
 * A Confluent Cloud Account
 
 ## Provisioning a Workshop
