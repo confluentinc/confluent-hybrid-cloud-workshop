@@ -383,7 +383,7 @@ b.button:before { content: "["; padding: 0 3px 0 2px; }
 b.button:after { content: "]"; padding: 0 2px 0 3px; }
 
 /* Control max width here */
-#header , #content, #footnotes, #footer {  width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
+#header , #content, #footnotes, #footer {  width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 1150px; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before {content:url(./images/confluent-logo-300.png);} #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { display: table; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
 
@@ -773,7 +773,7 @@ a span.icon > .fa { cursor: inherit; }
 .admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
 .admonitionblock td.icon .icon-warning:before { content: "\f071"; color: #bf6900; }
 .admonitionblock td.icon .icon-caution:before { content: "\f06d"; color: #bf3400; }
-.admonitionblock td.icon .icon-important:before { content: "\f06a"; color: #bf0000; }
+.admonitionblock td.icon .icon-important:before { content: "\f12a"; color: #D8365D; }
 
 .conum[data-value] { display: inline-block; color: #fff !important; background-color: #404040; -webkit-border-radius: 50%; border-radius: 50%; text-align: center; font-size: 0.75em; width: 1.67em; height: 1.67em; line-height: 1.67em; font-family: "Open Sans", "DejaVu Sans", sans-serif; font-style: normal; font-weight: bold; }
 .conum[data-value] * { color: #fff !important; }
@@ -785,7 +785,7 @@ b.conum * { color: inherit !important; }
 
 .conum:not([data-value]):empty { display: none; }
 
-#header {padding-top:2.9em ;}, #content, #footnotes { background: white; padding-left: 2.5em; padding-right: 2.5em; }
+#header {padding-top:2.9em;} #content, #footnotes { background: white; padding-left: 2.5em; padding-right: 2.5em; }
 
 #header { margin-bottom: 0; }
 #header > h1 { border-bottom: none; }

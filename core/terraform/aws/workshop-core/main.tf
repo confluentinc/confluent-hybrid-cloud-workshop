@@ -4,26 +4,26 @@
 
 // Template for VM bootstrap script
 data "template_file" "bootstrap_vm" {
-  template = "${file("./common/bootstrap_vm.tpl")}"
-  count    = "${var.participant_count}"
+  template = file("./common/bootstrap_vm.tpl")
+  count    = var.participant_count
   vars = {
-    dc = "${format("dc%02d", count.index + 1)}"
-    participant_password = "${var.participant_password}"
+    dc = format("dc%02d", count.index + 1)
+    participant_password = var.participant_password
   }
 }
 
 // Template for docker bootstrap and startup
 data "template_file" "bootstrap_docker" {
-  template = "${file("./common/bootstrap_docker.tpl")}"
-  count    = "${var.participant_count}"
+  template = file("./common/bootstrap_docker.tpl")
+  count    = var.participant_count
   vars = {
-    dc                      = "${format("dc%02d", count.index + 1)}"
-    ext_ip                  = "${aws_instance.instance[count.index].public_ip}"
-    ccloud_cluster_endpoint = "${var.ccloud_bootstrap_servers}"
-    ccloud_api_key          = "${var.ccloud_api_key}"
-    ccloud_api_secret       = "${var.ccloud_api_secret}"
-    ccloud_topics           = "${var.ccloud_topics}"
-    feedback_form_url       = "${var.feedback_form_url}"
+    dc                      = format("dc%02d", count.index + 1)
+    ext_ip                  = aws_instance.instance[count.index].public_ip
+    ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
+    ccloud_api_key          = var.ccloud_api_key
+    ccloud_api_secret       = var.ccloud_api_secret
+    ccloud_topics           = var.ccloud_topics
+    feedback_form_url       = var.feedback_form_url
   }
 }
 
@@ -31,9 +31,9 @@ data "template_file" "bootstrap_docker" {
  Resources
 */
 resource "aws_instance" "instance" {
-  count         = "${var.participant_count}"
-  ami           = "${var.ami}"
-  instance_type = "${var.vm_type}"
+  count         = var.participant_count
+  ami           = var.ami
+  instance_type = var.vm_type
   vpc_security_group_ids = [aws_security_group.instance.id]
 
   user_data  = <<EOF
@@ -84,6 +84,13 @@ resource "aws_security_group" "instance" {
   }
 
   ingress {
+      from_port   = 8088
+      to_port     = 8088
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
       from_port   = 8089
       to_port     = 8089
       protocol    = "tcp"
@@ -110,19 +117,19 @@ resource "aws_security_group" "instance" {
  Provisioners
 */
 resource "null_resource" "vm_provisioners" {
-  depends_on = ["aws_instance.instance"]
-  count                 = "${var.participant_count}"
+  depends_on = [aws_instance.instance]
+  count      = var.participant_count
 
   // Copy bootstrap script to the VM
   provisioner "file" {
-    content     = "${element(data.template_file.bootstrap_vm.*.rendered, count.index)}"
+    content     = element(data.template_file.bootstrap_vm.*.rendered, count.index)
     destination = "/tmp/bootstrap_vm.sh"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${aws_instance.instance[count.index].public_ip}"
+      host     = aws_instance.instance[count.index].public_ip
     }
   }
 
@@ -134,10 +141,10 @@ resource "null_resource" "vm_provisioners" {
     ]
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${aws_instance.instance[count.index].public_ip}"
+      host     = aws_instance.instance[count.index].public_ip
     }
   }
 
@@ -147,23 +154,23 @@ resource "null_resource" "vm_provisioners" {
     destination = ".workshop/docker"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${aws_instance.instance[count.index].public_ip}"
+      host     = aws_instance.instance[count.index].public_ip
     }
   }
 
   // Copy docker script to the VM
   provisioner "file" {
-    content     = "${element(data.template_file.bootstrap_docker.*.rendered, count.index)}"
+    content     = element(data.template_file.bootstrap_docker.*.rendered, count.index)
     destination = "/tmp/bootstrap_docker.sh"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${aws_instance.instance[count.index].public_ip}"
+      host     = aws_instance.instance[count.index].public_ip
     }
   }
 
@@ -175,10 +182,10 @@ resource "null_resource" "vm_provisioners" {
     ]
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${aws_instance.instance[count.index].public_ip}"
+      host     = aws_instance.instance[count.index].public_ip
     }
   }
 }

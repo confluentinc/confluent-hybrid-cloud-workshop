@@ -2,17 +2,22 @@
 
 We can use the Google Cloud Storage Sink Connector to stream changes from a topics to Google Cloud Storage, from here the data can be consumed other Google Cloud Platform services.
 
-Another preview feature of KSQL 5.4 is the ability to create connectors directly within KSQL.
+To do this we'll use the ksqlDB CLI to create the connector.
 
-Start a KSQL CLI session
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
 ----
-docker exec -it ksql-cli ksql http://ksql-server-ccloud:8088
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
+====
 
 And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to Google Cloud Storage.
 
-[source,bash,subs=attributes]
+[IMPORTANT]
+====
+[source,subs=attributes]
 ----
 CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
   'connector.class' = 'io.confluent.connect.gcs.GcsSinkConnector',
@@ -20,7 +25,7 @@ CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
   'gcs.bucket.name' = '${file:/secrets.properties:GCS_BUCKET_NAME}',
   'gcs.part.size' = '5242880',
   'gcs.credentials.path' = '${file:/secrets.properties:GCS_CREDENTIALS_PATH}',
-  'flush.size'= '50',
+  'flush.size'= '10',
   'storage.class'= 'io.confluent.connect.gcs.storage.GcsStorage',
   'format.class'= 'io.confluent.connect.gcs.format.avro.AvroFormat',
   'partitioner.class'= 'io.confluent.connect.storage.partitioner.DefaultPartitioner',
@@ -35,15 +40,16 @@ CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
   'key.converter'= 'org.apache.kafka.connect.storage.StringConverter'
 );
 ----
+====
 
 We can list our current connectors using the following command
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 show connectors;
 ----
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
  Connector Name            | Type   | Class
 ------------------------------------------------------------------------------------------------
@@ -54,11 +60,11 @@ show connectors;
 
 We can also describe a connector and view its status using the `describe connector` statement.
 
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 describe connector {dc}_GCS_SINK;
 ----
-[source,bash,subs=attributes]
+[source,subs=attributes]
 ----
 Name                 : {dc}_GCS_SINK
 Class                : io.confluent.connect.gcs.GcsSinkConnector

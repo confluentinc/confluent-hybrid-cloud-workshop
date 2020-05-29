@@ -5,26 +5,26 @@
 
 // Template for VM bootstrap script
 data "template_file" "bootstrap_vm" {
-  template = "${file("./common/bootstrap_vm.tpl")}"
-  count    = "${var.participant_count}"
+  template = file("./common/bootstrap_vm.tpl")
+  count    = var.participant_count
   vars = {
-    dc = "${format("dc%02d", count.index + 1)}"
-    participant_password = "${var.participant_password}"
+    dc = format("dc%02d", count.index + 1)
+    participant_password = var.participant_password
   }
 }
 
 // Template for docker bootstrap and startup
 data "template_file" "bootstrap_docker" {
-  template = "${file("./common/bootstrap_docker.tpl")}"
-  count    = "${var.participant_count}"
+  template = file("./common/bootstrap_docker.tpl")
+  count    = var.participant_count
   vars = {
-    dc                      = "${format("dc%02d", count.index + 1)}"
-    ext_ip                  = "${element(google_compute_address.instance.*.address, count.index)}"
-    ccloud_cluster_endpoint = "${var.ccloud_bootstrap_servers}"
-    ccloud_api_key          = "${var.ccloud_api_key}"
-    ccloud_api_secret       = "${var.ccloud_api_secret}"
-    ccloud_topics           = "${var.ccloud_topics}"
-    feedback_form_url       = "${var.feedback_form_url}"
+    dc                      = format("dc%02d", count.index + 1)
+    ext_ip                  = element(google_compute_address.instance.*.address, count.index)
+    ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
+    ccloud_api_key          = var.ccloud_api_key
+    ccloud_api_secret       = var.ccloud_api_secret
+    ccloud_topics           = var.ccloud_topics
+    feedback_form_url       = var.feedback_form_url
   }
 }
 
@@ -39,7 +39,7 @@ resource "google_compute_network" "workshop-network" {
 
 resource "google_compute_firewall" "workshop-firewall" {
   name    = "${var.name}-firewall"
-  network = "${google_compute_network.workshop-network.name}"
+  network = google_compute_network.workshop-network.name
 
   allow {
     protocol = "tcp"
@@ -48,16 +48,16 @@ resource "google_compute_firewall" "workshop-firewall" {
 }
 
 resource "google_compute_address" "instance" {
-  count        = "${var.participant_count}"
+  count        = var.participant_count
   name         = "${var.name}-${count.index}-nic"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_instance" "instance" {
   name         = "${var.name}-${count.index}-vm"
-  count        = "${var.participant_count}"
-  machine_type = "${var.vm_type}"
-  zone         = "${var.region_zone}"
+  count        = var.participant_count
+  machine_type = var.vm_type
+  zone         = var.region_zone
 
   boot_disk {
     initialize_params {
@@ -67,13 +67,12 @@ resource "google_compute_instance" "instance" {
   }
 
   network_interface {
-    network = "${google_compute_network.workshop-network.self_link}"
+    network = google_compute_network.workshop-network.self_link
 
     access_config {
-      nat_ip = "${element(google_compute_address.instance.*.address, count.index)}"
+      nat_ip = element(google_compute_address.instance.*.address, count.index)
     }
   }
-
 
   metadata_startup_script = <<SCRIPT
 sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config 
@@ -86,14 +85,14 @@ SCRIPT
 
   // Copy bootstrap script to the VM
   provisioner "file" {
-    content     = "${element(data.template_file.bootstrap_vm.*.rendered, count.index)}"
+    content     = element(data.template_file.bootstrap_vm.*.rendered, count.index)
     destination = "/tmp/bootstrap_vm.sh"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(google_compute_address.instance.*.address, count.index)}"
+      host     = element(google_compute_address.instance.*.address, count.index)
     }
   }
 
@@ -105,10 +104,10 @@ SCRIPT
     ]
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(google_compute_address.instance.*.address, count.index)}"
+      host     = element(google_compute_address.instance.*.address, count.index)
     }
   }
 
@@ -118,23 +117,23 @@ SCRIPT
     destination = ".workshop/docker"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(google_compute_address.instance.*.address, count.index)}"
+      host     = element(google_compute_address.instance.*.address, count.index)
     }
   }
 
   // Copy docker script to the VM
   provisioner "file" {
-    content     = "${element(data.template_file.bootstrap_docker.*.rendered, count.index)}"
+    content     = element(data.template_file.bootstrap_docker.*.rendered, count.index)
     destination = "/tmp/bootstrap_docker.sh"
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(google_compute_address.instance.*.address, count.index)}"
+      host     = element(google_compute_address.instance.*.address, count.index)
     }
   }
 
@@ -146,10 +145,10 @@ SCRIPT
     ]
 
     connection {
-      user     = "${format("dc%02d", count.index + 1)}"
-      password = "${var.participant_password}"
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
       insecure = true
-      host     = "${element(google_compute_address.instance.*.address, count.index)}"
+      host     = element(google_compute_address.instance.*.address, count.index)
     }
   }
 }
