@@ -2,7 +2,7 @@
     "name": "mongodb-atlas",
     "type": "mongodb-atlas",
     "config": {
-        "clusterName": "ConfluentWS",
+        "clusterName": "${mongodbatlas_cluster_name}",
         "readPreference": "primary",
         "wireProtocolEnabled": false
     },

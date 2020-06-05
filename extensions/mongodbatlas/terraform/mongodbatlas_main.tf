@@ -10,7 +10,7 @@ locals {
 
 resource "mongodbatlas_cluster" "confluent" {
   project_id   = var.mongodbatlas_project_id
-  name         = "ConfluentWS"
+  name         = var.name
   num_shards   = 1
 
   replication_factor           = 3
@@ -72,36 +72,31 @@ resource "null_resource" "vm_provisioners_atlas" {
   }
 }
 
-resource "null_resource" "vm_provisioner_stitch_app" {
-  depends_on = [module.workshop-core]
-  count = 1
+resource "local_file" "stitch_cli_config" {
+  content = templatefile("${path.module}/config_stitch_cli.tpl", { 
+    mongodbatlas_public_key   = var.mongodbatlas_public_key
+    mongodbatlas_private_key  = var.mongodbatlas_private_key
+    mongodbatlas_project_id   = var.mongodbatlas_project_id
+    stitch_app_dir            = "${path.module}/tmp/${var.name}"
+    mongodb_stich_utils_path  = "${path.module}/mongodb_stitch_utils.sh"
+  })
+  filename = "${path.module}/tmp/${var.name}_stitch.sh"
+}
 
-  provisioner "file" {
-    source      = "${path.module}/stitch_apps"
-    destination = "mongodb"
+resource "template_dir" "stitch_app_config" {
+  source_dir      = "${path.module}/stitch_apps"
+  destination_dir = "${path.module}/tmp/${var.name}"
 
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = element(module.workshop-core.external_ip_addresses, count.index)
-    }
+  vars = {
+    mongodbatlas_cluster_name = var.name
+  }
+}
+
+resource "null_resource" "provisioner_install_stitch_app" {
+  depends_on = [mongodbatlas_cluster.confluent]
+
+  provisioner "local-exec" {
+    command = "source ${local_file.stitch_cli_config.filename} && import_stitch_app" 
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sleep 30",
-      "sudo apt install npm -y",
-      "sudo npm install -g mongodb-stitch-cli -y",
-      "stitch-cli login --api-key=${var.mongodbatlas_public_key} --private-api-key=${var.mongodbatlas_private_key} --yes",
-      "stitch-cli import --path mongodb/stitch_checkout --strategy=replace-by-name --project-id ${var.mongodbatlas_project_id} --include-hosting --yes"
-    ]
-
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = element(module.workshop-core.external_ip_addresses, count.index)
-    }
-  }
 }
