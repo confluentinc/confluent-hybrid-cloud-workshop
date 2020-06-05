@@ -26,35 +26,35 @@ resource "mongodbatlas_cluster" "confluent" {
 }
 
 data "mongodbatlas_cluster" "confluent" {
-    depends_on   = [mongodbatlas_cluster.confluent]
-    project_id = mongodbatlas_cluster.confluent.project_id
-    name       = mongodbatlas_cluster.confluent.name
+  depends_on   = [mongodbatlas_cluster.confluent]
+  project_id = mongodbatlas_cluster.confluent.project_id
+  name       = mongodbatlas_cluster.confluent.name
 }
 
 # There is no Atlas API to create a DB, but the user need access to it. So here we create the rule for the db "demo". The DB will be automatically created as soon as the connect tries to push data to it. Still, this rule need to exist beforehand
 resource "mongodbatlas_database_user" "confluent" {
-    username      = var.mongodbatlas_dbuser_username
-    password      = var.mongodbatlas_dbuser_password
-    project_id    = mongodbatlas_cluster.confluent.project_id
-    auth_database_name = "admin"
+  username      = var.mongodbatlas_dbuser_username
+  password      = var.mongodbatlas_dbuser_password
+  project_id    = mongodbatlas_cluster.confluent.project_id
+  auth_database_name = "admin"
 
-    roles {
-        role_name     = "readWrite"
-        database_name = "demo"
-    }
+  roles {
+      role_name     = "readWrite"
+      database_name = "demo"
+  }
 }
 
 resource "mongodbatlas_project_ip_whitelist" "confluent" {
-    depends_on = [module.workshop-core]
-    count      = var.participant_count
-    project_id = mongodbatlas_cluster.confluent.project_id
-    ip_address = element(module.workshop-core.external_ip_addresses, count.index)
-    comment    = "ip address for tf acc testing"
+  depends_on = [module.workshop-core]
+  count      = var.participant_count
+  project_id = mongodbatlas_cluster.confluent.project_id
+  ip_address = element(module.workshop-core.external_ip_addresses, count.index)
+  comment    = "ip address for tf acc testing"
 }
 
 resource "null_resource" "vm_provisioners_atlas" {
-   depends_on = [module.workshop-core]
-   count      = var.participant_count
+  depends_on = [module.workshop-core]
+  count      = var.participant_count
 
   provisioner "remote-exec" {
     inline = [
@@ -72,3 +72,36 @@ resource "null_resource" "vm_provisioners_atlas" {
   }
 }
 
+resource "null_resource" "vm_provisioner_stitch_app" {
+  depends_on = [module.workshop-core]
+  count = 1
+
+  provisioner "file" {
+    source      = "${path.module}/stitch_apps"
+    destination = "mongodb"
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 30",
+      "sudo apt install npm -y",
+      "sudo npm install -g mongodb-stitch-cli -y",
+      "stitch-cli login --api-key=${mongodbatlas_public_key} --private-api-key=${mongodbatlas_private_key} --yes",
+      "stitch-cli import --path mongodb/stitch_checkout --strategy=replace-by-name --project-id ${mongodbatlas_project_id} --include-hosting --yes"
+    ]
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
+    }
+  }
+}
