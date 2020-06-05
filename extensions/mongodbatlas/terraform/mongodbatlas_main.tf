@@ -110,3 +110,39 @@ resource "null_resource" "provisioner_install_stitch_app" {
   }
 
 }
+
+resource "null_resource" "vm_provisioners_atlas_stitch_app" {
+  depends_on = [null_resource.provisioner_install_stitch_app]
+  count      = var.participant_count
+
+  provisioner "file" {
+    source      = "${path.module}/mongodb_stitch_utils.sh"
+    destination = "/tmp/mongodb_stitch_utils.sh"
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 30",
+      "MONGODBATLAS_PUBLIC_KEY=${var.mongodbatlas_public_key}",
+      "MONGODBATLAS_PRIVATE_KEY=${var.mongodbatlas_private_key}",
+      "MONGODBATLAS_PROJECT_ID=${var.mongodbatlas_project_id}",
+      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html"
+      "source /tmp/mongodb_stitch_utils.sh",
+      "replace_stitch_url_in_docs"
+    ]
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
+    }
+  }
+}

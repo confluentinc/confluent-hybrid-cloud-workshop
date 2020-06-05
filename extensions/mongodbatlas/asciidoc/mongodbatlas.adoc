@@ -97,7 +97,7 @@ These applications will also produce new data, what if you need to communicate t
 
 
 The application is already deployed in MongoDB Atlas and let's you put Orders online, with a simple neat web application. 
-Place your first order using the link that will be provided by the instructor (Or access MongoDB Atlas to find the App URL)
+Place your first order link:MONGODB_STITCH_APP_URL[at this link]
 
 image::./images/mongodb-stitch-app.png[]
 
