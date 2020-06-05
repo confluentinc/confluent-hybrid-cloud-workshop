@@ -93,8 +93,8 @@ resource "null_resource" "vm_provisioner_stitch_app" {
       "sleep 30",
       "sudo apt install npm -y",
       "sudo npm install -g mongodb-stitch-cli -y",
-      "stitch-cli login --api-key=${mongodbatlas_public_key} --private-api-key=${mongodbatlas_private_key} --yes",
-      "stitch-cli import --path mongodb/stitch_checkout --strategy=replace-by-name --project-id ${mongodbatlas_project_id} --include-hosting --yes"
+      "stitch-cli login --api-key=${var.mongodbatlas_public_key} --private-api-key=${var.mongodbatlas_private_key} --yes",
+      "stitch-cli import --path mongodb/stitch_checkout --strategy=replace-by-name --project-id ${var.mongodbatlas_project_id} --include-hosting --yes"
     ]
 
     connection {
