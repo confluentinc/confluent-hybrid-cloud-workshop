@@ -133,7 +133,8 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
       "MONGODBATLAS_PUBLIC_KEY=${var.mongodbatlas_public_key}",
       "MONGODBATLAS_PRIVATE_KEY=${var.mongodbatlas_private_key}",
       "MONGODBATLAS_PROJECT_ID=${var.mongodbatlas_project_id}",
-      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html"
+      "MONGODBATLAS_APP_NAME=checkout",
+      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html",
       "source /tmp/mongodb_stitch_utils.sh",
       "replace_stitch_url_in_docs"
     ]
