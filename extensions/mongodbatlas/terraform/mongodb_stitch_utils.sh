@@ -1,9 +1,8 @@
 #!/bin/bash
 
 function import_stitch_app(){
-    cd "$STITCH_APP_DIR"
     stitch-cli login --api-key=${MONGODBATLAS_PUBLIC_KEY} --private-api-key=${MONGODBATLAS_PRIVATE_KEY} --yes
-    stitch-cli import --path mongodb/stitch_checkout --strategy=replace-by-name --project-id ${MONGODBATLAS_PROJECT_ID} --include-hosting --yes
+    stitch-cli import --path $STITCH_APP_DIR --strategy=replace-by-name --project-id ${MONGODBATLAS_PROJECT_ID} --include-hosting --yes
 }
 
 #app_name = checkout
@@ -20,8 +19,9 @@ function get_stitch_app_id() {
     https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps/${MONGODBATLAS_APP_ID}
 }
 
-function get_stitch_app_id() {
-    cd "$STITCH_APP_DIR"
+function delete_stitch_app() {
+    login_stitch_api
+    get_stitch_app_id
   
     echo "DELETING Stitch App: App id $MONGODBATLAS_APP_ID"
 

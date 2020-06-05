@@ -6,6 +6,7 @@ provider "mongodbatlas" {
 
 locals {
   mongodbatlas_srv_address = format("mongodb+srv://%s:%s@%s",var.mongodbatlas_dbuser_username,var.mongodbatlas_dbuser_password,replace(data.mongodbatlas_cluster.confluent.srv_address, "mongodb+srv://", ""))
+  stitch_config_sh_path = "${path.module}/tmp/${var.name}_stitch.sh"
 }
 
 resource "mongodbatlas_cluster" "confluent" {
@@ -77,10 +78,10 @@ resource "local_file" "stitch_cli_config" {
     mongodbatlas_public_key   = var.mongodbatlas_public_key
     mongodbatlas_private_key  = var.mongodbatlas_private_key
     mongodbatlas_project_id   = var.mongodbatlas_project_id
-    stitch_app_dir            = "${path.module}/tmp/${var.name}"
+    stitch_app_dir            = "${path.module}/tmp/${var.name}/stitch_checkout"
     mongodb_stich_utils_path  = "${path.module}/mongodb_stitch_utils.sh"
   })
-  filename = "${path.module}/tmp/${var.name}_stitch.sh"
+  filename = local.stitch_config_sh_path
 }
 
 resource "template_dir" "stitch_app_config" {
@@ -93,10 +94,19 @@ resource "template_dir" "stitch_app_config" {
 }
 
 resource "null_resource" "provisioner_install_stitch_app" {
-  depends_on = [mongodbatlas_cluster.confluent]
+  depends_on = [mongodbatlas_cluster.confluent, local_file.stitch_cli_config]
+
+  triggers = {
+    stitch_config_sh_path = local.stitch_config_sh_path
+  }
 
   provisioner "local-exec" {
     command = "source ${local_file.stitch_cli_config.filename} && import_stitch_app" 
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "source ${self.triggers.stitch_config_sh_path} && delete_stitch_app" 
   }
 
 }

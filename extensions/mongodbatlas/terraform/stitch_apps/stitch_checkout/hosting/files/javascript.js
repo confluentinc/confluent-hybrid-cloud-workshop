@@ -26,8 +26,8 @@ $(function () {
             $("#orderItems").append(
                 `<li class="list-group-item">
                     <div class="form-group">
-                        <label for="orderItem">Order Item ${x}</label>
-                        <input type="text" class="form-control" id="oid_${x}" name="lineItem" value="${value}" readonly>
+                        <label for="orderItem">Order Item`+x+`</label>
+                        <input type="text" class="form-control" id="oid_`+x+`" name="lineItem" value="`+value+`" readonly>
                     </div>
                 </li>`
             );
