@@ -7,6 +7,7 @@ provider "mongodbatlas" {
 locals {
   mongodbatlas_srv_address = format("mongodb+srv://%s:%s@%s",var.mongodbatlas_dbuser_username,var.mongodbatlas_dbuser_password,replace(data.mongodbatlas_cluster.confluent.srv_address, "mongodb+srv://", ""))
   stitch_config_sh_path = "${path.module}/tmp/${var.name}_stitch.sh"
+  stitch_app_id = data.external.stitch_app_id.result
 }
 
 resource "mongodbatlas_cluster" "confluent" {
@@ -111,21 +112,37 @@ resource "null_resource" "provisioner_install_stitch_app" {
 
 }
 
+#see here https://gitmemory.com/issue/hashicorp/terraform/21532/498052347
+
+# data "external" "stitch_app_id" {
+#   program = ["jq", ".", "${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"]
+#   query = {}
+# }
+
+# output "stitch_app_id" {
+#   value = local.stitch_app_id
+# }
+
+# I don't want to pass the creds to the VM, will change this to read the id from bash and pus directly the sed command
 resource "null_resource" "vm_provisioners_atlas_stitch_app" {
   depends_on = [null_resource.provisioner_install_stitch_app]
   count      = var.participant_count
 
-  provisioner "file" {
-    source      = "${path.module}/mongodb_stitch_utils.sh"
-    destination = "/tmp/mongodb_stitch_utils.sh"
-
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = element(module.workshop-core.external_ip_addresses, count.index)
-    }
+  triggers = {
+    stitch_app_config=jsondecode(file("${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"))
   }
+
+  # provisioner "file" {
+  #   source      = "${path.module}/mongodb_stitch_utils.sh"
+  #   destination = "/tmp/mongodb_stitch_utils.sh"
+
+  #   connection {
+  #     user     = format("dc%02d", count.index + 1)
+  #     password = var.participant_password
+  #     insecure = true
+  #     host     = element(module.workshop-core.external_ip_addresses, count.index)
+  #   }
+  # }
 
   provisioner "file" {
     source      = "${path.module}/add_stitch_url_to_docs.tpl"
@@ -141,11 +158,8 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
 
   provisioner "remote-exec" {
     inline = [
-      "sleep 30",
-      "MONGODBATLAS_PUBLIC_KEY=${var.mongodbatlas_public_key}",
-      "MONGODBATLAS_PRIVATE_KEY=${var.mongodbatlas_private_key}",
-      "MONGODBATLAS_PROJECT_ID=${var.mongodbatlas_project_id}",
-      "MONGODBATLAS_APP_NAME=checkout",
+      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html",
+      "MONGODBATLAS_APP_ID=${self.triggers.stitch_app_config.app_id}",
       "chmod +x /tmp/add_stitch_url_to_docs.sh",
       "/tmp/add_stitch_url_to_docs.sh"
     ]

@@ -45,9 +45,3 @@ function install_stitch_cli() {
     sudo npm install -g mongodb-stitch-cli -y
 }
 
-function replace_stitch_url_in_docs() {
-    login_stitch_api
-    get_stitch_app_id
-    MONGODBATLAS_APP_URL="https://$MONGODBATLAS_APP_ID.mongodbstitch.com/"
-    sed -i "s,MONGODB_STITCH_APP_URL,$MONGODBATLAS_APP_URL,g" $DOC_FILE_PATH
-}
