@@ -7,7 +7,7 @@ provider "mongodbatlas" {
 locals {
   mongodbatlas_srv_address = format("mongodb+srv://%s:%s@%s",var.mongodbatlas_dbuser_username,var.mongodbatlas_dbuser_password,replace(data.mongodbatlas_cluster.confluent.srv_address, "mongodb+srv://", ""))
   stitch_config_sh_path = "${path.module}/tmp/${var.name}_stitch.sh"
-  stitch_app_id = data.external.stitch_app_id.result
+  mongodbatlas_stitch_app_id = data.external.stitch_app_id.result["app_id"]
 }
 
 resource "mongodbatlas_cluster" "confluent" {
@@ -81,6 +81,7 @@ resource "local_file" "stitch_cli_config" {
     mongodbatlas_project_id   = var.mongodbatlas_project_id
     stitch_app_dir            = "${path.module}/tmp/${var.name}/stitch_checkout"
     mongodb_stich_utils_path  = "${path.module}/mongodb_stitch_utils.sh"
+    stitch_app_name           = "checkout"
   })
   filename = local.stitch_config_sh_path
 }
@@ -102,7 +103,7 @@ resource "null_resource" "provisioner_install_stitch_app" {
   }
 
   provisioner "local-exec" {
-    command = "source ${local_file.stitch_cli_config.filename} && import_stitch_app" 
+    command = "source ${self.triggers.stitch_config_sh_path} && import_stitch_app" 
   }
 
   provisioner "local-exec" {
@@ -112,40 +113,29 @@ resource "null_resource" "provisioner_install_stitch_app" {
 
 }
 
-#see here https://gitmemory.com/issue/hashicorp/terraform/21532/498052347
 
-# data "external" "stitch_app_id" {
-#   program = ["jq", ".", "${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"]
-#   query = {}
-# }
-
-# output "stitch_app_id" {
-#   value = local.stitch_app_id
-# }
-
-# I don't want to pass the creds to the VM, will change this to read the id from bash and pus directly the sed command
-resource "null_resource" "vm_provisioners_atlas_stitch_app" {
+data "external" "stitch_app_id" {
   depends_on = [null_resource.provisioner_install_stitch_app]
+  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"]
+}
+
+
+output "stitch_app_id" {
+  value = local.mongodbatlas_stitch_app_id
+}
+
+resource "null_resource" "vm_provisioners_atlas_stitch_app" {
   count      = var.participant_count
 
   triggers = {
-    stitch_app_config=jsondecode(file("${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"))
+    stitch_app_id=local.mongodbatlas_stitch_app_id
   }
 
-  # provisioner "file" {
-  #   source      = "${path.module}/mongodb_stitch_utils.sh"
-  #   destination = "/tmp/mongodb_stitch_utils.sh"
-
-  #   connection {
-  #     user     = format("dc%02d", count.index + 1)
-  #     password = var.participant_password
-  #     insecure = true
-  #     host     = element(module.workshop-core.external_ip_addresses, count.index)
-  #   }
-  # }
-
   provisioner "file" {
-    source      = "${path.module}/add_stitch_url_to_docs.tpl"
+    content      = templatefile("${path.module}/add_stitch_url_to_docs.tpl", { 
+      mongodbatlas_stitch_app_id   = self.triggers.stitch_app_id
+      asciidoc_index_path  = "~/.workshop/docker/asciidoc/index.html"
+    })
     destination = "/tmp/add_stitch_url_to_docs.sh"
 
     connection {
@@ -158,8 +148,6 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
 
   provisioner "remote-exec" {
     inline = [
-      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html",
-      "MONGODBATLAS_APP_ID=${self.triggers.stitch_app_config.app_id}",
       "chmod +x /tmp/add_stitch_url_to_docs.sh",
       "/tmp/add_stitch_url_to_docs.sh"
     ]

@@ -8,15 +8,15 @@ function import_stitch_app(){
 #app_name = checkout
 function get_stitch_app_id() {
 
+    echo "Getting stitch App ID via REST api"
+    echo "curl --request GET \
+    --header 'Authorization: Bearer '${MONGODBATLAS_BEARER_AUTH} \
+    https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps | jq -c --arg app_name $MONGODBATLAS_APP_NAME '.[] | select( .name==$app_name ) ' | jq '._id' -r"
+
     MONGODBATLAS_APP_ID=$(curl --request GET \
     --header 'Authorization: Bearer '${MONGODBATLAS_BEARER_AUTH} \
-    https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps | jq -c '.[] | select( .name == "'$MONGODBATLAS_APP_NAME'" ) ' | jq '._id' -r)
+    https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps | jq -c --arg app_name "$MONGODBATLAS_APP_NAME" '.[] | select( .name==$app_name ) ' | jq '._id' -r)
 
-    echo "DELETING Stitch App: App id $MONGODBATLAS_APP_ID"
-
-    curl --request DELETE \
-    --header 'Authorization: Bearer '${MONGODBATLAS_BEARER_AUTH} \
-    https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps/${MONGODBATLAS_APP_ID}
 }
 
 function delete_stitch_app() {
@@ -25,12 +25,18 @@ function delete_stitch_app() {
   
     echo "DELETING Stitch App: App id $MONGODBATLAS_APP_ID"
 
+    echo "curl --request DELETE \
+    --header 'Authorization: Bearer '$MONGODBATLAS_BEARER_AUTH \
+    https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps/${MONGODBATLAS_APP_ID}"
     curl --request DELETE \
-    --header 'Authorization: Bearer '${MONGODBATLAS_BEARER_AUTH} \
+    --header 'Authorization: Bearer '$MONGODBATLAS_BEARER_AUTH \
     https://stitch.mongodb.com/api/admin/v3.0/groups/${MONGODBATLAS_PROJECT_ID}/apps/${MONGODBATLAS_APP_ID}
 }
 
 function login_stitch_api() {
+
+    echo "Logging in Stitch API via Rest"
+    echo "${MONGODBATLAS_PUBLIC_KEY}     ${MONGODBATLAS_PRIVATE_KEY} "
 
     MONGODBATLAS_BEARER_AUTH=$(curl --request POST \
         --header 'Content-Type: application/json' \
