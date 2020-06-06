@@ -127,6 +127,18 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
     }
   }
 
+  provisioner "file" {
+    source      = "${path.module}/add_stitch_url_to_docs.tpl"
+    destination = "/tmp/add_stitch_url_to_docs.sh"
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = element(module.workshop-core.external_ip_addresses, count.index)
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sleep 30",
@@ -134,9 +146,8 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
       "MONGODBATLAS_PRIVATE_KEY=${var.mongodbatlas_private_key}",
       "MONGODBATLAS_PROJECT_ID=${var.mongodbatlas_project_id}",
       "MONGODBATLAS_APP_NAME=checkout",
-      "DOC_FILE_PATH=~/.workshop/docker/asciidoc/index.html",
-      "source /tmp/mongodb_stitch_utils.sh",
-      "replace_stitch_url_in_docs"
+      "chmod +x /tmp/add_stitch_url_to_docs.sh",
+      "/tmp/add_stitch_url_to_docs.sh"
     ]
 
     connection {
