@@ -6,7 +6,7 @@
             "INSERT"
         ],
         "database": "demo",
-        "collection": "orders",
+        "collection": "dc01_sales",
         "service_name": "mongodb-atlas",
         "match": {},
         "full_document": true,
