@@ -51,7 +51,7 @@ $(function () {
             console.log(JSON.stringify(po))
             po['owner_id'] = client.auth.user.id
 
-            db.collection('po').insertOne(po).then(success => {
+            db.collection('estore').insertOne(po).then(success => {
                 $("#alerts").append(`
                     <div class="alert alert-success mx-auto">
                         <strong>Success!</strong> Order successfully submitted!
