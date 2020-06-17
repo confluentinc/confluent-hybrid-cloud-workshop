@@ -1500,6 +1500,22 @@ When we query the `out_of_stock_events` stream...
 
 The next step is to replicate the `out_of_stock_events` topic to our on-premise cluster.
 
+image::./images/5_replicate_to_onprem.png[]	
+
+Before we do that, let's create the target topic in our on-premise Kafka cluster using link:http://{externalip}:9021[Confluent Control Center, window=_blank]	
+Select your on-premise cluster from the left-hand navigation bar, select _"topics"_ and then click on _"Add a Topic"_. 	
+
+[IMPORTANT]
+====
+image::./images/c3_80.png[]	
+
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create with defaults"_	
+
+image::./images/c3_90.png[]	
+
+We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
+====
+
 === Submit the Replicator Connector Config
 
 Execute the following to create the Replicator Connector.
