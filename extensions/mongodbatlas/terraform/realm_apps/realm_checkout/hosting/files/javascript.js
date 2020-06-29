@@ -4,7 +4,7 @@ var hostname = $(location).attr('hostname');
 var res = hostname.split(".");
 console.log(res[0])
 
-// Initialize Stitch client with App ID retrieved from URL
+// Initialize Realm client with App ID retrieved from URL
 const client = stitch.Stitch.initializeDefaultAppClient(res[0]);
 
 const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('demo');

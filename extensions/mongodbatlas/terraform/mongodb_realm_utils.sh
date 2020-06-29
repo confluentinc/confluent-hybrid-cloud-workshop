@@ -1,7 +1,8 @@
 #!/bin/bash
 
 function import_realm_app(){
-    install_realm_cli
+    #install_realm_cli
+    #Installation should be done on the host laptop that execute the workshop creation. This code is executed locally
     realm-cli login --api-key=${MONGODBATLAS_PUBLIC_KEY} --private-api-key=${MONGODBATLAS_PRIVATE_KEY} --yes
     realm-cli import --path $REALM_APP_DIR --strategy=replace-by-name --project-id ${MONGODBATLAS_PROJECT_ID} --include-hosting --yes
 }

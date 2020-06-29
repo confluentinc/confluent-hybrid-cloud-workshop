@@ -116,7 +116,7 @@ resource "null_resource" "provisioner_install_realm_app" {
 
 data "external" "realm_app_id" {
   depends_on = [null_resource.provisioner_install_realm_app]
-  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/realm_checkout/realm.json"]
+  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/realm_checkout/config.json"]
 }
 
 
