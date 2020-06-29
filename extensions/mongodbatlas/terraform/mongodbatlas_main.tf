@@ -6,8 +6,8 @@ provider "mongodbatlas" {
 
 locals {
   mongodbatlas_srv_address = format("mongodb+srv://%s:%s@%s",var.mongodbatlas_dbuser_username,var.mongodbatlas_dbuser_password,replace(data.mongodbatlas_cluster.confluent.srv_address, "mongodb+srv://", ""))
-  stitch_config_sh_path = "${path.module}/tmp/${var.name}_stitch.sh"
-  mongodbatlas_stitch_app_id = data.external.stitch_app_id.result["app_id"]
+  realm_config_sh_path = "${path.module}/tmp/${var.name}_realm.sh"
+  mongodbatlas_realm_app_id = data.external.realm_app_id.result["app_id"]
 }
 
 resource "mongodbatlas_cluster" "confluent" {
@@ -74,20 +74,20 @@ resource "null_resource" "vm_provisioners_atlas" {
   }
 }
 
-resource "local_file" "stitch_cli_config" {
-  content = templatefile("${path.module}/config_stitch_cli.tpl", { 
+resource "local_file" "realm_cli_config" {
+  content = templatefile("${path.module}/config_realm_cli.tpl", { 
     mongodbatlas_public_key   = var.mongodbatlas_public_key
     mongodbatlas_private_key  = var.mongodbatlas_private_key
     mongodbatlas_project_id   = var.mongodbatlas_project_id
-    stitch_app_dir            = "${path.module}/tmp/${var.name}/stitch_checkout"
-    mongodb_stich_utils_path  = "${path.module}/mongodb_stitch_utils.sh"
-    stitch_app_name           = "checkout"
+    realm_app_dir            = "${path.module}/tmp/${var.name}/realm_checkout"
+    mongodb_realm_utils_path  = "${path.module}/mongodb_realm_utils.sh"
+    realm_app_name           = "checkout"
   })
-  filename = local.stitch_config_sh_path
+  filename = local.realm_config_sh_path
 }
 
-resource "template_dir" "stitch_app_config" {
-  source_dir      = "${path.module}/stitch_apps"
+resource "template_dir" "realm_app_config" {
+  source_dir      = "${path.module}/realm_apps"
   destination_dir = "${path.module}/tmp/${var.name}"
 
   vars = {
@@ -95,48 +95,48 @@ resource "template_dir" "stitch_app_config" {
   }
 }
 
-resource "null_resource" "provisioner_install_stitch_app" {
-  depends_on = [mongodbatlas_cluster.confluent, local_file.stitch_cli_config]
+resource "null_resource" "provisioner_install_realm_app" {
+  depends_on = [mongodbatlas_cluster.confluent, local_file.realm_cli_config]
 
   triggers = {
-    stitch_config_sh_path = local.stitch_config_sh_path
+    realm_config_sh_path = local.realm_config_sh_path
   }
 
   provisioner "local-exec" {
-    command = "source ${self.triggers.stitch_config_sh_path} && import_stitch_app" 
+    command = "source ${self.triggers.realm_config_sh_path} && import_realm_app" 
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "source ${self.triggers.stitch_config_sh_path} && delete_stitch_app" 
+    command = "source ${self.triggers.realm_config_sh_path} && delete_realm_app" 
   }
 
 }
 
 
-data "external" "stitch_app_id" {
-  depends_on = [null_resource.provisioner_install_stitch_app]
-  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/stitch_checkout/stitch.json"]
+data "external" "realm_app_id" {
+  depends_on = [null_resource.provisioner_install_realm_app]
+  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/realm_checkout/realm.json"]
 }
 
 
-output "stitch_app_id" {
-  value = local.mongodbatlas_stitch_app_id
+output "realm_app_id" {
+  value = local.mongodbatlas_realm_app_id
 }
 
-resource "null_resource" "vm_provisioners_atlas_stitch_app" {
+resource "null_resource" "vm_provisioners_atlas_realm_app" {
   count      = var.participant_count
 
   triggers = {
-    stitch_app_id=local.mongodbatlas_stitch_app_id
+    realm_app_id=local.mongodbatlas_realm_app_id
   }
 
   provisioner "file" {
-    content      = templatefile("${path.module}/add_stitch_url_to_docs.tpl", { 
-      mongodbatlas_stitch_app_id   = self.triggers.stitch_app_id
+    content      = templatefile("${path.module}/add_realm_url_to_docs.tpl", { 
+      mongodbatlas_realm_app_id   = self.triggers.realm_app_id
       asciidoc_index_path  = "~/.workshop/docker/asciidoc/index.html"
     })
-    destination = "/tmp/add_stitch_url_to_docs.sh"
+    destination = "/tmp/add_realm_url_to_docs.sh"
 
     connection {
       user     = format("dc%02d", count.index + 1)
@@ -148,8 +148,8 @@ resource "null_resource" "vm_provisioners_atlas_stitch_app" {
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/add_stitch_url_to_docs.sh",
-      "/tmp/add_stitch_url_to_docs.sh"
+      "chmod +x /tmp/add_realm_url_to_docs.sh",
+      "/tmp/add_realm_url_to_docs.sh"
     ]
 
     connection {

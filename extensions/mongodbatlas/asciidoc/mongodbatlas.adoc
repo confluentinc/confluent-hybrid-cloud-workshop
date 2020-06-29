@@ -87,16 +87,16 @@ Exit the ksqlDB cli
 exit
 ====
 
-=== Stitch triggers
+=== Realm triggers
 Now that we got our data in MongoDB Atlas, there are multiple things we can do with it.
 
-MongoDB Stitch triggers enable you to execute application and database logic automatically, either in response to events or based on a pre-defined schedule. Stitch supports three types of triggers:
+MongoDB Realm triggers enable you to execute application and database logic automatically, either in response to events or based on a pre-defined schedule. Realm supports three types of triggers:
 
 * **Database triggers**, which can automatically respond when documents are added, updated, or removed in a linked MongoDB collection.
 * **Authentication triggers**, which execute additional server-side logic when a user is created, authenticated, or deleted.
 * **Scheduled triggers**, which execute functions at regular intervals according to a pre-defined schedule.
 
-Triggers listen for application events of a configured type and are each linked with a specific Stitch function. Whenever a trigger observes an event that matches your configuration, it “fires” and passes the event object that caused it to fire as the argument to its linked function. You can configure the events that cause a trigger to fire based on their operation type as well as other values specific to each type of trigger.
+Triggers listen for application events of a configured type and are each linked with a specific Realm function. Whenever a trigger observes an event that matches your configuration, it “fires” and passes the event object that caused it to fire as the argument to its linked function. You can configure the events that cause a trigger to fire based on their operation type as well as other values specific to each type of trigger.
 
 In this workshop we configured a Trigger that reads data from the `dc01_sales` collection in MongoDB and writes it to a new collection using a different JSON structure. Below you can see the code of this function.
 
@@ -128,16 +128,16 @@ exports = function(changeEvent) {
 };
 ----
 
-=== Stitch application
+=== Realm application
 MongoDB Atlas is a great platform to build modern and scalable applications. These applications can now leverage all the data retrieved in real time from your legacy systems as it is now in MongoDB Atlas ready to be used. 
 These applications will also produce new data, what if you need to communicate these information back to your on premise environment? Let's have a look!
 
 The application is already deployed in MongoDB Atlas and lets you put Orders online, with a simple web application. 
 
 
-link:MONGODB_STITCH_APP_URL[Place your first order at this link, window=_blank]
+link:MONGODB_REALM_APP_URL[Place your first order at this link, window=_blank]
 
-image::./images/mongodb-stitch-app.png[]
+image::./images/mongodb-realm-app.png[]
 
 The application itself is hosted in MongoDB Atlas, and the data inserted from the UI will flow in the collection `demo.po`
 
@@ -202,5 +202,5 @@ Now that the data is in Confluent Cloud, you could sync it back to On-Premise Ka
 ====
 * link:https://www.mongodb.com/cloud/atlas[MongoDB Atlas]
 * link:https://github.com/mongodb/mongo-kafka[MongoDB Kafka Connector]
-* link:https://docs.mongodb.com/stitch/triggers[Stitch Triggers]
+* link:https://docs.mongodb.com/realm/triggers[Realm Triggers]
 ====
