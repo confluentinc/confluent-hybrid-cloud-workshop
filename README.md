@@ -21,6 +21,7 @@ Each workshop participant will work through a series of Labs to create the follo
 * Python + [Yaml](https://pyyaml.org/wiki/PyYAML)
 * A GCP/AWS/Azure account with the appropriate privileges
 * A Confluent Cloud Account
+* [MongoDB Realm CLI](https://docs.mongodb.com/realm/deploy/realm-cli-reference/#installation) (required if you use the MongoDB Atlas extension)
 
 ## Provisioning a Workshop
 
