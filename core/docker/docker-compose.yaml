@@ -97,7 +97,7 @@ services:
         curl -k -SL "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.37.tar.gz" | tar -xzf -
         #
         echo "Launching Kafka Connect worker"
-        /etc/confluent/docker/run & 
+        /etc/confluent/docker/run &
         #
         sleep infinity
     volumes:
@@ -175,10 +175,10 @@ services:
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
         curl -k -L "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.41.1065/RedshiftJDBC42-no-awssdk-1.2.41.1065.jar" -o RedshiftJDBC42-no-awssdk-1.2.41.1065.jar
-        
+
         #
         echo "Launching Kafka Connect worker"
-        /etc/confluent/docker/run & 
+        /etc/confluent/docker/run &
         #
         sleep infinity
     volumes:
@@ -236,8 +236,8 @@ services:
       - "8088:8088"
     environment:
       KSQL_HOST_NAME: ksqldb-server
-      KSQL_CONFIG_DIR: "/etc/ksql"
-      KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/ksql/log4j-rolling.properties"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
+      KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/ksqldb/log4j-rolling.properties"
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_COMMIT_INTERVAL_MS: 0
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
@@ -249,7 +249,7 @@ services:
       KSQL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
       KSQL_KSQL_CONNECT_URL: http://kafka-connect-ccloud:18084
       KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
-      KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
+      KSQL_KSQL_HIDDEN_TOPICS: "^_.*"
       KSQL_KSQL_SERVICE_ID: ${DC}-ksqldbserver_
       KSQL_KSQL_STREAMS_PRODUCER_RETRIES: 2147483647
       KSQL_KSQL_STREAMS_PRODUCER_CONFLUENT_BATCH_EXPIRE_MS: 9223372036854775807
@@ -258,7 +258,7 @@ services:
       KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 3
       KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 3
       KSQL_KSQL_SINK_REPLICAS: 3
-      # Producer/Consumer Confluent Monitoring Interceptors for Control Center streams monitoring 
+      # Producer/Consumer Confluent Monitoring Interceptors for Control Center streams monitoring
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.5.0.jar
       KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
@@ -275,10 +275,10 @@ services:
         cd /usr/share/java/monitoring-interceptors
         curl -k -L https://packages.confluent.io/maven/io/confluent/monitoring-interceptors/5.5.0/monitoring-interceptors-5.5.0.jar -o monitoring-interceptors-5.5.0.jar
         echo "Launching ksqlDB server"
-        /usr/bin/docker/run & 
+        /usr/bin/docker/run &
         #
         sleep infinity
-  
+
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.9.0
     container_name: ksqldb-cli
@@ -296,7 +296,7 @@ services:
       - "80:80"
     volumes:
       - ./asciidoc:/usr/share/nginx/html
- 
+
   create-cloud-topics:
     image: confluentinc/cp-kafka:5.5.0
     hostname: create-cloud-topics
@@ -339,4 +339,4 @@ services:
         condition: service_healthy
     command: tail -f /dev/null
     build:
-      context: ./db_transaction_simulator    
+      context: ./db_transaction_simulator
