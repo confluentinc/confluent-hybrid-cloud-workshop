@@ -13,7 +13,6 @@ data "template_file" "aws_s3_iam_name" {
 resource "aws_s3_bucket" "bucket" {
   bucket   = "tf-bucket-${data.template_file.aws_s3_iam_name.rendered}"
   acl      = "private"
-  region   = var.region
   force_destroy = true
 
   versioning {
