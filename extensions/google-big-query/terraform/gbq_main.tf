@@ -9,13 +9,13 @@ resource "google_bigquery_dataset" "dataset" {
 
 }
 
-resource "google_bigquery_dataset_access" "dataEditorAccess" {
+resource "google_bigquery_dataset_access" "dataEditorAccessGroup" {
   dataset_id    = google_bigquery_dataset.dataset.dataset_id
   role          = "roles/bigquery.dataEditor"
   special_group = "allAuthenticatedUsers"
 }
 
-resource "google_bigquery_dataset_access" "dataEditorAccess" {
+resource "google_bigquery_dataset_access" "dataEditorAccessEmail" {
   dataset_id    = google_bigquery_dataset.dataset.dataset_id
   role          = "roles/bigquery.dataEditor"
   user_by_email = google_service_account.gbq_service_account.email
