@@ -1,21 +1,24 @@
 
 resource "google_bigquery_dataset" "dataset" {
   dataset_id                  = "${var.name}_dataset"
-  friendly_name               = "Workshop Dataset"
-  description                 = "Workshop Dataset"
+  friendly_name               = "${var.name} Dataset"
+  description                 = "${var.name} Dataset - Confluent Hybrid Cloud workshop"
   project                     = var.gbq_project
   location                    = var.gbq_location
   delete_contents_on_destroy  = true
 
-  access {
-    role          = "roles/bigquery.dataEditor"
-    user_by_email = google_service_account.gbq_service_account.email
-  }
+}
 
-  access {
-    role          = "roles/bigquery.dataEditor"
-    special_group = "allAuthenticatedUsers"
-  }
+resource "google_bigquery_dataset_access" "dataEditorAccess" {
+  dataset_id    = google_bigquery_dataset.dataset.dataset_id
+  role          = "roles/bigquery.dataEditor"
+  special_group = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_access" "dataEditorAccess" {
+  dataset_id    = google_bigquery_dataset.dataset.dataset_id
+  role          = "roles/bigquery.dataEditor"
+  user_by_email = google_service_account.gbq_service_account.email
 }
 
 resource "google_service_account" "gbq_service_account" {
