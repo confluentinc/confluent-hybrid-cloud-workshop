@@ -6,7 +6,7 @@ This repository allows you to configure and provision a cloud-based workshop usi
 
 For a single workshop participant, the logical architecture looks like this.
 
-![workshop](core/asciidoc/images/architecture.png)
+![workshop](core/asciidoc/images/architecture.png) 
 
 From a physical architecture point of view, each component, except for Confluent Cloud, is hosted on the participant's virtual machine. 
 
