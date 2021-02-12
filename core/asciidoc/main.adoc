@@ -906,7 +906,7 @@ We'll use these tables soon and join them to our streams.
 * link:https://docs.confluent.io/current/ksql/docs/developer-guide/syntax-reference.html#create-stream-as-select[CREATE STREAM AS SELECT Syntax]
 ====
 
-== Lab 8: Joining Steams & Tables with ksqlDB
+== Lab 8: Joining Streams & Tables with ksqlDB
 
 We can join two streams together in ksqlDB using a windowed join. When using a windowed join, you must specify a windowing scheme by using the `WITHIN` clause. A new input record on one side produces a join output for each matching record on the other side, and there can be multiple such matching records within a join window.
 
