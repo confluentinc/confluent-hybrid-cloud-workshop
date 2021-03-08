@@ -304,7 +304,7 @@ services:
     volumes:
       - ./ccloud.properties:/ccloud.properties
       - ./create_ccloud_topics.sh:/create_ccloud_topics.sh
-    command: "bash -c 'chmod +x /create_ccloud_topics.sh; /create_ccloud_topics.sh ${CCLOUD_TOPICS} ${DC}'"
+    command: "bash -c 'source /create_ccloud_topics.sh; create_ccloud_topics ${CCLOUD_TOPICS} ${DC}'"
     environment:
       # The following settings are listed here only to satisfy the image’s requirements.
       # We override the image’s command anyways, hence this container will not start a broker.
