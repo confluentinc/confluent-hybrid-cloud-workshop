@@ -47,7 +47,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
 
   kafka-connect-onprem:
-    image: confluentinc/cp-kafka-connect:5.5.0
+    image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}
     container_name: kafka-connect-onprem
     hostname: kafka-connect-onprem
     depends_on:
@@ -89,7 +89,6 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
@@ -104,7 +103,7 @@ services:
       - .env:/secrets.properties
 
   kafka-connect-ccloud:
-    image: confluentinc/cp-kafka-connect:5.5.0
+    image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}
     container_name: kafka-connect-ccloud
     hostname: kafka-connect-ccloud
     depends_on:
@@ -165,7 +164,6 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt confluentinc/kafka-connect-gcs-source:1.1.0-preview
         confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
