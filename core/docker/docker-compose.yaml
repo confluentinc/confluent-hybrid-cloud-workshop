@@ -165,10 +165,10 @@ services:
       - |
         apt-get -qq update
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs-source:1.1.0-preview
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs:5.5.5
         confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.0-preview
-        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.0.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.7
+        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.4.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
