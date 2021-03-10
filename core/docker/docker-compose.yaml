@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.5.0
+    image: confluentinc/cp-zookeeper:${CONFLUENT_DOCKER_TAG}
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -11,7 +11,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-enterprise-kafka:5.5.0
+    image: confluentinc/cp-enterprise-kafka:${CONFLUENT_DOCKER_TAG}
     hostname: broker
     container_name: broker
     depends_on:
@@ -34,7 +34,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.0
+    image: confluentinc/cp-schema-registry:${CONFLUENT_DOCKER_TAG}
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
@@ -47,7 +47,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
 
   kafka-connect-onprem:
-    image: confluentinc/cp-kafka-connect:5.5.0
+    image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}
     container_name: kafka-connect-onprem
     hostname: kafka-connect-onprem
     depends_on:
@@ -80,7 +80,7 @@ services:
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components/"
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.5.0.jar:/usr/share/java/kafka-connect-replicator/replicator-rest-extension-5.5.0.jar
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar:/usr/share/java/kafka-connect-replicator/replicator-rest-extension-${CONFLUENT_DOCKER_TAG}.jar
       CONNECT_CONFIG_PROVIDERS: "file"
       CONNECT_CONFIG_PROVIDERS_FILE_CLASS: "org.apache.kafka.common.config.provider.FileConfigProvider"
       CONNECT_REST_EXTENSION_CLASSES: io.confluent.connect.replicator.monitoring.ReplicatorMonitoringExtension
@@ -89,7 +89,6 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
@@ -104,7 +103,7 @@ services:
       - .env:/secrets.properties
 
   kafka-connect-ccloud:
-    image: confluentinc/cp-kafka-connect:5.5.0
+    image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}
     container_name: kafka-connect-ccloud
     hostname: kafka-connect-ccloud
     depends_on:
@@ -146,7 +145,7 @@ services:
       # Interceptor config
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.5.0.jar:/usr/share/java/kafka-connect-replicator/replicator-rest-extension-5.5.0.jar
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar:/usr/share/java/kafka-connect-replicator/replicator-rest-extension-${CONFLUENT_DOCKER_TAG}.jar
       # Producer config
       CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
       CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
@@ -165,12 +164,11 @@ services:
       - -c
       - |
         apt-get -qq update
-        apt-get install -y confluent-kafka-connect-replicator=5.5.0-1
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs-source:1.1.0-preview
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs:5.5.5
         confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.0-preview
-        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.0.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.7
+        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.4.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
@@ -185,7 +183,7 @@ services:
       - .env:/secrets.properties
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:5.5.0
+    image: confluentinc/cp-enterprise-control-center:${CONFLUENT_DOCKER_TAG}
     hostname: control-center
     container_name: control-center
     depends_on:
@@ -259,7 +257,7 @@ services:
       KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 3
       KSQL_KSQL_SINK_REPLICAS: 3
       # Producer/Consumer Confluent Monitoring Interceptors for Control Center streams monitoring 
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.5.0.jar
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar
       KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       KSQL_CONFLUENT_MONITORING_INTERCEPTOR_BOOTSTRAP_SERVERS: ${CCLOUD_CLUSTER_ENDPOINT}
@@ -273,7 +271,7 @@ services:
       - |
         mkdir /usr/share/java/monitoring-interceptors
         cd /usr/share/java/monitoring-interceptors
-        curl -k -L https://packages.confluent.io/maven/io/confluent/monitoring-interceptors/5.5.0/monitoring-interceptors-5.5.0.jar -o monitoring-interceptors-5.5.0.jar
+        curl -k -L https://packages.confluent.io/maven/io/confluent/monitoring-interceptors/${CONFLUENT_DOCKER_TAG}/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar -o monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar
         echo "Launching ksqlDB server"
         /usr/bin/docker/run & 
         #
@@ -298,13 +296,13 @@ services:
       - ./asciidoc:/usr/share/nginx/html
  
   create-cloud-topics:
-    image: confluentinc/cp-kafka:5.5.0
+    image: confluentinc/cp-kafka:${CONFLUENT_DOCKER_TAG}
     hostname: create-cloud-topics
     container_name: create-cloud-topics
     volumes:
       - ./ccloud.properties:/ccloud.properties
       - ./create_ccloud_topics.sh:/create_ccloud_topics.sh
-    command: "bash -c 'chmod +x /create_ccloud_topics.sh; /create_ccloud_topics.sh ${CCLOUD_TOPICS} ${DC}'"
+    command: "bash -c 'source /create_ccloud_topics.sh; create_ccloud_topics ${CCLOUD_TOPICS} ${DC}'"
     environment:
       # The following settings are listed here only to satisfy the image’s requirements.
       # We override the image’s command anyways, hence this container will not start a broker.

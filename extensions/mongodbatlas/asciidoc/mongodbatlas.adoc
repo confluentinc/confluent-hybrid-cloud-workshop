@@ -152,19 +152,13 @@ We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank
 ====
 Create the `{dc}_mdb.demo.estore` topic.
 
-Select the "CC" cluster from the left-hand navigation bar and then select "Topics". 
+Select the "ccloud" cluster from the home page and then select "Topics". 
 
 Click on "+ Add Topic"
 
 Input `{dc}_mdb.demo.estore` as _Topic Name_, and select 1 for _Number of partitions_
 
-Click on _Customize settings_
-
-Select _Balanced availability/durability_ as _Availability_ type 
-
-Select _Delete_ as _Cleanup policy_
-
-Click on _Save & create_
+Click on _Create with defaults_
 
 image::./images/mongodb_topic_creation.png[]
 
@@ -193,6 +187,14 @@ curl -i -X POST -H "Accept:application/json" \
   }'
 ----
 ====
+
+Use link:http://{externalip}:9021[Confluent Control Center, window=_blank] to see the events coming in, as they are synced from MongoDB Atlas.
+Select "ccloud" cluster from the Home page.
+
+Select the `{dc}_mdb.demo.estore` topic, then click on the Messages tab and observe that messages are being streamed into Kafka from MongoDB ATlas in real time.
+
+image::./images/mongodb-c3-topic-dcNN_mdb.demo.estore.png[]
+
 
 === Replicate MongoDB orders to On-Premise Kafka
 Now that the data is in Confluent Cloud, you could sync it back to On-Premise Kafka, and then to MySQL using similar steps you have already followed in this workshop. This step is optional, and will not be explained step by step. Have fun!
