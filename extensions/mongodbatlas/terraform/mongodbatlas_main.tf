@@ -160,3 +160,11 @@ resource "null_resource" "vm_provisioners_atlas_realm_app" {
     }
   }
 }
+
+terraform {
+  required_providers {
+    mongodbatlas = {
+      source  = "mongodb/mongodbatlas"
+    }
+  }
+}
