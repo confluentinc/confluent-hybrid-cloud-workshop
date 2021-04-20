@@ -57,6 +57,15 @@ When you are finished with the workshop you can destroy it using `workshop-destr
 python workshop-destroy.py --dir ~/myworkshop
 ```
 
+## Troubleshooting
+If you ever need root access on the docker containers use:
+
+```
+docker exec --interactive --tty --user root --workdir / kafka-connect-ccloud bash
+```
+See [this blog post](https://rmoff.net/2021/01/13/running-as-root-on-docker-images-that-dont-use-root/) for more info
+
+
 ## License
 
 This project is licensed under the Apache 2.0 - see the [LICENSE.md](LICENSE.md) file for details

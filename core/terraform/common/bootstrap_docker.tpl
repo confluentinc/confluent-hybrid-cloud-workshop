@@ -31,6 +31,9 @@ asciidoctor workshop.adoc -o index.html -a stylesheet=stylesheet.css -a external
 # Inject c&p functionality into rendered html file.
 sed -i -e '/<title>/r clipboard.html' index.html
 
+# Creating empty folder to host aws configs later
+mkdir ~/.workshop/docker/.aws
+
 # startup the containers
 cd ~/.workshop/docker/
 docker-compose up -d
