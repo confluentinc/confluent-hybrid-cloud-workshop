@@ -116,7 +116,7 @@ resource "null_resource" "s3_provisioners" {
 
   provisioner "file" {
     source      = "aws_credentials.txt"
-    destination = "/tmp/aws_credentials.txt"
+    destination = "~/.workshop/docker/.aws/credentials"
 
     connection {
       user     = format("dc%02d", count.index + 1)
@@ -129,11 +129,7 @@ resource "null_resource" "s3_provisioners" {
   provisioner "remote-exec" {
     inline = [
       "cat /tmp/s3_bucket_info.txt >> ~/.workshop/docker/.env",
-      "rm /tmp/s3_bucket_info.txt",
-      "docker cp /tmp/aws_credentials.txt kafka-connect-ccloud:/tmp/aws_credentials.txt",
-      "docker exec kafka-connect-ccloud mkdir /root/.aws",
-      "docker exec kafka-connect-ccloud cp /tmp/aws_credentials.txt /root/.aws/credentials",
-      "rm /tmp/aws_credentials.txt"
+      "rm /tmp/s3_bucket_info.txt"
     ]
 
     connection {

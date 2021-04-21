@@ -10,7 +10,7 @@ Start a KSQL CLI session
 docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
 
-And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS S3:-
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS S3:
 
 [source,bash,subs=attributes]
 ----

@@ -13,9 +13,9 @@ docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
 ----
 ====
 
-And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS Redshift:-
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS Redshift:
 
-[source,subs=attributes]
+[source,bash,subs=attributes]
 ----
 {dc}_sales_orders
 {dc}_sales_order_details
@@ -26,9 +26,12 @@ And run the following `CREATE SINK CONNECTOR` command. This will create a connec
 {dc}_suppliers 
 ----
 
+Then you can create the connector
+
+
 [IMPORTANT]
 ====
-[source,subs=attributes]
+[source,subs="quotes,attributes"]
 ----
 CREATE SINK CONNECTOR {dc}_redshift_sink WITH (  
   'connector.class'='io.confluent.connect.jdbc.JdbcSinkConnector',
@@ -42,9 +45,8 @@ CREATE SINK CONNECTOR {dc}_redshift_sink WITH (
   'key.converter'='org.apache.kafka.connect.storage.StringConverter',
   'dialect.name'='PostgreSqlDatabaseDialect'
 );
-====
-
 ----
+====
 
 We can list our current connectors using the following command
 
@@ -69,6 +71,9 @@ We can also describe a connector and view its status using the `describe connect
 ----
 describe connector {dc}_redshift_sink;
 ----
+
+And here an example result
+
 [source,subs=attributes]
 ----
 Name                 : {dc}_REDSHIFT_SINK
