@@ -63,6 +63,7 @@ resource "google_compute_instance" "instance" {
     initialize_params {
       type  = "pd-standard"
       image = "ubuntu-1804-lts"
+      size  = var.vm_disk_size
     }
   }
 

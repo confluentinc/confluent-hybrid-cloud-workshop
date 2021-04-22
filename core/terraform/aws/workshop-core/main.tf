@@ -36,6 +36,10 @@ resource "aws_instance" "instance" {
   instance_type = var.vm_type
   vpc_security_group_ids = [aws_security_group.instance.id]
 
+  root_block_device {
+    volume_size           = var.vm_disk_size
+  }
+
   user_data  = <<EOF
 #! /bin/bash
 sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config 

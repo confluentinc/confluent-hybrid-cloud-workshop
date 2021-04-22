@@ -17,6 +17,7 @@ module "workshop-core" {
   project                  = var.project
   credentials_file_path    = var.credentials_file_path
   vm_type                  = var.vm_type
+  vm_disk_size             = var.vm_disk_size
   ccloud_bootstrap_servers = var.ccloud_bootstrap_servers
   ccloud_api_key           = var.ccloud_api_key
   ccloud_api_secret        = var.ccloud_api_secret

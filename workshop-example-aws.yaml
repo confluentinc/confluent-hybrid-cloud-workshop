@@ -19,6 +19,7 @@ workshop:
     secret_key: <secret key>
     region: eu-west-2
     vm_type: t2.xlarge
+    vm_disk_size: 100
     # EU - does not exist in SG
     ami: ami-0eb89db7593b5d434
     # SG - Ubuntu Server 18.04 LTS (HVM), SSD Volume Type

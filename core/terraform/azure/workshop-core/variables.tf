@@ -17,6 +17,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "vm_disk_size" {
+  description = "VM Disk Size"
+}
+
 variable "location" {
   description = "Location"
 }

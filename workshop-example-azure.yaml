@@ -21,6 +21,7 @@ workshop:
     tenant_id:        <Azure Tenant Id>
     location:         westeurope
     vm_type: Standard_DS3_v2
+    vm_disk_size: 100
 
     # The workshop Confluent Cloud configuration
     ccloud_bootstrap_servers: <CCloud Bootstrap Server>

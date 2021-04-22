@@ -35,6 +35,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "vm_disk_size" {
+  description = "VM Disk Size"
+}
+
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
   description = "Confluent Cloud username"
