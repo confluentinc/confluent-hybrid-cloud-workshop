@@ -91,6 +91,7 @@ services:
         apt-get -qq update
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
         confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.4.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
         curl -k -SL "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.37.tar.gz" | tar -xzf -
@@ -101,6 +102,7 @@ services:
         sleep infinity
     volumes:
       - .env:/secrets.properties
+      - .data/datagen:/datagen/
 
   kafka-connect-ccloud:
     image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}

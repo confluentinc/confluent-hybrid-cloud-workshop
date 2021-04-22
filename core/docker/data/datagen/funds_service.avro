@@ -1,0 +1,40 @@
+{
+        "namespace": "ksql",
+        "name": "payment_funds_status",
+        "type": "record",
+        "fields": [
+                {"name": "payment_id", "type": {
+                    "type": "int",
+                    "arg.properties": {
+                        "iteration": { "start": 1, "step": 2}
+                    }
+                }},
+                {"name": "reason_code", "type": {
+                    "type": "string",
+                    "arg.properties": {
+                    "options": [
+                        "20",
+                        "10",
+                        "00",
+                        "30",
+                        "99"
+                        ]
+                    }
+                }},
+                {"name": "status", "type": {
+                    "type": "string",
+                    "arg.properties": {
+                    "options": [
+                        "OK",
+                        "OK",
+                        "OK",
+                        "OK",
+                        "OK",
+                        "OK",
+                        "OK",
+                        "NOT OK"
+                        ]
+                    }
+                }}
+        ]
+}
