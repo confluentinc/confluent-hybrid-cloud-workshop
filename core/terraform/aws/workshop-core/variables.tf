@@ -46,6 +46,10 @@ variable "ccloud_topics" {
   description = "Confluent Cloud topics to precreate"
 }
 
+variable "onprem_topics" {
+  description = "Confluent Server local on-prem to precreate"
+}
+
 variable "feedback_form_url" {
   description = "Feedback Form Url"
 }
