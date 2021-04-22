@@ -1,0 +1,22 @@
+= Confluent workshops
+:doctype: book
+:!toc:
+:nofooter:
+:experimental:
+:icons: font
+:imagesdir: .
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+
+
+== Pick your workshop
+
+This environment is configured for multiple workshops:
+
+*Available workshops*
+
+* link:hybrid-cloud-workshop.html[Hybrid-Cloud Streaming Workshop]
+* link:ksql-hands-on-workshop.html[ksqlDB Hands-on Workshop]
+
+

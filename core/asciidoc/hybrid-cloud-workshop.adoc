@@ -6,17 +6,18 @@
 :experimental:
 :icons: font
 :imagesdir: .
-:githubreponame: partner-workshops
-:cloudprovider: GCP
 :externalip: localhost
 :dc: dc
 :feedbackformurl: 
+:nofooter:
 
 
-include::intro.adoc[]
+include::bits/intro.adoc[]
 
-include::main.adoc[]
+include::bits/workshop-env.adoc[]
+
+include::bits/main.adoc[]
 
 #EXTENSIONS_PLACEHOLDER#
 
-include::outro.adoc[]
+include::bits/outro.adoc[]

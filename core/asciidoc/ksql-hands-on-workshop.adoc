@@ -1,0 +1,28 @@
+= ksqlDB Hands-on Workshop
+:doctype: book
+:toc:
+:toc-title: Table of Contents
+:toclevels: 1
+:experimental:
+:icons: font
+:imagesdir: .
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+:nofooter:
+
+== Introduction
+
+In this workshop we will focus on how ksqlDB can be used across different use-cases.
+
+Organizations are looking to become more event driven. The Confluent Platform is a streaming platform that can stream data, in real time, to the systems that need it, when they need it, across an entire organization. Processes that were once batch can now become real time, every event can be used to trigger other services and this can all be done using a common API with low latency and high throughput.
+
+In this workshop we will explore how the Confluent can enable these architectures by building multiple use-cases using ksqlDB.
+
+
+include::bits/workshop-env.adoc[]
+
+include::bits/uc-intro.adoc[]
+
+include::bits/uc-financial-01.adoc[]
+

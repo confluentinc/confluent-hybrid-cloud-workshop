@@ -1,0 +1,379 @@
+== Lab 2: Finacial services case: Payment Status check
+
+We are going to build data pipeline which should look like this:
+image::./images/ksqlws/img/Financial_datapipe.png[Financial Services Use cases as flow]
+
+=== Start the ksqlDB CLI
+
+To start the ksqlDB CLI run the following command:-
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-onprem:8088
+----
+====
+
+You should see something like this:-
+
+```
+                  ===========================================
+                  =       _              _ ____  ____       =
+                  =      | | _____  __ _| |  _ \| __ )      =
+                  =      | |/ / __|/ _` | | | | |  _ \      =
+                  =      |   <\__ \ (_| | | |_| | |_) |     =
+                  =      |_|\_\___/\__, |_|____/|____/      =
+                  =                   |_|                   =
+                  =  Event Streaming Database purpose-built =
+                  =        for stream processing apps       =
+                  ===========================================
+
+Copyright 2017-2020 Confluent Inc.
+
+CLI v0.9.0, Server v0.9.0 located at http://ksqldb-server-onprem:8088
+
+Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!
+
+ksql>
+
+```
+
+The ksqlDB CLI is pointing at a ksqlDB Server connected to your Confluent Server instance.
+
+To view a list of all topics in Confluent Cloud run the following command:-
+
+`show topics;`
+
+You should see your own topics, `{dc}_*`, along with topics from other workshop users.
+
+```
+ksql> show topics;
+
+ Kafka Topic                 | Partitions | Partition Replicas
+---------------------------------------------------------------
+ dc01_customers              | 1          | 3
+ dc01_products               | 1          | 3
+ dc01_purchase_order_details | 1          | 3
+ dc01_purchase_orders        | 1          | 3
+ dc01_sales_order_details    | 1          | 3
+ dc01_sales_orders           | 1          | 3
+ dc01_suppliers              | 1          | 3
+ dc02_customers              | 1          | 3
+ dc02_products               | 1          | 3
+ dc02_purchase_order_details | 1          | 3
+ dc02_purchase_orders        | 1          | 3
+ dc02_sales_order_details    | 1          | 3
+...
+```
+
+To view a list of all streams in ksqlDB run the following command:-
+
+`show streams;`
+
+You should see no streams (yet).
+
+=== Inspect a topic\'s contents
+
+To inspect the contents of a topic run the following:-
+
+`PRINT '{dc}_Payment_Instruction';`
+
+to see new incoming events or limit to 3 records
+
+`PRINT '{dc}_Payment_Instruction' from beginning limit 3;`
+
+You should see something similar:-
+
+[source,subs="attributes"]
+----
+ksql> PRINT {dc}_Payment_Instruction;
+Key format: AVRO
+Value format: AVRO
+rowtime: 2020/05/20 10:10:29.264 Z, key: {"id": 1}, value: {"id": 1, "order_date": 1589969387000, "customer_id": 14, "sourcedc": "{dc}"}
+rowtime: 2020/05/20 10:10:29.265 Z, key: {"id": 2}, value: {"id": 2, "order_date": 1589969392000, "customer_id": 14, "sourcedc": "{dc}"}
+rowtime: 2020/05/20 10:10:29.265 Z, key: {"id": 3}, value: {"id": 3, "order_date": 1589969397000, "customer_id": 14, "sourcedc": "{dc}"}
+...
+----
+
+Press `ctrl-c` to stop
+
+
+Check the properties set for ksqlDB.
+[source]
+----
+show properties;
+
+----
+
+
+=== Create Payment Stream and convert it automatically to AVRO.
+
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*CREATE STREAM* payments *WITH*(kafka_topic='{dc}_Payment_Instruction', value_format='avro');
+----
+====
+
+Check your creation with describe and select. 
+
+[source]
+----
+describe payments;
+set 'auto.offset.reset'='earliest';
+select * from payments emit changes;
+
+----
+
+=== Create additional streams
+
+Create the other streams
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*CREATE STREAM* aml_status *WITH*(kafka_topic='{dc}_AML_Status', value_format='avro');
+*CREATE STREAM* funds_status *WITH*(kafka_topic='{dc}_Funds_Status', value_format='avro');
+----
+====
+
+To view your current streams run the following command:-
+
+[source,subs="quotes,attributes"]
+----
+SHOW STREAMS;
+----
+
+Notice that each stream is mapped to an underlying Kafka topic and that the format is AVRO. 
+
+[source,subs="quotes,attributes"]
+----
+ Stream Name            | Kafka Topic                 | Format
+---------------------------------------------------------------
+ CUSTOMERS              | {dc}_customers              | AVRO
+ PRODUCTS               | {dc}_products               | AVRO
+ PURCHASE_ORDERS        | {dc}_purchase_orders        | AVRO
+ PURCHASE_ORDER_DETAILS | {dc}_purchase_order_details | AVRO
+ SALES_ORDERS           | {dc}_sales_orders           | AVRO
+ SALES_ORDER_DETAILS    | {dc}_sales_order_details    | AVRO
+ SUPPLIERS              | {dc}_suppliers              | AVRO
+---------------------------------------------------------------
+----
+
+Exit the ksqlDB cli 
+
+[IMPORTANT]
+====
+exit
+====
+
+=== Database Schema
+
+The MySQL database contains a simple schema that includes _Customer_, _Supplier_, _Product_, _Sales Order_ and _Purchase Order_ information. 
+
+The idea behind this schema is simple, customers order products from a company and sales orders get created, the company then sends purchase orders to their suppliers so that product demand can be met by maintaining sensible stock levels.
+
+image::./images/mysql_schema.png[MySQL schema]
+
+We can inspect this schema further by logging into the MySQL CLI...
+
+[source]
+----
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database demo'
+----
+
+...and viewing your tables
+
+[source]
+----
+show tables;
+----
+
+There's an extra table here called `{dc}_out_of_stock_events` that not in the schema diagram above, we'll cover this table separately later on.
+
+[source,subs="attributes"]
+----
++--------------------------+
+| Tables_in_orders         |
++--------------------------+
+| customers                |
+| {dc}_out_of_stock_events |
+| products                 |
+| purchase_order_details   |
+| purchase_orders          |
+| sales_order_details      |
+| sales_orders             |
+| suppliers                |
++--------------------------+
+8 rows in set (0.00 sec)
+----
+
+Let's view the row count for each table
+
+[source]
+----
+SELECT * from (
+  SELECT 'customers' as table_name, COUNT(*) FROM customers 
+  UNION 
+  SELECT 'products' as table_name, COUNT(*) FROM products 
+  UNION 
+  SELECT 'suppliers' as table_name, COUNT(*) FROM suppliers 
+  UNION 
+  SELECT 'sales_orders' as table_name, COUNT(*) FROM sales_orders 
+  UNION 
+  SELECT 'sales_order_details' as table_name, COUNT(*) FROM sales_order_details 
+  UNION 
+  SELECT 'purchase_orders' as table_name, COUNT(*) FROM purchase_orders 
+  UNION 
+  SELECT 'purchase_order_details' as table_name, COUNT(*) FROM purchase_order_details 
+) row_counts;
+----
+
+As you can see, we have 30 customers, suppliers and products, 0 sales orders and 1 purchase order. 
+
+[source]
+----
++------------------------+----------+
+| table_name             | COUNT(*) |
++------------------------+----------+
+| customers              |       30 |
+| products               |       30 |
+| suppliers              |       30 |
+| sales_orders           |        0 |
+| sales_order_details    |        0 |
+| purchase_orders        |        1 |
+| purchase_order_details |       30 |
++------------------------+----------+
+7 rows in set (0.00 sec)
+----
+
+The single purchase order was created so we have something in stock to sell, let's have a look at what was ordered.
+
+[source]
+----
+select * from CUSTOMERS;
+----
+
+[source]
+----
++----+-------------------+------------+----------+------+
+| id | purchase_order_id | product_id | quantity | cost |
++----+-------------------+------------+----------+------+
+|  1 |                 1 |          1 |      100 | 6.82 |
+|  2 |                 1 |          2 |      100 | 7.52 |
+|  3 |                 1 |          3 |      100 | 6.16 |
+|  4 |                 1 |          4 |      100 | 8.07 |
+|  5 |                 1 |          5 |      100 | 2.10 |
+|  6 |                 1 |          6 |      100 | 7.45 |
+|  7 |                 1 |          7 |      100 | 4.02 |
+|  8 |                 1 |          8 |      100 | 0.64 |
+|  9 |                 1 |          9 |      100 | 8.51 |
+| 10 |                 1 |         10 |      100 | 3.61 |
+| 11 |                 1 |         11 |      100 | 2.62 |
+| 12 |                 1 |         12 |      100 | 2.60 |
+| 13 |                 1 |         13 |      100 | 1.26 |
+| 14 |                 1 |         14 |      100 | 4.08 |
+| 15 |                 1 |         15 |      100 | 3.56 |
+| 16 |                 1 |         16 |      100 | 7.13 |
+| 17 |                 1 |         17 |      100 | 7.64 |
+| 18 |                 1 |         18 |      100 | 5.94 |
+| 19 |                 1 |         19 |      100 | 2.94 |
+| 20 |                 1 |         20 |      100 | 1.91 |
+| 21 |                 1 |         21 |      100 | 8.89 |
+| 22 |                 1 |         22 |      100 | 7.62 |
+| 23 |                 1 |         23 |      100 | 6.19 |
+| 24 |                 1 |         24 |      100 | 2.83 |
+| 25 |                 1 |         25 |      100 | 5.51 |
+| 26 |                 1 |         26 |      100 | 4.23 |
+| 27 |                 1 |         27 |      100 | 8.33 |
+| 28 |                 1 |         28 |      100 | 7.09 |
+| 29 |                 1 |         29 |      100 | 1.75 |
+| 30 |                 1 |         30 |      100 | 1.72 |
++----+-------------------+------------+----------+------+
+30 rows in set (0.00 sec)
+----
+
+Here we have a single purchase order that is procuring 100 of each product, this reflects our initial and current stock levels.
+
+Type `exit` to leave the MySQL CLI
+
+
+== Lab 3: Stream Events to Confluent Platform
+
+Now that we have data being automatically created in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
+
+image::./images/2_mysql_source_connector.png[]
+
+=== Create the MySQL source connector
+
+We have a Kafka Connect worker already up and running in a docker container called `kafka-connect-onprem`. This Kafka Connect worker is configured to connect to your on-premise Kafka cluster and has a internal REST server listening on port `18083`. We can create a connector from the command line using the cURL command. The cURL command allows us to send an HTTP POST request to the REST server, the '-H' option specifies the header of the request and includes the target host and port information, the `-d` option specifies the data we will send, in this case its the configuration options for the connector. You can of course create and manage connectors using any tool or language capable of issuing HTTP requests.
+
+To create the Debezium MySQL Source connector instance run the following command:-
+
+[IMPORTANT]
+====
+[source,bash,subs=attributes]
+----
+CREATE SINK CONNECTOR source_dbz_mysql WITH (  
+  'connector.class': 'io.debezium.connector.mysql.MySqlConnector',
+  'database.hostname': 'mysql',
+  'database.port': '3306',
+  'database.user': 'mysqluser',
+  'database.password': 'mysqlpw',
+  'database.server.id': '12345',
+  'database.server.name': '{dc}',
+  'database.whitelist': 'demo',
+  'database.history.kafka.bootstrap.servers': 'broker:29092',
+  'database.history.kafka.topic': 'dbhistory.demo' ,
+  'include.schema.changes': 'true',
+  'snapshot.mode': 'when_needed',
+  'transforms': 'unwrap,sourcedc,TopicRename,addTopicSuffix,extractKey',
+  'transforms.unwrap.type': 'io.debezium.transforms.UnwrapFromEnvelope',
+  'transforms.sourcedc.type':'org.apache.kafka.connect.transforms.InsertField$Value',
+  'transforms.sourcedc.static.field':'sourcedc',
+  'transforms.sourcedc.static.value':'{dc}',
+  'transforms.TopicRename.type': 'org.apache.kafka.connect.transforms.RegexRouter',
+  'transforms.TopicRename.regex': '(.*)\\.(.*)\\.(.*)',
+  'transforms.TopicRename.replacement': '$1_$3',
+  'transforms.extractKey.type': 'org.apache.kafka.connect.transforms.ExtractField$Key',
+  'transforms.extractKey.field': 'id',
+  'transforms.addTopicSuffix.type' = 'org.apache.kafka.connect.transforms.RegexRouter',
+  'transforms.addTopicSuffix.regex' = '(.*)',
+  'transforms.addTopicSuffix.replacement' = '$1-cdc'
+  'key.converter': 'org.apache.kafka.connect.converters.IntegerConverter'
+);
+----
+====
+
+We can confirm the connector is running by querying the REST interface
+
+[source]
+----
+curl -s localhost:18083/connectors/mysql-source-connector/status | jq
+----
+
+You should see that the connector's state is `RUNNING`
+
+[source]
+----
+{
+  "name": "mysql-source-connector",
+  "connector": {
+    "state": "RUNNING",
+    "worker_id": "kafka-connect-onprem:18083"
+  },
+  "tasks": [
+    {
+      "id": 0,
+      "state": "RUNNING",
+      "worker_id": "kafka-connect-onprem:18083"
+    }
+  ],
+  "type": "source"
+}
+----
+

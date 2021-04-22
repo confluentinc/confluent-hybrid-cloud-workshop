@@ -100,7 +100,7 @@ copytree(os.path.join("./core/asciidoc"), os.path.join(docker_staging, "asciidoc
 # Deal with extensions
 if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
 
-    # Add each extensions asciidoc file as an include in the main workshop.adoc file
+    # Add each extensions asciidoc file as an include in the main hybrid-cloud-workshop.adoc file
     includes = []
     include_str="" 
     for extension in config['workshop']['extensions']:
@@ -111,8 +111,8 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
     for include in includes:
         include_str += 'include::.' + include + '[]\n'
     
-    # Add extension includes to core workshop.adoc 
-    for line in fileinput.input(os.path.join(docker_staging, "asciidoc/workshop.adoc"), inplace=True):
+    # Add extension includes to core hybrid-cloud-workshop.adoc
+    for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
         line=re.sub("^#EXTENSIONS_PLACEHOLDER#",include_str,line)   
         print(line.rstrip())
     
@@ -136,7 +136,7 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
                     with open(os.path.join(docker_staging, "extensions", extension, "docker/.env"), 'a') as env_file:
                         env_file.write(var + '=' + config['workshop']['extensions'][extension][var] + "\n")
 else:  
-    for line in fileinput.input(os.path.join(docker_staging, "asciidoc/workshop.adoc"), inplace=True):
+    for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
         line=re.sub("^#EXTENSIONS_PLACEHOLDER#","",line)   
         print(line.rstrip())
               
