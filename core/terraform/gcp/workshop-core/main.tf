@@ -44,7 +44,7 @@ resource "google_compute_firewall" "workshop-firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "9021", "80", "8088", "8089"]
+    ports    = ["22", "9021", "80", "8088", "8089","18088"]
   }
 }
 

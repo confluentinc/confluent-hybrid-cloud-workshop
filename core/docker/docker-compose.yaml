@@ -284,6 +284,49 @@ services:
         /usr/bin/docker/run & 
         #
         sleep infinity
+
+  ksqldb-server-onprem:
+    image: confluentinc/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
+    hostname: ksqldb-server-onprem
+    container_name: ksqldb-server-onprem
+    depends_on:
+      - schema-registry
+      - broker
+      - control-center
+      - kafka-connect-onprem
+    ports:
+      - "18088:8088"
+    environment:
+      KSQL_HOST_NAME: ksqldb-server-onprem
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
+      KSQL_KSQL_EXTENSION_DIR: "/etc/ksqldb/ext/"
+      KSQL_CUB_KAFKA_TIMEOUT: 120
+      KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/ksqldb/log4j-rolling.properties"
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_COMMIT_INTERVAL_MS: 0
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_BOOTSTRAP_SERVERS: "broker:29092"
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect-onprem:18083
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
+      KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
+      KSQL_KSQL_SERVICE_ID: ${DC}-onprem-ksqldbserver_
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_PARTITIONS: 2
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KSQL_KSQL_COMMIT_INTERVAL_MS: 2000
+      KSQL_KSQL_CACHE_MAX_BYTES_BUFFERING: 10000000
+      KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 1
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
+      KSQL_KSQL_SINK_REPLICAS: 1
+      # Producer/Consumer Confluent Monitoring Interceptors for Control Center streams monitoring 
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar
+    healthcheck:
+      disable: true
+
   
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.9.0
