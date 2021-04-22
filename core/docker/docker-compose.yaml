@@ -353,7 +353,7 @@ services:
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
     volumes:
-      - ./mysql_schema.sql:/docker-entrypoint-initdb.d/mysql_schema.sql
+      - ./data/mysql:/docker-entrypoint-initdb.d/
     healthcheck:
       test: '/usr/bin/mysql --user=root --password=debezium --execute "SHOW DATABASES;"'
       interval: 5s
