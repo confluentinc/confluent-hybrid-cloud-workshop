@@ -1,4 +1,4 @@
-=== Starting the Datagen connectors 
+== Lab {counter:labs}: Starting the Datagen connectors 
 
 In this workshop we'll simulate the use of existing systems. To start generating some data we need to start the datagen connectors. This connectory will continuously create new data to simulate a running environment. 
 
@@ -8,7 +8,7 @@ Start the Anti Money Laundry Status datagen by running the following command.
 ====
 [source,subs="attributes"]
 ----
-curl -i -X POST -H "Accept:application/json" \
+curl -X POST -H "Accept:application/json" \
   -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
   -d '{
     "name": "source-aml-status-change",
@@ -20,7 +20,7 @@ curl -i -X POST -H "Accept:application/json" \
         "schema.filename": "/datagen/aml_service.avro",
         "schema.keyfield": "payment_id"
       }
-  }'
+  }' | jq
 ----
 ====
 
@@ -31,7 +31,7 @@ Start the Funds Status datagen by running the following command.
 ====
 [source,subs="attributes"]
 ----
-curl -i -X POST -H "Accept:application/json" \
+curl -X POST -H "Accept:application/json" \
   -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
   -d '{
     "name": "source-funds-status-change",
@@ -43,7 +43,7 @@ curl -i -X POST -H "Accept:application/json" \
         "schema.filename": "/datagen/funds_service.avro",
         "schema.keyfield": "payment_id"
       }
-  }'
+  }' | jq
 ----
 ====
 
@@ -53,7 +53,7 @@ Start the Source Payment datagen by running the following command.
 ====
 [source,subs="attributes"]
 ----
-curl -i -X POST -H "Accept:application/json" \
+curl -X POST -H "Accept:application/json" \
   -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
   -d '{
     "name": "source-payment-instruction",
@@ -65,7 +65,7 @@ curl -i -X POST -H "Accept:application/json" \
         "schema.filename": "/datagen/payment_service.avro",
         "schema.keyfield": "payment_id"
       }
-  }'
+  }' | jq
 ----
 ====
 
@@ -96,22 +96,22 @@ image::./images/c3_20.png[]
 
 Select the Topics Menu on the left
 
-image::./images/c3_30.png[]
+image::./images/ksqlws/c3_31.png[]
 
 Select the `Funds_Status` topic
 
-image::./images/c3_40.png[]
+image::./images/ksqlws/c3_41.png[]
 
 Finally select the Messages tab and observe that messages are being streamed into Kafka in real time.
 
-image::./images/c3_50.png[]
+image::./images/ksqlws/c3_51.png[]
 
 You can repeat these steps to check also the `AML_Status` and `Payment_Instruction` topics
 
 .Further Reading
 [TIP]
 ====
-* link:https://debezium.io/documentation/reference/1.1/connectors/mysql.html#mysql-connector-configuration-properties_debezium[Debezium MySQL Configuration Options , window=_blank]
+* link:https://github.com/confluentinc/kafka-connect-datagen/blob/master/README.md[Datagen Connector , window=_blank]
 * link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
 * link:https://curl.haxx.se/docs/manpage.html[cURL manpage]
 * link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]

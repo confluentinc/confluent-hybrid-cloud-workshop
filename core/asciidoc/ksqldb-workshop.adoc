@@ -1,6 +1,6 @@
 = ksqlDB Hands-on Workshop
 :doctype: book
-:toc:
+:!toc:
 :toc-title: Table of Contents
 :toclevels: 1
 :experimental:
@@ -19,10 +19,7 @@ Organizations are looking to become more event driven. The Confluent Platform is
 
 In this workshop we will explore how the Confluent can enable these architectures by building multiple use-cases using ksqlDB.
 
-
-include::bits/workshop-env.adoc[]
-
-include::bits/uc-intro.adoc[]
-
-include::bits/uc-financial-01.adoc[]
+* link:ksqldb-usecase-finserv.html[Usecase: Financial Service with ksqlDB]
+* link:ksqldb-usecase-retail.html[Usecase: Retail/Logistics with ksqlDB]
+* link:ksqldb-advanced-topics.html[Advanced ksqlDB topics]
 

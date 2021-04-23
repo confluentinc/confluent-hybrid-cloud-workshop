@@ -1,4 +1,4 @@
-== Lab 1: Connecting to your Workshop Environment
+== Lab {counter:labs}: Connecting to your Workshop Environment
 
 Your environment represents an on-premise data center and consists of a virtual machine hosted in the cloud running several docker containers. In a real world implementation, some of the components would be deployed differently but the logical data flow that we will be working on would remain the same.
 
@@ -20,17 +20,18 @@ You should see something similar to this.
 [source,subs=attributes+]
 ----
 CONTAINER ID        NAMES                     CREATED             STATUS
-ef959fb9e566        db-trans-simulator        3 minutes ago       Up 3 minutes
-979c20e26e60        ksqldb-cli                3 minutes ago       Up 3 minutes
-0d9e1fa2c83f        ksqldb-server-ccloud      3 minutes ago       Up 3 minutes
-4eb1ba589357        control-center            3 minutes ago       Up 3 minutes
-e83088712e60        kafka-connect-ccloud      3 minutes ago       Up 3 minutes
-c2362c0fc8e0        kafka-connect-onprem      3 minutes ago       Up 3 minutes
-82086be4e239        schema-registry           3 minutes ago       Up 3 minutes
-62b037976674        broker                    3 minutes ago       Up 3 minutes
-92c955b221f3        zookeeper                 3 minutes ago       Up 3 minutes
-0794f9008bb6        mysql                     3 minutes ago       Up 3 minutes (healthy)
-31c3c1372aa1        workshop-docs-webserver   3 minutes ago       Up 3 minutes
+2e00ef311a1e        db-trans-simulator        3 hours ago         Up 3 hours
+d1dd041794c6        ksqldb-cli                3 hours ago         Up 3 hours
+db48a734610b        ksqldb-server-ccloud      3 hours ago         Up 3 hours
+38d3d9e34955        ksqldb-server-onprem      3 hours ago         Up 3 hours
+8196109a2b63        control-center            3 hours ago         Up 3 hours
+25bb635f1a5b        kafka-connect-ccloud      3 hours ago         Up 3 hours
+73efa70ca7f2        kafka-connect-onprem      3 hours ago         Up 3 hours
+d01e8b2c94d9        schema-registry           3 hours ago         Up 3 hours
+e524ab366a9b        broker                    3 hours ago         Up 3 hours
+f9eaa46679c9        zookeeper                 3 hours ago         Up 3 hours
+45e2a713e251        mysql                     3 hours ago         Up 3 hours (healthy)
+ae43037e162c        workshop-docs-webserver   3 hours ago         Up 3 hours
 ----
 
 [IMPORTANT]

@@ -9,14 +9,15 @@
 :dc: dc
 :feedbackformurl: 
 
+This environment is configured for multiple workshops
 
-== Pick your workshop
+== Hybrid-Cloud Streaming Workshop
 
-This environment is configured for multiple workshops:
+link:hybrid-cloud-workshop.html[Hybrid-Cloud Streaming Workshop]
 
-*Available workshops*
+== ksqlDB Hands-on Workshop
 
-* link:hybrid-cloud-workshop.html[Hybrid-Cloud Streaming Workshop]
-* link:ksql-hands-on-workshop.html[ksqlDB Hands-on Workshop]
+link:ksqldb-workshop.html[ksqlDB Hands-on Workshop]
+
 
 
