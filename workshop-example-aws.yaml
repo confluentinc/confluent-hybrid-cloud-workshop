@@ -24,6 +24,8 @@ workshop:
     ami: ami-0eb89db7593b5d434
     # SG - Ubuntu Server 18.04 LTS (HVM), SSD Volume Type
     #ami: ami-0f7719e8b7ba25c61
+    # us-east-2 - Ubuntu Server 18.04 LTS (HVM), SSD Volume Type
+    #ami: ami-0b9064170e32bde34
 
     # The workshop Confluent Cloud configuration
     ccloud_bootstrap_servers: <CCloud Bootstrap Server>
