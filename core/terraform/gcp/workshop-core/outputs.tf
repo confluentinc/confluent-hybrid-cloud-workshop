@@ -4,4 +4,5 @@ output "external_ip_addresses" {
 
 output "google_compute_instance" {
   value = google_compute_instance.instance
+  sensitive = true
 }
