@@ -28,14 +28,14 @@ You should see something similar:-
 [source,subs="attributes"]
 ----
 ksql> PRINT 'uc_atm_locations' from beginning limit 6;
-Key format: KAFKA_STRING
+Key format: JSON or KAFKA_STRING
 Value format: JSON or KAFKA_STRING
-rowtime: 2021/04/26 13:52:49.005 Z, key: {"id", value: "a746","atm":"NatWest","location1":{"lat":"53.7982284","lon":"-1.5469429"},"location2":{"lat":"53.796226","lon":"-1.5426083"}}
-rowtime: 2021/04/26 13:52:49.027 Z, key: {"id", value: "a674","atm":"Co Operative Bank","location1":{"lat":"53.6914382","lon":"-1.7997313"},"location2":{"lat":"53.7986913","lon":"-1.2518281"}}
-rowtime: 2021/04/26 13:52:49.028 Z, key: {"id", value: "a189","atm":"RBS","location1":{"lat":"53.5540984","lon":"-1.4816161"},"location2":{"lat":"53.7015283","lon":"-1.4630307"}}
-rowtime: 2021/04/26 13:52:49.028 Z, key: {"id", value: "a357","atm":"NatWest","location1":{"lat":"53.798281","lon":"-1.5469429"},"location2":{"lat":"53.8018075","lon":"-1.5442589"}}
-rowtime: 2021/04/26 13:52:49.028 Z, key: {"id", value: "a906","atm":"Halifax Building Society","location1":{"lat":"53.9056907","lon":"-1.694482"},"location2":{"lat":"53.8687467","lon":"-1.9042448"}}
-rowtime: 2021/04/26 13:52:49.028 Z, key: {"id", value: "a906","atm":"Post Office","location1":{"lat":"53.8127993","lon":"-1.6712572"},"location2":{"lat":"53.8134854","lon":"-1.6021803"}}
+rowtime: 2021/04/30 17:12:03.036 Z, key: "a746", value: {"id":"a746","atm":"NatWest","location1":{"lat":"53.7982284","lon":"-1.5469429"},"location2":{"lat":"53.796226","lon":"-1.5426083"}}
+rowtime: 2021/04/30 17:12:03.055 Z, key: "a674", value: {"id":"a674","atm":"Co Operative Bank","location1":{"lat":"53.6914382","lon":"-1.7997313"},"location2":{"lat":"53.7986913","lon":"-1.2518281"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a189", value: {"id":"a189","atm":"RBS","location1":{"lat":"53.5540984","lon":"-1.4816161"},"location2":{"lat":"53.7015283","lon":"-1.4630307"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a357", value: {"id":"a357","atm":"NatWest","location1":{"lat":"53.798281","lon":"-1.5469429"},"location2":{"lat":"53.8018075","lon":"-1.5442589"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a906", value: {"id":"a906","atm":"Halifax Building Society","location1":{"lat":"53.9056907","lon":"-1.694482"},"location2":{"lat":"53.8687467","lon":"-1.9042448"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a906", value: {"id":"a906","atm":"Post Office","location1":{"lat":"53.8127993","lon":"-1.6712572"},"location2":{"lat":"53.8134854","lon":"-1.6021803"}}
 Topic printing ceased
 ----
 
