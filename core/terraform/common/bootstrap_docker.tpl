@@ -23,7 +23,7 @@ echo "CONFLUENT_DOCKER_TAG"=6.1.1 >> .env
 
 # select the DC correctly in the database simulator script and schema file.
 sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/db_transaction_simulator/simulate_dbtrans.py
-sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/mysql_schema.sql
+sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/data/mysql/mysql_schema.sql
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
