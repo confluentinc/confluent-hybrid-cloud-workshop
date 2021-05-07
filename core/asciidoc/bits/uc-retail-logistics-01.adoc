@@ -70,7 +70,7 @@ To view a list of all streams in ksqlDB run the following command:-
 show streams;
 ```
 
-You should see no streams (yet).
+You should see only one stream for now .
 
 === Step {counter:steps-uc2}: Inspect a topic\'s contents
 
