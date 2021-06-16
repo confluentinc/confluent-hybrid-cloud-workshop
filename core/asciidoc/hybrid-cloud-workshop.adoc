@@ -1,0 +1,23 @@
+= Hybrid-Cloud Streaming Workshop
+:doctype: book
+:toc:
+:toc-title: Table of Contents
+:toclevels: 1
+:experimental:
+:icons: font
+:imagesdir: .
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+:nofooter:
+
+
+include::bits/intro.adoc[]
+
+include::bits/workshop-env.adoc[]
+
+include::bits/main.adoc[]
+
+#EXTENSIONS_PLACEHOLDER#
+
+include::bits/outro.adoc[]

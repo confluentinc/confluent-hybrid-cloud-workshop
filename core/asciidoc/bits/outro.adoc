@@ -1,0 +1,10 @@
+== Wrapping up
+
+During this workshop we have seen how the Confluent Platform and Confluent Cloud can be used to build event driven, real time applications that span the data center and public cloud.
+
+ifeval::["{feedbackformurl}" != ""]
+== Help us improve
+
+We hope you enjoyed this workshop. Please let us know how we did and how we can improve by filling link:{feedbackformurl}[this short questionnaire, window=_blank]
+endif::[]
+

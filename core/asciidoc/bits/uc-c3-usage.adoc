@@ -1,0 +1,41 @@
+
+We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank] to inspect the resources part of this workshop. 
+
+Use the following and username and password to authenticate to Confluent Control Center
+
+[source,subs="attributes"]
+----
+Username: {dc}
+Password: your workshop password
+----
+
+image::./images/c3_05.png[]
+
+On the landing page we can see that Confluent Control Center is monitoring two Kafka Clusters, our on-premise cluster and a Confluent Cloud Cluster
+
+image::./images/c3_10.png[]
+
+Click on the "controlcenter.cluster" tile, this is your on-premise cluster.
+
+image::./images/c3_20.png[]
+
+Select the Topics Menu on the left
+
+image::./images/ksqlws/c3_31.png[]
+
+Select a Topic
+
+image::./images/ksqlws/c3_41.png[]
+
+Finally select the Messages tab and observe that messages are being streamed into Kafka in real time.
+
+image::./images/ksqlws/c3_51.png[]
+
+.Further Reading
+[TIP]
+====
+* link:https://github.com/confluentinc/kafka-connect-datagen/blob/master/README.md[Datagen Connector , window=_blank]
+* link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
+* link:https://curl.haxx.se/docs/manpage.html[cURL manpage]
+* link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]
+====

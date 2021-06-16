@@ -18,18 +18,28 @@ echo "CCLOUD_API_SECRET=${ccloud_api_secret}" >> .env
 echo "HOSTNAME"=$HOSTNAME >> .env
 echo "DC"=${dc} >> .env
 echo "CCLOUD_TOPICS"=${ccloud_topics} >> .env
-echo "CONFLUENT_DOCKER_TAG"=6.1.0 >> .env
+echo "ONPREM_TOPICS"=${onprem_topics} >> .env
+echo "CONFLUENT_DOCKER_TAG"=6.1.1 >> .env
 
 # select the DC correctly in the database simulator script and schema file.
 sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/db_transaction_simulator/simulate_dbtrans.py
-sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/mysql_schema.sql
+sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/data/mysql/mysql_schema.sql
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
-asciidoctor workshop.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
+asciidoctor index.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc}
+asciidoctor hybrid-cloud-workshop.adoc -o hybrid-cloud-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
+asciidoctor ksqldb-workshop.adoc -o ksqldb-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
+asciidoctor ksqldb-advanced-topics.adoc -o ksqldb-advanced-topics.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
+asciidoctor ksqldb-usecase-retail.adoc -o ksqldb-usecase-retail.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
+asciidoctor ksqldb-usecase-finserv.adoc -o ksqldb-usecase-finserv.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}"
 
 # Inject c&p functionality into rendered html file.
-sed -i -e '/<title>/r clipboard.html' index.html
+sed -i -e '/<title>/r clipboard.html' hybrid-cloud-workshop.html
+sed -i -e '/<title>/r clipboard.html' ksqldb-workshop.html
+sed -i -e '/<title>/r clipboard.html' ksqldb-advanced-topics.html
+sed -i -e '/<title>/r clipboard.html' ksqldb-usecase-retail.html
+sed -i -e '/<title>/r clipboard.html' ksqldb-usecase-finserv.html
 
 # Creating empty folder to host aws configs later
 mkdir ~/.workshop/docker/.aws

@@ -24,6 +24,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
     ccloud_topics           = var.ccloud_topics
+    onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
   }
 }
@@ -43,7 +44,7 @@ resource "google_compute_firewall" "workshop-firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "9021", "80", "8088", "8089"]
+    ports    = ["22", "9021", "80", "8088", "8089","18088"]
   }
 }
 
@@ -63,6 +64,7 @@ resource "google_compute_instance" "instance" {
     initialize_params {
       type  = "pd-standard"
       image = "ubuntu-1804-lts"
+      size  = var.vm_disk_size
     }
   }
 

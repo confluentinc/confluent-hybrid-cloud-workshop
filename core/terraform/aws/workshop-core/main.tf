@@ -23,6 +23,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
     ccloud_topics           = var.ccloud_topics
+    onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
   }
 }
@@ -35,6 +36,10 @@ resource "aws_instance" "instance" {
   ami           = var.ami
   instance_type = var.vm_type
   vpc_security_group_ids = [aws_security_group.instance.id]
+
+  root_block_device {
+    volume_size           = var.vm_disk_size
+  }
 
   user_data  = <<EOF
 #! /bin/bash
@@ -86,6 +91,13 @@ resource "aws_security_group" "instance" {
   ingress {
       from_port   = 8088
       to_port     = 8088
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+      from_port   = 18088
+      to_port     = 18088
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
   }

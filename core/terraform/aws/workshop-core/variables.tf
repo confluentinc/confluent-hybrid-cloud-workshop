@@ -21,6 +21,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "vm_disk_size" {
+  description = "VM Disk Size"
+}
+
 variable "ami" {
   description = "Amazon Machine Image"
 }
@@ -40,6 +44,10 @@ variable "ccloud_api_secret" {
 
 variable "ccloud_topics" {
   description = "Confluent Cloud topics to precreate"
+}
+
+variable "onprem_topics" {
+  description = "Confluent Server local on-prem to precreate"
 }
 
 variable "feedback_form_url" {

@@ -33,6 +33,10 @@ variable "vm_type" {
   description = "VM Type"
 }
 
+variable "vm_disk_size" {
+  description = "VM Disk Size"
+}
+
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
   description = "Confluent Cloud username"
@@ -48,6 +52,10 @@ variable "ccloud_api_secret" {
 
 variable "ccloud_topics" {
   description = "Confluent Cloud topics to precreate"
+}
+
+variable "onprem_topics" {
+  description = "Confluent Server on-prem topics to precreate"
 }
 
 variable "feedback_form_url" {

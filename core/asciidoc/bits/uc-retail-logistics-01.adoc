@@ -1,0 +1,217 @@
+== Lab {counter:labs}: Real-Time Inventory
+
+
+=== Step {counter:steps-uc2}: Start the ksqlDB CLI
+
+To start the ksqlDB CLI run the following command:-
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-onprem:8088
+----
+====
+
+You should see something like this:-
+
+```
+                  ===========================================
+                  =       _              _ ____  ____       =
+                  =      | | _____  __ _| |  _ \| __ )      =
+                  =      | |/ / __|/ _` | | | | |  _ \      =
+                  =      |   <\__ \ (_| | | |_| | |_) |     =
+                  =      |_|\_\___/\__, |_|____/|____/      =
+                  =                   |_|                   =
+                  =  Event Streaming Database purpose-built =
+                  =        for stream processing apps       =
+                  ===========================================
+
+Copyright 2017-2020 Confluent Inc.
+
+CLI v6.1.1, Server v6.1.1 located at http://ksqldb-server-onprem:8088
+Server Status: RUNNING
+
+Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!
+
+ksql>
+
+```
+
+The ksqlDB CLI is pointing at a ksqlDB Server connected to your Confluent Server instance.
+
+To view a list of all topics in Confluent Cloud run the following command:-
+
+```
+show topics;
+```
+
+You should see these topics:
+
+[source,subs="quotes,attributes"]
+----
+ksql> show topics;
+
+ Kafka Topic                                  | Partitions | Partition Replicas 
+-------------------------------------------------------------------------------- 
+ {dc}-onprem-ksqldbserver_ksql_processing_log | 2          | 1                  
+ uc_inventory                                 | 1          | 1                  
+ uc_orders                                    | 1          | 1                  
+ uc_shipment_status                           | 1          | 1                  
+ uc_shipments                                 | 1          | 1                  
+ uc_transactions                              | 1          | 1                  
+--------------------------------------------------------------------------------
+
+----
+
+To view a list of all streams in ksqlDB run the following command:-
+
+```
+show streams;
+```
+
+You should see only one stream for now .
+
+=== Step {counter:steps-uc2}: Inspect a topic\'s contents
+
+To inspect the contents of a topic run the following:-
+
+```
+PRINT 'uc_inventory' from beginning limit 8;
+```
+
+You should see something similar:-
+
+[source,subs="attributes"]
+----
+ksql> PRINT 'uc_inventory' from beginning limit 8;
+Key format: JSON or KAFKA_STRING
+Value format: JSON or KAFKA_STRING
+rowtime: 2021/04/26 12:46:21.585 Z, key: "1", value: {"cid":"1","item":"Apple Magic Mouse 2","qty":10,"price":99}
+rowtime: 2021/04/26 12:46:21.599 Z, key: "2", value: {"cid":"2","item":"iPhoneX","qty":25,"price":999}
+rowtime: 2021/04/26 12:46:21.600 Z, key: "3", value: {"cid":"3","item":"MacBookPro13","qty":100,"price":1799}
+rowtime: 2021/04/26 12:46:21.600 Z, key: "4", value: {"cid":"4","item":"iPad4","qty":20,"price":340}
+rowtime: 2021/04/26 12:46:21.600 Z, key: "5", value: {"cid":"5","item":"Apple Pencil","qty":10,"price":79}
+rowtime: 2021/04/26 12:46:21.600 Z, key: "2", value: {"cid":"2","item":"PhoneX","qty":10,"price":899}
+rowtime: 2021/04/26 12:46:21.605 Z, key: "4", value: {"cid":"4","item":"iPad4","qty":-20,"price":399}
+rowtime: 2021/04/26 12:46:21.606 Z, key: "3", value: {"cid":"3","item":"MacBookPro13","qty":10,"price":1899}
+Topic printing ceased
+----
+
+Check the properties set for ksqlDB.
+
+[source]
+----
+show properties;
+----
+
+=== Step {counter:steps-uc2}: Create centralized view of inventory
+
+Now, data from all Inventories are online, go to ksqlDB and create a centralized view:
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*CREATE STREAM* inventory_stream (
+    cid STRING, 
+    item STRING, 
+    qty INTEGER, 
+    price DOUBLE, 
+    balance INTEGER) 
+  *WITH* (VALUE_FORMAT='json',  KAFKA_TOPIC='uc_inventory');
+----
+====
+
+Check your creation with describe and select. 
+
+[source]
+----
+describe inventory_stream;
+----
+
+[source]
+----
+set 'auto.offset.reset'='earliest';
+select * from inventory_stream emit changes;
+----
+
+=== Step {counter:steps-uc2}: Create stateful Table
+
+In order to access the most up to date information at any given time, let's create a Sateful Table:-
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*CREATE TABLE* inventory_stream_table *AS*
+  *SELECT* 
+    item, 
+    SUM(qty) *AS* item_qty 
+  *FROM* inventory_stream 
+  *GROUP BY* item 
+  EMIT CHANGES;
+  
+----
+====
+
+Now you can see the table structure..
+
+[source]
+----
+describe inventory_stream_table;
+----
+
+To view your tables run the following command:-
+
+[source,subs="quotes,attributes"]
+----
+SHOW TABLES;
+----
+
+=== Step {counter:steps-uc2}: Access inventory via Push Query
+
+We can view in real time all the changes to our inventory via push query:-
+
+[source,subs="quotes,attributes"]
+----
+select * from inventory_stream_table emit changes;
+----
+
+=== Step {counter:steps-uc2}: Access inventory via Push Query
+
+Now let's ask ksqlDB what is the status for a specific item in our inventory, via Pull Query:-
+
+[source,subs="quotes,attributes"]
+----
+select * from inventory_stream_table where item='iPad4';
+select * from inventory_stream_table where item='iPhoneX';
+----
+
+Where is topic INVENTORY_STREAM_TABLE and what it is?
+
+List tables in ksqlDB:-
+
+[source,subs="quotes,attributes"]
+----
+list tables;
+----
+
+List topics in ksqlDB:-
+
+[source,subs="quotes,attributes"]
+----
+list topics;
+----
+
+Exit the ksqlDB cli 
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+exit
+----
+====
+
+Check also the running queries in ksqlDB UI in link:http://{externalip}:9021[Confluent Control Center, window=_blank] and compare SINK and SOURCE of CTAS_INVENTORY_STREAM_TABLE_5. Is that what you expected?

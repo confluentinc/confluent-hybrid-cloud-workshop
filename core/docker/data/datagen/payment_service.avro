@@ -1,0 +1,48 @@
+{
+        "namespace": "ksql",
+        "name": "payment_payments",
+        "type": "record",
+        "fields": [
+                {"name": "payment_id", "type": {
+                    "type": "int",
+                    "arg.properties": {
+                        "iteration": { "start": 1, "step": 2}
+                    }
+                }},
+                {"name": "custid", "type": {
+                    "type": "int",
+                    "arg.properties": {
+                        "iteration": { "start": 1, "restart": 25}
+                    }
+                }},
+                {"name": "accountid", "type": {
+                    "type": "int",
+                    "arg.properties": {
+                        "iteration": { "start": 1234000, "step": 100, "restart": 1235000}
+                    }
+                }},
+                {"name": "amount", "type": {
+                    "type":"long",
+                    "arg.properties":{
+                      "iteration": { "start": 100, "step": 100, "restart": 5000}
+                    }
+                }},
+                {"name": "bank", "type": {
+                    "type": "string",
+                    "arg.properties": {
+                    "options": [
+                        "Citi",
+                        "Commonwealth Bank of Australia",
+                        "BNP Paribas",
+                        "Wells Fargo",
+                        "Deutsche Bank",
+                        "Royal Bank of Canada",
+                        "Barclays Bank",
+                        "United Overseas Bank",
+                        "DBS",
+                        "SCB"
+                        ]
+                    }
+                }}
+        ]
+}

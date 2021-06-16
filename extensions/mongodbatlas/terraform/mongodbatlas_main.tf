@@ -134,7 +134,7 @@ resource "null_resource" "vm_provisioners_atlas_realm_app" {
   provisioner "file" {
     content      = templatefile("${path.module}/add_realm_url_to_docs.tpl", { 
       mongodbatlas_realm_app_id   = self.triggers.realm_app_id
-      asciidoc_index_path  = "~/.workshop/docker/asciidoc/index.html"
+      asciidoc_index_path  = "~/.workshop/docker/asciidoc/hybrid-cloud-workshop.html"
     })
     destination = "/tmp/add_realm_url_to_docs.sh"
 
