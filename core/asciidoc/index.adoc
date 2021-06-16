@@ -31,11 +31,6 @@ image::./images/architecture.png[Workshop Architecture Diagram]
 * Advanced ksqlDB topics
 |===
 
-== Hybrid-Cloud Streaming Workshop
-
-
-
-== ksqlDB Hands-on Workshop
 
 
 
