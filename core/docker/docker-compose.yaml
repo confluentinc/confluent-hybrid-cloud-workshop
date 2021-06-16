@@ -178,6 +178,7 @@ services:
         confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-aws-dynamodb:1.2.0
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
         curl -k -L "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.41.1065/RedshiftJDBC42-no-awssdk-1.2.41.1065.jar" -o RedshiftJDBC42-no-awssdk-1.2.41.1065.jar
         
