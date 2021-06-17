@@ -43,5 +43,5 @@ Whenever you see this icon it means the step is mandatory. Missing one of these 
 ====
 Take advantage of the copy to clipboard button, it will save you some time!
 
-image::./images/copypaste.png[]
+image::./copypaste.png[]
 ====

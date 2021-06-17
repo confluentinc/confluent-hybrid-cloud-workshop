@@ -146,7 +146,7 @@ GROUP BY supplier_name
 
 This is an example of a report you can build:
 
-image::./images/datastudio_report.png[Google DataStudio Report]
+image::./../../datastudio_report.png[Google DataStudio Report]
 
 .Further Reading
 [TIP]

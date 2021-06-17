@@ -9,27 +9,27 @@ Username: {dc}
 Password: your workshop password
 ----
 
-image::./images/c3_05.png[]
+image::./c3_05.png[]
 
 On the landing page we can see that Confluent Control Center is monitoring two Kafka Clusters, our on-premise cluster and a Confluent Cloud Cluster
 
-image::./images/c3_10.png[]
+image::./c3_10.png[]
 
 Click on the "controlcenter.cluster" tile, this is your on-premise cluster.
 
-image::./images/c3_20.png[]
+image::./c3_20.png[]
 
 Select the Topics Menu on the left
 
-image::./images/ksqlws/c3_31.png[]
+image::./c3_31.png[]
 
 Select a Topic
 
-image::./images/ksqlws/c3_41.png[]
+image::./c3_41.png[]
 
 Finally select the Messages tab and observe that messages are being streamed into Kafka in real time.
 
-image::./images/ksqlws/c3_51.png[]
+image::./c3_51.png[]
 
 .Further Reading
 [TIP]

@@ -5,7 +5,7 @@
 :toclevels: 1
 :experimental:
 :icons: font
-:imagesdir: .
+:imagesdir: ./images/ksqlws
 :externalip: localhost
 :dc: dc
 :feedbackformurl: 
