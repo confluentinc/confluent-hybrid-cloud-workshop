@@ -22,7 +22,7 @@ And run the following `CREATE SINK CONNECTOR` command. This will create a connec
 ----
 CREATE SINK CONNECTOR {dc}_dynamodb_sink WITH (  
   'connector.class'='io.confluent.connect.aws.dynamodb.DynamoDbSinkConnector',
-  'topics'='{dc}_orders_summary',
+  'topics'='{dc}_sales_enriched',
   'tasks.max'='1',
   'aws.dynamodb.region'='${file:/secrets.properties:DYNAMODB_REGION}',
   'aws.dynamodb.endpoint'='${file:/secrets.properties:DYNAMODB_ENDPOINT}',

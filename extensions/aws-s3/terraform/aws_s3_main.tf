@@ -1,4 +1,5 @@
-resource "random_string" "random_string" {
+
+resource "random_string" "s3_random_string" {
   length = 8
   special = false
   upper = false
@@ -6,12 +7,12 @@ resource "random_string" "random_string" {
   number = false
 }
 
-data "template_file" "aws_s3_iam_name" {
-  template = "${var.name}-${random_string.random_string.result}"
+data "template_file" "s3_bucket_name" {
+  template = "${var.name}-orders-table-${random_string.s3_random_string.result}"
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket   = "tf-bucket-${data.template_file.aws_s3_iam_name.rendered}"
+  bucket   = "tf-bucket-${data.template_file.s3_bucket_name.rendered}"
   acl      = "private"
   force_destroy = true
 
@@ -21,17 +22,9 @@ resource "aws_s3_bucket" "bucket" {
 
 }
 
-resource "aws_iam_user" "s3" {
-  name = "tf-user-${data.template_file.aws_s3_iam_name.rendered}"
-  path = "/system/"
-}
-
-resource "aws_iam_access_key" "s3" {
-  user = aws_iam_user.s3.name
-}
 
 resource "aws_iam_policy" "s3" {
-  name = "tf-role-policy-${data.template_file.aws_s3_iam_name.rendered}"
+  name = "tf-role-policy-s3-${data.template_file.s3_bucket_name.rendered}"
 
   policy = <<POLICY
 {
@@ -71,7 +64,7 @@ POLICY
 }
 
 resource "aws_iam_user_policy_attachment" "replication" {
-  user       = aws_iam_user.s3.name
+  user       = module.workshop-core.ws_iam_user_name
   policy_arn = aws_iam_policy.s3.arn
 }
 
@@ -84,39 +77,16 @@ EOF
   filename = "${path.module}/s3_bucket_info.txt"
 }
 
-resource "local_file" "aws_credentials" {
-
-  content  = <<EOF
-[default]
-aws_access_key_id = ${aws_iam_access_key.s3.id}
-aws_secret_access_key = ${aws_iam_access_key.s3.secret}
-EOF
-  filename = "${path.module}/aws_credentials.txt"
-}
-
 resource "null_resource" "s3_provisioners" {
    count      = var.participant_count
    depends_on = [
      module.workshop-core,
-     local_file.s3_bucket_info,
-     local_file.aws_credentials
+     local_file.s3_bucket_info
    ]
 
   provisioner "file" {
     source      = "s3_bucket_info.txt"
     destination = "/tmp/s3_bucket_info.txt"
-
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = element(module.workshop-core.external_ip_addresses, count.index)
-    }
-  }
-
-  provisioner "file" {
-    source      = "aws_credentials.txt"
-    destination = "~/.workshop/docker/.aws/credentials"
 
     connection {
       user     = format("dc%02d", count.index + 1)

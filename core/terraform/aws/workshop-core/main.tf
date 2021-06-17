@@ -25,12 +25,49 @@ data "template_file" "bootstrap_docker" {
     ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
+    cloud_provider          = "aws"
   }
 }
 
 /*
  Resources
 */
+
+
+## Create API Key and Secret for the workshop
+
+resource "random_string" "random_string" {
+  length = 8
+  special = false
+  upper = false
+  lower = true
+  number = false
+}
+
+data "template_file" "aws_ws_iam_name" {
+  template = "${var.name}-${random_string.random_string.result}"
+}
+
+resource "aws_iam_user" "ws" {
+  name = "tf-user-${data.template_file.aws_ws_iam_name.rendered}"
+  path = "/system/"
+}
+
+resource "aws_iam_access_key" "ws" {
+  user = aws_iam_user.ws.name
+}
+
+resource "local_file" "aws_credentials" {
+
+  content  = <<EOF
+[default]
+aws_access_key_id = ${aws_iam_access_key.ws.id}
+aws_secret_access_key = ${aws_iam_access_key.ws.secret}
+EOF
+  filename = "${path.root}/aws_credentials.txt"
+}
+
+
 resource "aws_instance" "instance" {
   count         = var.participant_count
   ami           = var.ami
@@ -129,7 +166,7 @@ resource "aws_security_group" "instance" {
  Provisioners
 */
 resource "null_resource" "vm_provisioners" {
-  depends_on = [aws_instance.instance]
+  depends_on = [aws_instance.instance, local_file.aws_credentials]
   count      = var.participant_count
 
   // Copy bootstrap script to the VM
@@ -192,6 +229,19 @@ resource "null_resource" "vm_provisioners" {
       "chmod +x /tmp/bootstrap_docker.sh",
       "/tmp/bootstrap_docker.sh",
     ]
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = aws_instance.instance[count.index].public_ip
+    }
+  }
+
+  //Adding AWS Credentials for Connect
+  provisioner "file" {
+    source      = "aws_credentials.txt"
+    destination = "~/.workshop/docker/.aws/credentials"
 
     connection {
       user     = format("dc%02d", count.index + 1)
