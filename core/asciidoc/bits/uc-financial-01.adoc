@@ -2,7 +2,7 @@
 
 We are going to build data pipeline which should look like this:
 
-image:./images/ksqlws/Financial_datapipe.png[Financial Services Use cases as flow]
+image:./Financial_datapipe.png[Financial Services Use cases as flow]
 
 === Step {counter:steps-uc1}: Start the ksqlDB CLI
 
@@ -849,4 +849,4 @@ curl -X "POST" "http://localhost:18088/ksql" \
 
 You can see the Final table with payment statuses in link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
-image:./images/ksqlws/payments_final_status.png[Financial Services Final Result]
+image:./payments_final_status.png[Financial Services Final Result]

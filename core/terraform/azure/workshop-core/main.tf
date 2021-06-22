@@ -30,6 +30,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
+    cloud_provider          = "azure"
   }
 }
 

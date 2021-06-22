@@ -77,7 +77,7 @@ WorkerId             : kafka-connect:18084
 
 Depending on who's hosting the workshop, you may or may not have access to the MongoDB Atlas account where the database is held.
 
-image::./images/mongodb-orders-collection.png[]
+image::./../../mongodb-orders-collection.png[]
 
 
 Exit the ksqlDB cli 
@@ -137,7 +137,7 @@ The application is already deployed in MongoDB Atlas and lets you put Orders onl
 
 link:MONGODB_REALM_APP_URL[Place your first order at this link, window=_blank]
 
-image::./images/mongodb-realm-app.png[]
+image::./../../mongodb-realm-app.png[]
 
 The application itself is hosted in MongoDB Atlas, and the data inserted from the UI will flow in the collection `demo.po`
 
@@ -160,7 +160,7 @@ Input `{dc}_mdb.demo.estore` as _Topic Name_, and select 1 for _Number of partit
 
 Click on _Create with defaults_
 
-image::./images/mongodb_topic_creation.png[]
+image::./../../mongodb_topic_creation.png[]
 
 ====
 
@@ -193,7 +193,7 @@ Select "ccloud" cluster from the Home page.
 
 Select the `{dc}_mdb.demo.estore` topic, then click on the Messages tab and observe that messages are being streamed into Kafka from MongoDB ATlas in real time.
 
-image::./images/mongodb-c3-topic-dcNN_mdb.demo.estore.png[]
+image::./../../mongodb-c3-topic-dcNN_mdb.demo.estore.png[]
 
 
 === Replicate MongoDB orders to On-Premise Kafka

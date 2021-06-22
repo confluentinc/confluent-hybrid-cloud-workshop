@@ -46,6 +46,8 @@ workshop:
   # Uncomment the required extensions
   extensions:
 
+    # aws-dynamodb:
+
     # aws-s3:
 
     # aws-redshift:

@@ -5,7 +5,7 @@
 :toclevels: 1
 :experimental:
 :icons: font
-:imagesdir: .
+:imagesdir: ./images/hybrid-cloud-ws/default
 :externalip: localhost
 :dc: dc
 :feedbackformurl: 

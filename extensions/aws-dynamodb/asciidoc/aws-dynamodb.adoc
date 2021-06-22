@@ -1,0 +1,77 @@
+== Optional Lab: Stream Sales & Purchases to AWS DynamoDB
+
+We can use the JDBC Sink Connector to stream changes from our topics to AWS DynamoDB.
+
+To do this we'll use the ksqlDB CLI to create the connector.
+
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+====
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the topic {dc}_orders_summary to AWS DynamoDB.
+
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+CREATE SINK CONNECTOR {dc}_dynamodb_sink WITH (  
+  'connector.class'='io.confluent.connect.aws.dynamodb.DynamoDbSinkConnector',
+  'topics'='{dc}_sales_enriched',
+  'tasks.max'='1',
+  'aws.dynamodb.region'='${file:/secrets.properties:DYNAMODB_REGION}',
+  'aws.dynamodb.endpoint'='${file:/secrets.properties:DYNAMODB_ENDPOINT}',
+  'table.name.format'='${file:/secrets.properties:DYNAMODB_TABLENAME}',
+  'auto.create'='true',
+  'key.converter'='org.apache.kafka.connect.storage.StringConverter'
+);
+----
+====
+
+We can list our current connectors using the following command
+
+[source,subs=attributes]
+----
+show connectors;
+----
+
+[source,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_DYNAMODB_SINK        | SINK   | io.confluent.connect.aws.dynamodb.DynamoDbSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,subs=attributes]
+----
+describe connector {dc}_dynamodb_sink;
+----
+
+And here an example result
+
+[source,subs=attributes]
+----
+Name                 : {dc}_DYNAMODB_SINK
+Class                : io.confluent.connect.aws.dynamodb.DynamoDbSinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the AWS account where the DynamoDB cluster is hosted.
+
