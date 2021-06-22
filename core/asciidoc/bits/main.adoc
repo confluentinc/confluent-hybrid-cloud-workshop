@@ -1225,7 +1225,7 @@ To run a Pull query we just query the table as normal but drop the `EMIT CHANGES
 
 [source,subs="quotes,attributes"]
 ----
-select product_id, stock_level from current_stock where rowkey=15;
+select product_id, stock_level from current_stock where product_id=15;
 ----
 
 image::./ksql_015.png[align="center"]
@@ -1247,7 +1247,7 @@ Exit from the ksqlDB CLI and run the following from the command line.
 
 [source,subs="quotes,attributes"]
 ----
-curl -s -X "POST" "http://localhost:8088/query" -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" -d $'{ "ksql": "select product_id, stock_level from current_stock where rowkey=15;" }'| jq .
+curl -s -X "POST" "http://localhost:8088/query" -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" -d $'{ "ksql": "select product_id, stock_level from current_stock where product_id=15;" }'| jq .
 ----
 
 As you can see, the ksqlDB Server's REST endpoint will return a JSON message with the `product_id` and its current `stock_level`. This is useful for applications that want access to the current state of the world using a request/response type pattern.
@@ -1366,7 +1366,7 @@ Create a stream from the table's underlying topic...
 ====
 [source,subs="quotes,attributes"]
 ----
-*CREATE STREAM* product_demand_last_3mins *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', VALUE_FORMAT='AVRO');
+*CREATE STREAM* product_demand_last_3mins (PRODUCT_ID STRING KEY) *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', KEY_FORMAT='KAFKA', VALUE_FORMAT='AVRO', WINDOW_TYPE='HOPPING', WINDOW_SIZE='3 MINUTES');
 ----
 ====
 
