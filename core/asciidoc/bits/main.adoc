@@ -567,21 +567,18 @@ To view the details of an individual topic you can you can use the `describe` co
 
 Notice that all the columns have been created for us and we didn't need to explicitly set their names and data types when we created the stream, this is one of the advantages of using AVRO and the Schema Registry.
 
-Also notice that ksqlDB adds an implicit `ROWKEY` column to every stream and table, which represents the corresponding Kafka message key.
-
 [source,subs="attributes"]
 ----
 Name                 : SALES_ORDER_DETAILS
- Field          | Type
------------------------------------------
- ROWKEY         | VARCHAR(STRING)  (key)
- ID             | INTEGER
- SALES_ORDER_ID | INTEGER
- PRODUCT_ID     | INTEGER
- QUANTITY       | INTEGER
- PRICE          | DECIMAL
- SOURCEDC       | VARCHAR(STRING)
------------------------------------------
+ Field          | Type            
+----------------------------------
+ ID             | INTEGER         
+ SALES_ORDER_ID | INTEGER         
+ PRODUCT_ID     | INTEGER         
+ QUANTITY       | INTEGER         
+ PRICE          | DECIMAL         
+ SOURCEDC       | VARCHAR(STRING) 
+----------------------------------
 For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
 ----
 
@@ -1138,17 +1135,17 @@ We can see the demand for a single product by filtering on the `product_id` and 
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
 +------------------------------------------+------------------------------------------+
-|1                                         |-6                                        |
-|1                                         |-9                                        |
-|1                                         |-7                                        |
-|1                                         |-5                                        |
-|1                                         |-1                                        |
-|1                                         |-7                                        |
-|1                                         |-7                                        |
-|1                                         |-10                                       |
-|1                                         |-8                                        |
-|1                                         |-4                                        |
-|1                                         |-2                                        |
+|15                                        |-6                                        |
+|15                                        |-9                                        |
+|15                                        |-7                                        |
+|15                                        |-5                                        |
+|15                                        |-1                                        |
+|15                                        |-7                                        |
+|15                                        |-7                                        |
+|15                                        |-10                                       |
+|15                                        |-8                                        |
+|15                                        |-4                                        |
+|15                                        |-2                                        |
 ...
 ...
 ...
@@ -1174,7 +1171,7 @@ This query will only return a single event and reflects the initial purchase ord
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
 +------------------------------------------+------------------------------------------+
-|1                                         |100                                       |
+|15                                        |100                                       |
 ----
 
 We're now is a position where we can calculate the current stock level for each product. We can do this by creating a table that groups by the `product_id` and sums up the `quantity` column which contains both stock decrements and stock increments.
