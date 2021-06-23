@@ -1303,7 +1303,8 @@ Create the windowed query
 *AS SELECT*
       timestamptostring(windowStart,'HH:mm:ss') "WINDOW_START_TIME"
     , timestamptostring(windowEnd,'HH:mm:ss') "WINDOW_END_TIME"
-    , product_id
+    , product_id *AS* product_id_key
+    , AS_VALUE(product_id) *AS* product_id
     , *SUM*(product_qty) "DEMAND_LAST_3MINS"
 *FROM* sales_enriched
 *WINDOW HOPPING* (SIZE 3 MINUTES, ADVANCE BY 1 MINUTE)
@@ -1363,7 +1364,7 @@ Create a stream from the table's underlying topic...
 ====
 [source,subs="quotes,attributes"]
 ----
-*CREATE STREAM* product_demand_last_3mins (PRODUCT_ID STRING KEY) *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', KEY_FORMAT='KAFKA', VALUE_FORMAT='AVRO', WINDOW_TYPE='HOPPING', WINDOW_SIZE='3 MINUTES');
+*CREATE STREAM* product_demand_last_3mins *WITH* (KAFKA_TOPIC='{dc}_product_demand_last_3mins', VALUE_FORMAT='AVRO');
 ----
 ====
 
@@ -1386,7 +1387,8 @@ Now that we have the `current_stock` table and `product_demand_last_3mins` strea
 *SET* 'auto.offset.reset' = 'latest';
 *CREATE STREAM* out_of_stock_events *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_out_of_stock_events') 
 *AS SELECT* 
-  cs.product_id "PRODUCT_ID",
+  cs.product_id "PRODUCT_ID_KEY",
+  AS_VALUE(cs.product_id) AS product_id,
   pd.window_start_time,
   pd.window_end_time,
   cs.stock_level,
@@ -1460,9 +1462,15 @@ Select your on-premise cluster from the home, select _"topics"_ and then click o
 ====
 image::./c3_80.png[]	
 
-Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create with defaults"_	
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Customize settings"_	, 
 
 image::./c3_90.png[]	
+
+choose Custom availability settings and use replication_factor=1 and min_insync_replicas=1
+
+image::./c3_91.png[]	
+
+Click on  _"Save & create"_
 
 We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
 ====
