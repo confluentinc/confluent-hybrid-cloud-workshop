@@ -567,21 +567,18 @@ To view the details of an individual topic you can you can use the `describe` co
 
 Notice that all the columns have been created for us and we didn't need to explicitly set their names and data types when we created the stream, this is one of the advantages of using AVRO and the Schema Registry.
 
-Also notice that ksqlDB adds an implicit `ROWKEY` column to every stream and table, which represents the corresponding Kafka message key.
-
 [source,subs="attributes"]
 ----
 Name                 : SALES_ORDER_DETAILS
- Field          | Type
------------------------------------------
- ROWKEY         | VARCHAR(STRING)  (key)
- ID             | INTEGER
- SALES_ORDER_ID | INTEGER
- PRODUCT_ID     | INTEGER
- QUANTITY       | INTEGER
- PRICE          | DECIMAL
- SOURCEDC       | VARCHAR(STRING)
------------------------------------------
+ Field          | Type            
+----------------------------------
+ ID             | INTEGER         
+ SALES_ORDER_ID | INTEGER         
+ PRODUCT_ID     | INTEGER         
+ QUANTITY       | INTEGER         
+ PRICE          | DECIMAL         
+ SOURCEDC       | VARCHAR(STRING) 
+----------------------------------
 For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
 ----
 
@@ -1138,17 +1135,17 @@ We can see the demand for a single product by filtering on the `product_id` and 
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
 +------------------------------------------+------------------------------------------+
-|1                                         |-6                                        |
-|1                                         |-9                                        |
-|1                                         |-7                                        |
-|1                                         |-5                                        |
-|1                                         |-1                                        |
-|1                                         |-7                                        |
-|1                                         |-7                                        |
-|1                                         |-10                                       |
-|1                                         |-8                                        |
-|1                                         |-4                                        |
-|1                                         |-2                                        |
+|15                                        |-6                                        |
+|15                                        |-9                                        |
+|15                                        |-7                                        |
+|15                                        |-5                                        |
+|15                                        |-1                                        |
+|15                                        |-7                                        |
+|15                                        |-7                                        |
+|15                                        |-10                                       |
+|15                                        |-8                                        |
+|15                                        |-4                                        |
+|15                                        |-2                                        |
 ...
 ...
 ...
@@ -1174,7 +1171,7 @@ This query will only return a single event and reflects the initial purchase ord
 +------------------------------------------+------------------------------------------+
 |PRODUCT_ID                                |QUANTITY                                  |
 +------------------------------------------+------------------------------------------+
-|1                                         |100                                       |
+|15                                        |100                                       |
 ----
 
 We're now is a position where we can calculate the current stock level for each product. We can do this by creating a table that groups by the `product_id` and sums up the `quantity` column which contains both stock decrements and stock increments.
@@ -1225,7 +1222,7 @@ To run a Pull query we just query the table as normal but drop the `EMIT CHANGES
 
 [source,subs="quotes,attributes"]
 ----
-select product_id, stock_level from current_stock where rowkey=15;
+select product_id, stock_level from current_stock where product_id=15;
 ----
 
 image::./ksql_015.png[align="center"]
@@ -1247,7 +1244,7 @@ Exit from the ksqlDB CLI and run the following from the command line.
 
 [source,subs="quotes,attributes"]
 ----
-curl -s -X "POST" "http://localhost:8088/query" -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" -d $'{ "ksql": "select product_id, stock_level from current_stock where rowkey=15;" }'| jq .
+curl -s -X "POST" "http://localhost:8088/query" -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" -d $'{ "ksql": "select product_id, stock_level from current_stock where product_id=15;" }'| jq .
 ----
 
 As you can see, the ksqlDB Server's REST endpoint will return a JSON message with the `product_id` and its current `stock_level`. This is useful for applications that want access to the current state of the world using a request/response type pattern.
@@ -1306,7 +1303,8 @@ Create the windowed query
 *AS SELECT*
       timestamptostring(windowStart,'HH:mm:ss') "WINDOW_START_TIME"
     , timestamptostring(windowEnd,'HH:mm:ss') "WINDOW_END_TIME"
-    , product_id
+    , product_id *AS* product_id_key
+    , AS_VALUE(product_id) *AS* product_id
     , *SUM*(product_qty) "DEMAND_LAST_3MINS"
 *FROM* sales_enriched
 *WINDOW HOPPING* (SIZE 3 MINUTES, ADVANCE BY 1 MINUTE)
@@ -1389,7 +1387,8 @@ Now that we have the `current_stock` table and `product_demand_last_3mins` strea
 *SET* 'auto.offset.reset' = 'latest';
 *CREATE STREAM* out_of_stock_events *WITH* (PARTITIONS = 1, KAFKA_TOPIC = '{dc}_out_of_stock_events') 
 *AS SELECT* 
-  cs.product_id "PRODUCT_ID",
+  cs.product_id "PRODUCT_ID_KEY",
+  AS_VALUE(cs.product_id) AS product_id,
   pd.window_start_time,
   pd.window_end_time,
   cs.stock_level,
@@ -1463,9 +1462,15 @@ Select your on-premise cluster from the home, select _"topics"_ and then click o
 ====
 image::./c3_80.png[]	
 
-Name the topic `{dc}_out_of_stock_events` with one partition and click _"Create with defaults"_	
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Customize settings"_	, 
 
 image::./c3_90.png[]	
+
+choose Custom availability settings and use replication_factor=1 and min_insync_replicas=1
+
+image::./c3_91.png[]	
+
+Click on  _"Save & create"_
 
 We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
 ====
