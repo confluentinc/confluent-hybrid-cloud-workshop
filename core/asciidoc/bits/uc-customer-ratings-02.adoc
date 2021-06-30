@@ -1,0 +1,217 @@
+== Lab {counter:labs}: Getting started with DDL
+
+To make use of our ratings and customers topics in KSQL we first need to define some Streams and/or Tables over them.
+
+=== Step {counter:steps-uc3}: Create the Ratings data stream
+Register the RATINGS data as a KSQL stream, sourced from the 'ratings' topic
+[source,sql]
+----
+create stream ratings with (kafka_topic='ratings', value_format='avro');
+----
+Notice that here we are using the Schema Registry with our Avro-formatted data to pull in the schema of this stream automatically.
+If our data were in some other format which can't be described in the Schema Registry, such as CSV messages, then we would also need to specify each column and it's datatype in the `create` statement.
+
+Check your creation with `describe ratings;` and a couple of `select` queries. (HINT: in recent KSQL versions your `select` query will need to have `emit changes` added at the end!)
+
+What happens ? Why ?
+
+Try `describe extended ratings;`
+
+=== Step {counter:steps-uc3}: Bring in Customer lookup data from MySQL
+
+Defining a lookup table for Customer data from our MySQL CDC data-feed is a multi-step process:
+[source,sql]
+----
+create stream customers_cdc with(kafka_topic='{dc}.demo.CUSTOMERS-cdc', value_format='AVRO');
+----
+Quickly query a couple of records to check it (remember you can `describe` the stream to see the column names!).
+
+What happens when you query from this new stream ? Why is that the case ?
+
+
+[TIP]
+====
+If we aren't pushing new records into this stream (technically into it's backing topic) by changing data in MySQL
+then we won't see any query output.
+====
+
+What we are seeing - or rather, not seeing! - here in KSQL is actually the normal behavior of any Kafka client application (and remember, that's exactly what a KSQL query is!). By default, all Kafka client applications when they start up will consume messages which arrive in their input topics _from that moment forwards_. Older records in the topic are not consumed.
+We can control this behavior though by setting a configuration property, called 'auto.offset.reset'. In KSQL, the various configuration settings for our SQL apps can be inspected by typing `show properties` in the KSQL CLI. if you try that you can see a whole long list of technical defaults, almost all of which we can safely ignore :-)  We adjust the property which controls where new queries start reading from like this:
+[source,sql]
+----
+set 'auto.offset.reset' = 'earliest';
+----
+Now all the subsequent queries we issue will pick up this setting and consume _all_ the records in a topic, including those produced in the past. This setting will stay in effect for the rest of your KSQL session.
+
+==== Re-format the CDC data
+
+OK, back to our CDC customer data. Now that we have changed the value of `auto.offset.reset` we can run a new query against the `customers_cdc` stream and now we should get back some data. We should receive 20 records back, representing the original inserts into MySQL that ran when we populated the workshop environment.
+
+This is also a chance to practice the art of "struct-dereferencing" with the "`->`" operator.
+[source,sql]
+----
+select after->first_name as first_name, after->last_name as last_name from customers_cdc emit changes;
+----
+
+Observe that the message structure here is actually quite complex and nested. Remember you can get a view of that by `describe customers_cdc;`. You should see that there's a bunch of metadata about the actual change in MySQL (timestamp, transaction id, etc) and then a 'Before' and 'After' image of the changed row.
+For our use-case, we want to extract just the changed record values from the CDC structures, re-partition on the ID column, and set the target topic to have the same number of partitions as the source `ratings` topic:
+[source,sql]
+----
+create stream customers_flat with (partitions=1) as select
+after->id as id,
+after->first_name as first_name,
+after->last_name as last_name,
+after->email as email,
+after->status360 as club_status,
+after->comments as comments
+from customers_cdc partition by after->id;
+----
+Register the CUSTOMER data as a KSQL table, sourced from this new, re-partitioned, topic
+[source,sql]
+----
+create table customers (rowkey int primary key) with (kafka_topic='CUSTOMERS_FLAT', value_format='AVRO');
+----
+
+So now we have a "pipeline" of queries to read the CDC data, reformat it, and push it into a KSQL table we can use to do lookups against. Let's check our table at this point:
+[source,sql]
+----
+select * from customers emit changes;
+----
+
+
+=== Step {counter:steps-uc3}: Changing data in MySQL
+In a new terminal window, side-by-side with the one you are using already, connect to the server again (just like we did right at the beginning), and this time instead of running KSQL we want to launch the MySQL client:
+[source,bash]
+----
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database demo'
+----
+
+...and
+
+You should be able to see your source CUSTOMERS table here, and inspect it's original 20 records with 
+
+[source,sql]
+----
+SELECT * FROM CUSTOMERS;
+----
+
+Try inserting a new record or updating an existing one
+Example: update name of a record to be your own name
+[source,sql]
+----
+UPDATE CUSTOMERS set first_name = 'Jay', last_name='Kreps' where id = 1;
+----
+
+Now, let's get back to our ksqlDB terminal window.
+
+[TIP]
+====
+If you leave your KSQL `select...from customers;` query running in the first window, watch what happens as you change data in the MySQL source.
+====
+
+We can further check our work with
+[source,sql]
+----
+describe extended customers;
+----
+check the "total messages" value and see how it changes over time if you re-issue this same instruction after making some more changes in MySQL.
+
+
+=== Identify the unhappy customers
+
+Now that we have both our ratings and our continuously-updating table of customer data, we can join them together
+ to find out details about the customers who are posting negative reviews, and see if any of them are our valued elite customers.
+
+* Back in KSQL, we start by finding just the low-scoring ratings
+[source,sql]
+----
+select * from ratings where stars < 3 and channel like 'iOS%' emit changes limit 5;
+----
+(play around with the `where` clause conditions to experiment.)
+
+* Now convert this test query into a persistent one (a persistent query is one which starts with `create` and continuously writes its' output into a topic in Kafka):
+[source,sql]
+----
+create stream poor_ratings as select * from ratings where stars < 3 and channel like 'iOS%';
+----
+
+* Which of these low-score ratings was posted by an elite customer ? To answer this we need to join our customers table:
+[source,sql]
+----
+create stream vip_poor_ratings as
+select r.user_id, c.first_name, c.last_name, c.club_status, r.stars
+from poor_ratings r
+left join customers c
+on r.user_id = c.rowkey
+where lcase(c.club_status) = 'platinum';
+----
+
+* What do you think would happen if you went and changed the `club_status` of a customer while this join query is running ?
+
+Let's try that!
+
+
+=== Monitoring our Queries
+
+So what's actually happening under the covers here ? Let's see all our running queries:
+[source,sql]
+----
+show queries;
+explain <query_id>;  (case sensitive!)
+----
+
+==== View Consumer Lag for a Query
+
+
+Over in the Control Center browser window, navigate to 'Consumers' and, in the table of consumer groups, try to find the one for our join query and click on it.
+[TIP]
+====
+All the names are prefixed with '_confluent_ksql_' plus the ID of the query, as shown in the output of `explain queries`.
+====
+
+What do we see ?
+
+It's also possible (although not setup in this lab environment) to monitor a series of JMX metrics for each running query.
+
+== Application Overview
+Also in the Control Center browser window, now select 'ksqlDB' in the left navigation bar. The summary table which gets displayed on the right will give us an overview of how many queries are continuously running within this application.
+
+Now click into the application itself (here called just 'KSQL') and we can see the browser-based version of the CLI tool but the thing we want to focus on next is the 'Flow' tab where we can see the overview of how our new application is composed and even sample records from each stage by clicking it.
+
+== Extra Credit
+
+Time permitting, let's explore the following ideas:
+
+  * which customers are so upset that they post multiple bad ratings in quick succession ? Perhaps we want to route those complaints direct to our Customer Care team to do some outreach...
+
+[source,sql]
+----
+select first_name, 
+last_name, 
+count(*) as rating_count,
+timestamptostring(windowStart,'yyyy-MM-dd HH:mm:ss','Asia/Singapore') "WINDOW_START_TIME",
+timestamptostring(windowEnd,'yyyy-MM-dd HH:mm:ss', 'Asia/Singapore') "WINDOW_END_TIME"
+from vip_poor_ratings
+window tumbling (size 5 minutes)
+group by first_name, last_name
+having count(*) > 1 emit changes;
+----
+This may take a minute or two to return any data as we are now waiting for the random data generator which populates the orginal 'ratings' to produce the needed set of output.
+
+And of course we could prefix this query with `create table very_unhappy_vips as ...` to continuously record the output.
+
+
+== Follow-on Discussion Points
+
+* UDFs
+* Testing tools
+
+* mask the actual user names in the ouput
+* explore and describe the available functions
+* create a new stream over a topic that doesn't exist yet
+* use `insert...values` to write a couple of test records into this new topic
+* join it to one of our existing streams or tables
+
+== Further resources
+
+Don't forget to check out the #ksql channel on our https://slackpass.io/confluentcommunity[Community Slack group]

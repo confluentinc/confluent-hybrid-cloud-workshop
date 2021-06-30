@@ -1,0 +1,400 @@
+== Lab {counter:labs}: Starting Datagen Connector and Verifying MySQL Customer DB 
+
+In this workshop we'll simulate the use of existing systems. To start generating some data we need to start the datagen connectors. This connectory will continuously create new data to simulate a running environment. 
+
+=== Step {counter:steps-uc3}: Customer Satisfaction Survey
+
+Start the Customer Satisfaction Survey datagen stream by running the following command.
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+curl -X POST -H "Accept:application/json" \
+  -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
+  -d '{
+    "name": "confluent-datagen-ratings",
+    "config": {
+        "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+        "value.converter.schema.registry.url": "http://schema-registry:8081",
+        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+        "value.converter": "io.confluent.connect.avro.AvroConverter",
+        "max.interval": 1000,
+        "iterations": -1,
+        "quickstart": "ratings",
+        "kafka.topic": "ratings"
+      }
+  }' | jq
+----
+====
+
+We can confirm the connector is running by querying the REST interface
+
+[source]
+----
+curl -s http://localhost:18083/connectors/confluent-datagen-ratings/status | jq
+----
+
+You should see that the connector's state is `RUNNING`
+
+[source]
+----
+{
+  "name": "confluent-datagen-ratings",
+  "connector": {
+    "state": "RUNNING",
+    "worker_id": "kafka-connect-onprem:18083"
+  },
+  "tasks": [
+    {
+      "id": 0,
+      "state": "RUNNING",
+      "worker_id": "kafka-connect-onprem:18083"
+    }
+  ],
+  "type": "source"
+}
+----
+
+
+=== Step {counter:steps-uc3}: View Messages in Confluent Control Center
+
+Now that the our datagen source connectors are up and running, we will be able to see messages appear in our local Kafka cluster. 
+
+We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank] to confirm this. 
+
+Use the following and username and password to authenticate to Confluent Control Center
+
+[source,subs="attributes"]
+----
+Username: {dc}
+Password: your workshop password
+----
+
+image::./c3_05.png[]
+
+On the landing page we can see that Confluent Control Center is monitoring two Kafka Clusters, our on-premise cluster and a Confluent Cloud Cluster
+
+image::./c3_10.png[]
+
+Click on the "controlcenter.cluster" tile, this is your on-premise cluster.
+
+image::./c3_20.png[]
+
+Select the Topics Menu on the left
+
+image::./c3_31.png[]
+
+Select the `ratings` topic
+
+image::./c3_uc3_41.png[]
+
+Finally select the Messages tab and observe that messages are being streamed into Kafka in real time.
+
+image::./c3_uc3_51.png[]
+
+.Further Reading
+[TIP]
+====
+* link:https://github.com/confluentinc/kafka-connect-datagen/blob/master/README.md[Datagen Connector , window=_blank]
+* link:https://docs.confluent.io/current/connect/references/restapi.html[Kafka Connect REST API]
+* link:https://curl.haxx.se/docs/manpage.html[cURL manpage]
+* link:https://docs.confluent.io/current/control-center/index.html[Confluent Control Center Documentation]
+====
+
+
+We now have `ratings` rows being created for us by the customer satisfaction survey application.
+
+
+=== Step {counter:steps-uc3}: Database Schema
+
+The MySQL database contains a simple schema that includes only a _Customer_ table. 
+
+We can inspect this schema by logging into the MySQL CLI...
+
+[source]
+----
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database demo'
+----
+
+...and viewing your tables
+
+[source]
+----
+show tables;
+----
+
+You should see a similar result
+
+[source,subs="attributes"]
+----
++----------------+
+| Tables_in_demo |
++----------------+
+| CUSTOMERS      |
++----------------+
+1 row in set (0.00 sec)
+----
+
+Now you can see the table structure..
+
+[source]
+----
+describe CUSTOMERS;
+----
+
+
+[source,subs="attributes"]
+----
++------------+-------------+------+-----+-------------------+-----------------------------+
+| Field      | Type        | Null | Key | Default           | Extra                       |
++------------+-------------+------+-----+-------------------+-----------------------------+
+| id         | int(11)     | NO   | PRI | NULL              |                             |
+| first_name | varchar(50) | YES  |     | NULL              |                             |
+| last_name  | varchar(50) | YES  |     | NULL              |                             |
+| email      | varchar(50) | YES  |     | NULL              |                             |
+| gender     | varchar(50) | YES  |     | NULL              |                             |
+| status360  | varchar(8)  | YES  |     | NULL              |                             |
+| comments   | varchar(90) | YES  |     | NULL              |                             |
+| create_ts  | timestamp   | NO   |     | CURRENT_TIMESTAMP |                             |
+| update_ts  | timestamp   | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++------------+-------------+------+-----+-------------------+-----------------------------+
+9 rows in set (0.00 sec)
+----
+
+Let's view the row count for each table
+
+[source]
+----
+SELECT COUNT(*) from CUSTOMERS;
+----
+
+As you can see, we have 20 customers. 
+
+[source]
+----
+mysql> SELECT COUNT(*) from CUSTOMERS;
++----------+
+| count(*) |
++----------+
+|       20 |
++----------+
+1 row in set (0.00 sec)
+
+----
+
+
+[source]
+----
+SELECT * FROM CUSTOMERS;
+----
+
+[source]
+----
+mysql> SELECT * FROM CUSTOMERS;
++----+-------------+------------+----------------------------+--------+-----------+------------------------------------------------+---------------------+---------------------+
+| id | first_name  | last_name  | email                      | gender | status360 | comments                                       | create_ts           | update_ts           |
++----+-------------+------------+----------------------------+--------+-----------+------------------------------------------------+---------------------+---------------------+
+|  1 | Rica        | Blaisdell  | rblaisdell0@rambler.ru     | Female | bronze    | Universal optimal hierarchy                    | 2021-04-22 13:52:16 | 2021-04-22 13:52:16 |
+
+...
+
++----+-------------+------------+----------------------------+--------+-----------+------------------------------------------------+---------------------+---------------------+
+20 rows in set (0.00 sec)
+
+----
+
+You can now close the MySQL CLI
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+exit
+----
+====
+
+=== Step {counter:steps-uc3}: Create the MySQL source connector
+
+Now that we have seen the data in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
+
+We have a Kafka Connect worker already up and running in a docker container called `kafka-connect-onprem`. This Kafka Connect worker is configured to connect to your on-premise Kafka cluster and is already connected to our ksqlDB cluster. That means we can create and manage connectors direcly from ksqlDB.
+
+You will find it helpful to keep a copy of the ksqlDB reference guide open in another browser tab:
+`https://docs.ksqldb.io/en/0.15.0-ksqldb/reference/`
+
+==== ksqlDB
+
+ksqlDB can be accessed via either the command line interface (CLI), a graphical UI built into Confluent Control Center, or the documented https://docs.ksqldb.io/en/latest/developer-guide/api/[REST API].
+
+In this workshop we will be using the CLI. If you have used tools for MySQL, Postgres or Oracle's sql*plus before this should feel very familiar.
+
+Let's switch back to our terminal session and fire it up!
+
+To start the ksqlDB CLI run the following command:-
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-onprem:8088
+----
+====
+
+You should see something like this:-
+
+```
+                  ===========================================
+                  =       _              _ ____  ____       =
+                  =      | | _____  __ _| |  _ \| __ )      =
+                  =      | |/ / __|/ _` | | | | |  _ \      =
+                  =      |   <\__ \ (_| | | |_| | |_) |     =
+                  =      |_|\_\___/\__, |_|____/|____/      =
+                  =                   |_|                   =
+                  =  Event Streaming Database purpose-built =
+                  =        for stream processing apps       =
+                  ===========================================
+
+Copyright 2017-2020 Confluent Inc.
+
+CLI v6.1.1, Server v6.1.1 located at http://ksqldb-server-ccloud:8088
+
+Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!
+
+ksql>
+
+```
+
+=== Looking around
+Let's quickly get familiar with this environment by taking a look around:
+
+[TIP]
+====
+You can navigate your KSQL command history much like a BASH shell:
+
+  * type `history` to see a list of previous commands
+  * `!123` will retrieve a previous command
+  * `ctrl-r` invokes a 'backward search' for commands matching whatever you type next, use arrow keys to navigate matches
+  * `ctrl-c` to cancel and return to the KSQL prompt
+====
+
+==== Session properties
+Investigate session properties with `show properties;`. Although we won't be adjusting these today, the session properties mechanism is how you can temporarily adjust various performance settings for any subsequent queries you issue.
+
+
+
+To create the Debezium MySQL Source connector instance run the following command:-
+
+[IMPORTANT]
+====
+[source,subs=attributes]
+----
+CREATE SINK CONNECTOR source_dbz_mysql WITH (
+    'connector.class'= 'io.debezium.connector.mysql.MySqlConnector',
+    'database.hostname'= 'mysql',
+    'database.port'= '3306',
+    'database.user'= 'mysqluser',
+    'database.password'= 'mysqlpw',
+    'database.server.id'= '12345',
+    'database.server.name'= '{dc}',
+    'database.whitelist'= 'demo',
+    'database.history.kafka.bootstrap.servers'= 'broker:29092',
+    'database.history.kafka.topic'= 'dbhistory.demo' ,
+    'include.schema.changes'= 'true',
+    'snapshot.mode' = 'when_needed',
+    'database.allowPublicKeyRetrieval' = 'true',
+    'transforms' =  'addTopicSuffix',
+    'transforms.addTopicSuffix.type' = 'org.apache.kafka.connect.transforms.RegexRouter',
+    'transforms.addTopicSuffix.regex' = '(.*)',
+    'transforms.addTopicSuffix.replacement' = '$1-cdc'
+);
+----
+====
+
+
+Visualize the list of connectors
+
+[source]
+----
+show connectors;
+----
+
+You should see something like
+
+[source]
+----
+ksql> show connectors;
+
+ Connector Name             | Type   | Class                                               | Status                      
+-------------------------------------------------------------------------------------------------------------------------
+ confluent-datagen-ratings  | SOURCE | io.confluent.kafka.connect.datagen.DatagenConnector | RUNNING (1/1 tasks RUNNING) 
+ SOURCE_DBZ_MYSQL           | SOURCE | io.debezium.connector.mysql.MySqlConnector          | RUNNING (1/1 tasks RUNNING) 
+ ------------------------------------------------------------------------------------------------------------------------
+----
+
+Describe the `SOURCE_DBZ_MYSQL` connector
+
+[source]
+----
+DESCRIBE CONNECTOR SOURCE_DBZ_MYSQL;
+----
+
+See the data being created in the topic automatically by the CDC connector:-
+
+[source,subs=attributes]
+----
+PRINT '{dc}.demo.CUSTOMERS-cdc' FROM BEGINNING;
+----
+
+Press Ctrl-C to cancel and return to the KSQL prompt.
+
+Create a stream for this topic
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*CREATE STREAM* customers_cdc *WITH*(kafka_topic='{dc}.demo.CUSTOMERS-cdc', value_format='avro');
+----
+====
+
+Inspect the created stream
+
+[source,subs=attributes]
+----
+describe customers_cdc;
+----
+
+
+[TIP]
+====
+the Connect cluster has also a internal REST server listening on port `18083`. We could create a connector from the command line using a cURL command. The cURL command allows us to send an HTTP POST request to the REST server, the '-H' option specifies the header of the request and includes the target host and port information, the `-d` option specifies the data we will send, in this case its the configuration options for the connector. You can of course create and manage connectors using any tool or language capable of issuing HTTP requests.
+====
+
+=== See available Kafka topics and data
+
+KSQL can be used to view the topic metadata on a Kafka cluster - try `show topics;` and `show streams`:
+
+* `show topics;`
+* `show streams;`
+
+We can also investigate some data:
+
+* `print 'xxxx' limit 3` or
+* `print 'xxxx' from beginning limit 3;`
+
+The topics we will use today are *`ratings`* and *`{dc}.demo.CUSTOMERS-cdc`*
+
+The event stream driving this example is a simulated stream of events representing the ratings left by users
+on a mobile app or website, with fields including the device type that they used, the star rating (a score from 1 to 5),
+and an optional comment associated with the rating.
+
+Notice that we don't need to know the format of the data when `print`ing a topic; KSQL introspects the data and understands how to deserialize it.
+
+[TIP]
+====
+Because kafka topic names are case-sensitive ("Ratings" and "ratings" are two different topics on a Kafka broker) we
+take care to single-quote the topic names and correctly case them whenever we have to reference them. All the KSQL constructs
+though, like Streams and Tables and everything else, are case-insensitive as you would expect from most database-like systems.
+====
+

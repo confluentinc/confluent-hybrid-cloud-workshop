@@ -1,0 +1,10 @@
+== Introduction
+
+KSQL is the streaming SQL engine for Apache Kafka. This workshop will step through some practical examples of how to
+use KSQL to build powerful stream-processing applications:
+
+* Filtering streams of data
+* Joining live streams of events with reference data (e.g. from a database)
+* Continuous, stateful aggregations
+
+image::./workshop_architecture_uc3.png[Workshop Architecture Diagram]

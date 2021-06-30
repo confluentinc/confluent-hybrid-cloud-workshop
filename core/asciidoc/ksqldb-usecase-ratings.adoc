@@ -1,0 +1,23 @@
+= Usecase: Real-time Customer Satisfaction Survey
+:doctype: book
+:toc:
+:toc-title: Table of Contents
+:toclevels: 1
+:experimental:
+:icons: font
+:imagesdir: ./images/ksqlws
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+:nofooter:
+
+include::bits/uc-customer-ratings-intro.adoc[]
+
+include::bits/workshop-env.adoc[]
+
+include::bits/uc-customer-ratings-01.adoc[]
+
+include::bits/uc-customer-ratings-02.adoc[]
+
+link:ksqldb-workshop.html[go back to Agenda, window=_blank]
+
