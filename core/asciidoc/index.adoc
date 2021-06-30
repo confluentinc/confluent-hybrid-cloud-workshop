@@ -28,6 +28,7 @@ image::./architecture.png[Workshop Architecture Diagram]
 
 * Usecase: Financial Service with ksqlDB
 * Usecase: Retail/Logistics with ksqlDB
+* Usecase: Real-time Customer Satisfaction Survey 
 * Advanced ksqlDB topics
 |===
 

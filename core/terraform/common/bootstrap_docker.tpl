@@ -33,6 +33,7 @@ asciidoctor ksqldb-workshop.adoc -o ksqldb-workshop.html -a stylesheet=styleshee
 asciidoctor ksqldb-advanced-topics.adoc -o ksqldb-advanced-topics.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
 asciidoctor ksqldb-usecase-retail.adoc -o ksqldb-usecase-retail.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
 asciidoctor ksqldb-usecase-finserv.adoc -o ksqldb-usecase-finserv.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
+asciidoctor ksqldb-usecase-ratings.adoc -o ksqldb-usecase-ratings.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
 
 # Inject c&p functionality into rendered html file.
 sed -i -e '/<title>/r clipboard.html' hybrid-cloud-workshop.html
@@ -40,6 +41,7 @@ sed -i -e '/<title>/r clipboard.html' ksqldb-workshop.html
 sed -i -e '/<title>/r clipboard.html' ksqldb-advanced-topics.html
 sed -i -e '/<title>/r clipboard.html' ksqldb-usecase-retail.html
 sed -i -e '/<title>/r clipboard.html' ksqldb-usecase-finserv.html
+sed -i -e '/<title>/r clipboard.html' ksqldb-usecase-ratings.html
 
 # Creating empty folder to host aws configs later
 mkdir ~/.workshop/docker/.aws

@@ -21,5 +21,6 @@ In this workshop we will explore how the Confluent can enable these architecture
 
 * link:ksqldb-usecase-finserv.html[Usecase: Financial Service with ksqlDB]
 * link:ksqldb-usecase-retail.html[Usecase: Retail/Logistics with ksqlDB]
+* link:ksqldb-usecase-ratings.html[Usecase: Real-time Customer Satisfaction Survey]
 * link:ksqldb-advanced-topics.html[Advanced ksqlDB topics]
 
