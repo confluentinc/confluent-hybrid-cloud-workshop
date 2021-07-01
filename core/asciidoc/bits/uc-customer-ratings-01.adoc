@@ -287,7 +287,7 @@ To create the Debezium MySQL Source connector instance run the following command
 
 [IMPORTANT]
 ====
-[source,subs=attributes]
+[source,subs="attributes"]
 ----
 CREATE SINK CONNECTOR source_dbz_mysql WITH (
     'connector.class'= 'io.debezium.connector.mysql.MySqlConnector',
@@ -341,7 +341,7 @@ DESCRIBE CONNECTOR SOURCE_DBZ_MYSQL;
 
 See the data being created in the topic automatically by the CDC connector:-
 
-[source,subs=attributes]
+[source,subs="quotes,attributes"]
 ----
 PRINT '{dc}.demo.CUSTOMERS-cdc' FROM BEGINNING;
 ----
@@ -360,7 +360,7 @@ Create a stream for this topic
 
 Inspect the created stream
 
-[source,subs=attributes]
+[source,subs="quotes,attributes"]
 ----
 describe customers_cdc;
 ----

@@ -4,7 +4,7 @@ To make use of our ratings and customers topics in KSQL we first need to define 
 
 === Step {counter:steps-uc3}: Create the Ratings data stream
 Register the RATINGS data as a KSQL stream, sourced from the 'ratings' topic
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 create stream ratings with (kafka_topic='ratings', value_format='avro');
 ----
@@ -20,7 +20,7 @@ Try `describe extended ratings;`
 === Step {counter:steps-uc3}: Bring in Customer lookup data from MySQL
 
 Defining a lookup table for Customer data from our MySQL CDC data-feed is a multi-step process:
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 create stream customers_cdc with(kafka_topic='{dc}.demo.CUSTOMERS-cdc', value_format='AVRO');
 ----
@@ -37,7 +37,7 @@ then we won't see any query output.
 
 What we are seeing - or rather, not seeing! - here in KSQL is actually the normal behavior of any Kafka client application (and remember, that's exactly what a KSQL query is!). By default, all Kafka client applications when they start up will consume messages which arrive in their input topics _from that moment forwards_. Older records in the topic are not consumed.
 We can control this behavior though by setting a configuration property, called 'auto.offset.reset'. In KSQL, the various configuration settings for our SQL apps can be inspected by typing `show properties` in the KSQL CLI. if you try that you can see a whole long list of technical defaults, almost all of which we can safely ignore :-)  We adjust the property which controls where new queries start reading from like this:
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 set 'auto.offset.reset' = 'earliest';
 ----
@@ -48,14 +48,14 @@ Now all the subsequent queries we issue will pick up this setting and consume _a
 OK, back to our CDC customer data. Now that we have changed the value of `auto.offset.reset` we can run a new query against the `customers_cdc` stream and now we should get back some data. We should receive 20 records back, representing the original inserts into MySQL that ran when we populated the workshop environment.
 
 This is also a chance to practice the art of "struct-dereferencing" with the "`->`" operator.
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 select after->first_name as first_name, after->last_name as last_name from customers_cdc emit changes;
 ----
 
 Observe that the message structure here is actually quite complex and nested. Remember you can get a view of that by `describe customers_cdc;`. You should see that there's a bunch of metadata about the actual change in MySQL (timestamp, transaction id, etc) and then a 'Before' and 'After' image of the changed row.
 For our use-case, we want to extract just the changed record values from the CDC structures, re-partition on the ID column, and set the target topic to have the same number of partitions as the source `ratings` topic:
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 create stream customers_flat with (partitions=1) as select
 after->id as id,
@@ -67,13 +67,13 @@ after->comments as comments
 from customers_cdc partition by after->id;
 ----
 Register the CUSTOMER data as a KSQL table, sourced from this new, re-partitioned, topic
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 create table customers (rowkey int primary key) with (kafka_topic='CUSTOMERS_FLAT', value_format='AVRO');
 ----
 
 So now we have a "pipeline" of queries to read the CDC data, reformat it, and push it into a KSQL table we can use to do lookups against. Let's check our table at this point:
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 select * from customers emit changes;
 ----
@@ -90,14 +90,14 @@ docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD --database d
 
 You should be able to see your source CUSTOMERS table here, and inspect it's original 20 records with 
 
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 SELECT * FROM CUSTOMERS;
 ----
 
 Try inserting a new record or updating an existing one
 Example: update name of a record to be your own name
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 UPDATE CUSTOMERS set first_name = 'Jay', last_name='Kreps' where id = 1;
 ----
@@ -110,33 +110,36 @@ If you leave your KSQL `select...from customers;` query running in the first win
 ====
 
 We can further check our work with
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 describe extended customers;
 ----
 check the "total messages" value and see how it changes over time if you re-issue this same instruction after making some more changes in MySQL.
 
 
-=== Identify the unhappy customers
+=== Step {counter:steps-uc3}: Identify the unhappy customers
 
 Now that we have both our ratings and our continuously-updating table of customer data, we can join them together
  to find out details about the customers who are posting negative reviews, and see if any of them are our valued elite customers.
 
-* Back in KSQL, we start by finding just the low-scoring ratings
-[source,sql]
+* Back in KSQL, we start by finding just the low-scoring ratings:
+
+[source,subs="quotes,attributes"]
 ----
 select * from ratings where stars < 3 and channel like 'iOS%' emit changes limit 5;
 ----
 (play around with the `where` clause conditions to experiment.)
 
 * Now convert this test query into a persistent one (a persistent query is one which starts with `create` and continuously writes its' output into a topic in Kafka):
-[source,sql]
+
+[source,subs="quotes,attributes"]
 ----
 create stream poor_ratings as select * from ratings where stars < 3 and channel like 'iOS%';
 ----
 
 * Which of these low-score ratings was posted by an elite customer ? To answer this we need to join our customers table:
-[source,sql]
+
+[source,subs="quotes,attributes"]
 ----
 create stream vip_poor_ratings as
 select r.user_id, c.first_name, c.last_name, c.club_status, r.stars
@@ -151,10 +154,10 @@ where lcase(c.club_status) = 'platinum';
 Let's try that!
 
 
-=== Monitoring our Queries
+=== Step {counter:steps-uc3}: Monitoring our Queries
 
 So what's actually happening under the covers here ? Let's see all our running queries:
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 show queries;
 explain <query_id>;  (case sensitive!)
@@ -184,7 +187,7 @@ Time permitting, let's explore the following ideas:
 
   * which customers are so upset that they post multiple bad ratings in quick succession ? Perhaps we want to route those complaints direct to our Customer Care team to do some outreach...
 
-[source,sql]
+[source,subs="quotes,attributes"]
 ----
 select first_name, 
 last_name, 
