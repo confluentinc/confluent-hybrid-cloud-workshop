@@ -1,8 +1,8 @@
-== Lab {counter:labs}: Starting Datagen Connector and Verifying MySQL Customer DB 
+== Lab {counter:labs}: Starting Customer Survey Application
 
 In this workshop we'll simulate the use of existing systems. To start generating some data we need to start the datagen connectors. This connectory will continuously create new data to simulate a running environment. 
 
-=== Step {counter:steps-uc3}: Customer Satisfaction Survey
+=== Step {counter:steps-uc3-01}: Start Application Simulator
 
 Start the Customer Satisfaction Survey datagen stream by running the following command.
 
@@ -57,7 +57,7 @@ You should see that the connector's state is `RUNNING`
 ----
 
 
-=== Step {counter:steps-uc3}: View Messages in Confluent Control Center
+=== Step {counter:steps-uc3-01}: View Messages in Confluent Control Center
 
 Now that the our datagen source connectors are up and running, we will be able to see messages appear in our local Kafka cluster. 
 
@@ -105,8 +105,7 @@ image::./c3_uc3_51.png[]
 
 We now have `ratings` rows being created for us by the customer satisfaction survey application.
 
-
-=== Step {counter:steps-uc3}: Database Schema
+== Lab {counter:labs}: Reviewing MySQL Customer Data 
 
 The MySQL database contains a simple schema that includes only a _Customer_ table. 
 
@@ -214,7 +213,7 @@ exit
 ----
 ====
 
-=== Step {counter:steps-uc3}: Create the MySQL source connector
+== Lab {counter:labs}: Creating the MySQL Source Connector 
 
 Now that we have seen the data in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
 
@@ -223,7 +222,7 @@ We have a Kafka Connect worker already up and running in a docker container call
 You will find it helpful to keep a copy of the ksqlDB reference guide open in another browser tab:
 `https://docs.ksqldb.io/en/0.15.0-ksqldb/reference/`
 
-==== ksqlDB
+=== Step {counter:steps-uc3-02}: Connect to ksqlDB Server
 
 ksqlDB can be accessed via either the command line interface (CLI), a graphical UI built into Confluent Control Center, or the documented https://docs.ksqldb.io/en/latest/developer-guide/api/[REST API].
 
@@ -282,6 +281,7 @@ You can navigate your KSQL command history much like a BASH shell:
 Investigate session properties with `show properties;`. Although we won't be adjusting these today, the session properties mechanism is how you can temporarily adjust various performance settings for any subsequent queries you issue.
 
 
+=== Step {counter:steps-uc3-02}: Deploy MySQL Connector
 
 To create the Debezium MySQL Source connector instance run the following command:-
 
@@ -348,30 +348,7 @@ PRINT '{dc}.demo.CUSTOMERS-cdc' FROM BEGINNING;
 
 Press Ctrl-C to cancel and return to the KSQL prompt.
 
-Create a stream for this topic
-
-[IMPORTANT]
-====
-[source,subs="quotes,attributes"]
-----
-*CREATE STREAM* customers_cdc *WITH*(kafka_topic='{dc}.demo.CUSTOMERS-cdc', value_format='avro');
-----
-====
-
-Inspect the created stream
-
-[source,subs="quotes,attributes"]
-----
-describe customers_cdc;
-----
-
-
-[TIP]
-====
-the Connect cluster has also a internal REST server listening on port `18083`. We could create a connector from the command line using a cURL command. The cURL command allows us to send an HTTP POST request to the REST server, the '-H' option specifies the header of the request and includes the target host and port information, the `-d` option specifies the data we will send, in this case its the configuration options for the connector. You can of course create and manage connectors using any tool or language capable of issuing HTTP requests.
-====
-
-=== See available Kafka topics and data
+=== Step {counter:steps-uc3-02}: See available Kafka topics and data
 
 KSQL can be used to view the topic metadata on a Kafka cluster - try `show topics;` and `show streams`:
 
@@ -398,3 +375,16 @@ take care to single-quote the topic names and correctly case them whenever we ha
 though, like Streams and Tables and everything else, are case-insensitive as you would expect from most database-like systems.
 ====
 
+[source,subs="quotes,attributes"]
+----
+ksql> PRINT 'ratings';
+Format:AVRO
+9/12/19 12:55:04 GMT, 5312, {"rating_id": 5312, "user_id": 4, "stars": 4, "route_id": 2440, "rating_time": 1519304104965, "channel": "web", "message": "Surprisingly good, maybe you are getting your mojo back at long last!"}
+9/12/19 12:55:05 GMT, 5313, {"rating_id": 5313, "user_id": 3, "stars": 4, "route_id": 6975, "rating_time": 1519304105213, "channel": "web", "message": "why is it so difficult to keep the bathrooms clean ?"}
+----
+
+Press Ctrl-C to cancel and return to the KSQL prompt.
+
+=== Step {counter:steps-uc3-02}: Review session properties
+
+Investigate session properties with `show properties;`. Although we won't be adjusting these today, the session properties mechanism is how you can temporarily adjust various performance settings for any subsequent queries you issue.

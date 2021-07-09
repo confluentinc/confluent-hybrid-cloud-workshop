@@ -2,12 +2,17 @@
 
 To make use of our ratings and customers topics in KSQL we first need to define some Streams and/or Tables over them.
 
-=== Step {counter:steps-uc3}: Create the Ratings data stream
+=== Step {counter:steps-uc3-03}: Create the Ratings data stream
 Register the RATINGS data as a KSQL stream, sourced from the 'ratings' topic
+
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 create stream ratings with (kafka_topic='ratings', value_format='avro');
 ----
+====
+
 Notice that here we are using the Schema Registry with our Avro-formatted data to pull in the schema of this stream automatically.
 If our data were in some other format which can't be described in the Schema Registry, such as CSV messages, then we would also need to specify each column and it's datatype in the `create` statement.
 
@@ -15,15 +20,26 @@ Check your creation with `describe ratings;` and a couple of `select` queries. (
 
 What happens ? Why ?
 
-Try `describe extended ratings;`
+Try 
 
-=== Step {counter:steps-uc3}: Bring in Customer lookup data from MySQL
-
-Defining a lookup table for Customer data from our MySQL CDC data-feed is a multi-step process:
 [source,subs="quotes,attributes"]
 ----
+describe extended ratings;
+----
+
+=== Step {counter:steps-uc3-03}: Bring in Customer lookup data from MySQL
+
+Defining a lookup table for Customer data from our MySQL CDC data-feed is a multi-step process:
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+set 'auto.offset.reset' = 'latest';
 create stream customers_cdc with(kafka_topic='{dc}.demo.CUSTOMERS-cdc', value_format='AVRO');
 ----
+====
+
 Quickly query a couple of records to check it (remember you can `describe` the stream to see the column names!).
 
 What happens when you query from this new stream ? Why is that the case ?
@@ -37,13 +53,18 @@ then we won't see any query output.
 
 What we are seeing - or rather, not seeing! - here in KSQL is actually the normal behavior of any Kafka client application (and remember, that's exactly what a KSQL query is!). By default, all Kafka client applications when they start up will consume messages which arrive in their input topics _from that moment forwards_. Older records in the topic are not consumed.
 We can control this behavior though by setting a configuration property, called 'auto.offset.reset'. In KSQL, the various configuration settings for our SQL apps can be inspected by typing `show properties` in the KSQL CLI. if you try that you can see a whole long list of technical defaults, almost all of which we can safely ignore :-)  We adjust the property which controls where new queries start reading from like this:
+
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 set 'auto.offset.reset' = 'earliest';
 ----
+====
+
 Now all the subsequent queries we issue will pick up this setting and consume _all_ the records in a topic, including those produced in the past. This setting will stay in effect for the rest of your KSQL session.
 
-==== Re-format the CDC data
+=== Step {counter:steps-uc3-03}: Re-format the CDC data
 
 OK, back to our CDC customer data. Now that we have changed the value of `auto.offset.reset` we can run a new query against the `customers_cdc` stream and now we should get back some data. We should receive 20 records back, representing the original inserts into MySQL that ran when we populated the workshop environment.
 
@@ -55,6 +76,9 @@ select after->first_name as first_name, after->last_name as last_name from custo
 
 Observe that the message structure here is actually quite complex and nested. Remember you can get a view of that by `describe customers_cdc;`. You should see that there's a bunch of metadata about the actual change in MySQL (timestamp, transaction id, etc) and then a 'Before' and 'After' image of the changed row.
 For our use-case, we want to extract just the changed record values from the CDC structures, re-partition on the ID column, and set the target topic to have the same number of partitions as the source `ratings` topic:
+
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 create stream customers_flat with (partitions=1) as select
@@ -66,11 +90,16 @@ after->status360 as club_status,
 after->comments as comments
 from customers_cdc partition by after->id;
 ----
+====
+
 Register the CUSTOMER data as a KSQL table, sourced from this new, re-partitioned, topic
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 create table customers (rowkey int primary key) with (kafka_topic='CUSTOMERS_FLAT', value_format='AVRO');
 ----
+====
 
 So now we have a "pipeline" of queries to read the CDC data, reformat it, and push it into a KSQL table we can use to do lookups against. Let's check our table at this point:
 [source,subs="quotes,attributes"]
@@ -79,7 +108,10 @@ select * from customers emit changes;
 ----
 
 
-=== Step {counter:steps-uc3}: Changing data in MySQL
+== Lab {counter:labs}: Changing Customer Data in MySQL
+
+=== Step {counter:steps-uc3-04}: Update Customer Record
+
 In a new terminal window, side-by-side with the one you are using already, connect to the server again (just like we did right at the beginning), and this time instead of running KSQL we want to launch the MySQL client:
 [source,bash]
 ----
@@ -97,10 +129,16 @@ SELECT * FROM CUSTOMERS;
 
 Try inserting a new record or updating an existing one
 Example: update name of a record to be your own name
+
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 UPDATE CUSTOMERS set first_name = 'Jay', last_name='Kreps' where id = 1;
 ----
+====
+
+=== Step {counter:steps-uc3-04}: Back to ksqlDB CLI
 
 Now, let's get back to our ksqlDB terminal window.
 
@@ -117,7 +155,7 @@ describe extended customers;
 check the "total messages" value and see how it changes over time if you re-issue this same instruction after making some more changes in MySQL.
 
 
-=== Step {counter:steps-uc3}: Identify the unhappy customers
+== Lab {counter:labs}: Identify the unhappy customers
 
 Now that we have both our ratings and our continuously-updating table of customer data, we can join them together
  to find out details about the customers who are posting negative reviews, and see if any of them are our valued elite customers.
@@ -132,13 +170,18 @@ select * from ratings where stars < 3 and channel like 'iOS%' emit changes limit
 
 * Now convert this test query into a persistent one (a persistent query is one which starts with `create` and continuously writes its' output into a topic in Kafka):
 
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 create stream poor_ratings as select * from ratings where stars < 3 and channel like 'iOS%';
 ----
+====
 
 * Which of these low-score ratings was posted by an elite customer ? To answer this we need to join our customers table:
 
+[IMPORTANT]
+====
 [source,subs="quotes,attributes"]
 ----
 create stream vip_poor_ratings as
@@ -148,13 +191,14 @@ left join customers c
 on r.user_id = c.rowkey
 where lcase(c.club_status) = 'platinum';
 ----
+====
 
-* What do you think would happen if you went and changed the `club_status` of a customer while this join query is running ?
+* What do you think would happen if you went and changed the `club_status` ( `status360` DB column) of a customer while this join query is running ?
 
 Let's try that!
 
 
-=== Step {counter:steps-uc3}: Monitoring our Queries
+== Lab {counter:labs}: Monitoring our Queries
 
 So what's actually happening under the covers here ? Let's see all our running queries:
 [source,subs="quotes,attributes"]
@@ -163,7 +207,7 @@ show queries;
 explain <query_id>;  (case sensitive!)
 ----
 
-==== View Consumer Lag for a Query
+=== View Consumer Lag for a Query
 
 
 Over in the Control Center browser window, navigate to 'Consumers' and, in the table of consumer groups, try to find the one for our join query and click on it.
