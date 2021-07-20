@@ -201,7 +201,7 @@ Let's try that!
 == Lab {counter:labs}: Monitoring our Queries
 
 So what's actually happening under the covers here ? Let's see all our running queries:
-[source,subs="quotes,attributes"]
+[source]
 ----
 show queries;
 explain <query_id>;  (case sensitive!)
