@@ -1,4 +1,4 @@
-== Lab {counter:labs}: Payment Status check
+== Lab {counter:labs}: Detect Fraudulent Payments
 
 We are going to build data pipeline which should look like this:
 
@@ -740,6 +740,7 @@ Combine payment and status events in 1 hour window. Why do we need a timing wind
 *CREATE STREAM* payments_with_status *AS* 
 *SELECT*
   ep.payment_id as payment_id,
+  ep.customer_id,
   ep.accountid,
   ep.amount,
   ep.bank,
@@ -786,6 +787,9 @@ Check in the link:http://{externalip}:9021[Confluent Control Center, window=_bla
 *CREATE TABLE* payments_final *AS* 
 *SELECT*
   payment_id,
+  LATEST_BY_OFFSET(customer_id) as customer_id,
+  LATEST_BY_OFFSET(accountid) as accountid,
+  LATEST_BY_OFFSET(status360) as status360,
   histogram(status) as status_counts,
   collect_list('{ "system" : "' + source_system + '", "status" : "' + STATUS + '"}') as service_status_list
 *FROM* payments_with_status
@@ -807,6 +811,26 @@ Watch the data flowing in (with a limit)
 ----
 select * from payments_final emit changes limit 1;
 ----
+
+=== Step {counter:steps-uc1}: Detect customers with possible fraudulent AML activities?   
+
+Now that we have both our payment statuses and our continuously-updating table of customer data, we can find out details about the customers who are committing fraudulent activities, and see if any of them are our valued elite customers.
+
+[source,subs="quotes"]
+----
+set 'auto.offset.reset'='earliest';
+select payment_id, 
+  customer_id, 
+  accountid, 
+  status360, 
+  status_counts, 
+  service_status_list 
+from payments_final 
+where status_counts['FAIL'] > 0 and status_counts['NOT OK'] > 0 and status360 = 'platinum' 
+emit changes limit 5;
+----
+
+(play around with the `where` clause conditions to experiment.)
 
 === Step {counter:steps-uc1}: Pull queries
 You can use pull queries to check value for a specific payment (snapshot lookup).
