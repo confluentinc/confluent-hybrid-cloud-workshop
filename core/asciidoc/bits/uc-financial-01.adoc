@@ -311,7 +311,7 @@ To create the Debezium MySQL Source connector instance run the following command
 ====
 [source,subs=attributes]
 ----
-CREATE SINK CONNECTOR source_dbz_mysql WITH (
+CREATE SOURCE CONNECTOR source_dbz_mysql WITH (
     'connector.class'= 'io.debezium.connector.mysql.MySqlConnector',
     'database.hostname'= 'mysql',
     'database.port'= '3306',
