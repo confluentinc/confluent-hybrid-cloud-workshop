@@ -118,5 +118,5 @@ You can repeat these steps to check also the `AML_Status` and `Payment_Instructi
 ====
 
 
-We now have `Funds_Status`, `AML_Status` and `Payment_Instruction` rows being created for us by the orders application.
+We now have `Funds_Status`, `AML_Status` and `Payment_Instruction` rows being created for us by the Datagen simulator application.
 
