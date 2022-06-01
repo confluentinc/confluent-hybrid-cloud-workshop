@@ -3,6 +3,9 @@ workshop:
   # A name for the workshop, used to uniquely identify individual resources
   # IMPORTANT: can only contain of lowercase letters and numbers
   name: <My Workshop Name>   
+
+  # Owner email fror resource tagging complaince
+  owner_email: xxxxxxxx@confluent.io
  
   # The number of people attending the workshop ssh password
   participant_count: 2
@@ -15,8 +18,9 @@ workshop:
 
     # The workshop cloud provider & VM configuration
     cloud_provider: aws
-    access_key: <access key>
-    secret_key: <secret key>
+    #access_key: <access key>
+    #secret_key: <secret key>
+    profile: cc-internal-sales-engineering-1-/ConfluentSEAdminRole
     region: eu-west-2
     vm_type: t2.xlarge
     vm_disk_size: 100

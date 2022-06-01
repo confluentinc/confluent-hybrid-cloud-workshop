@@ -6,9 +6,17 @@ variable "name" {
   description = "The Prefix used for all resources in this example"
 }
 
+variable "profile" {
+  description = "AWS Profile to use"
+}
+
 variable "participant_count" {
   description = "How number of participants attending the workshop"
   type        = number
+}
+
+variable "owner_email" {
+  description = "Confluent owners email address for resource tagging"
 }
 
 variable "participant_password" {
@@ -31,13 +39,13 @@ variable "ami" {
   description = "Amazon Machine Image"
 }
 
-variable "access_key" {
-  description = "AWS Access Key"
-}
+#variable "access_key" {
+#  description = "AWS Access Key"
+#}
 
-variable "secret_key" {
-  description = "AWS Secret Key"
-}
+#variable "secret_key" {
+#  description = "AWS Secret Key"
+#}
 
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
