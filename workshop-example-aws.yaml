@@ -40,6 +40,11 @@ workshop:
     #Feedback Form url (Optional)
     #feedback_form_url: "<Feedback Form Url>"
 
+    #tags
+    owner_email: <Your email>
+    purpose: <Workshop name>
+    ref_link: <Workshop Git repo url>
+
   #
   # workshop extensions
   #
