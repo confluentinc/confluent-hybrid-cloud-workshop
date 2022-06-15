@@ -2,6 +2,13 @@ provider "aws" {
   region     = var.region
   access_key = var.access_key
   secret_key = var.secret_key
+  default_tags {
+      tags = {
+          owner_email = var.owner_email
+          purpose = var.purpose
+          ref_link = var.ref_link
+      }
+  }
 }
 
 module "workshop-core" {

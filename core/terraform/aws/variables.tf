@@ -64,3 +64,15 @@ variable "feedback_form_url" {
   description = "Feedback Form Url"
   default = ""
 }
+
+variable "owner_email" {
+  description = "Workshop owner email tag"
+}
+
+variable "purpose" {
+  description = "Workshop purpose tag"
+}
+
+variable "ref_link" {
+  description = "Workshop github repo tag"
+}
