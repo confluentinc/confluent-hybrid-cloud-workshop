@@ -76,3 +76,13 @@ variable "purpose" {
 variable "ref_link" {
   description = "Workshop github repo tag"
 }
+
+variable "credentials_file" {
+  description = "path where aws credentials are located"
+  default = ""
+}
+
+variable "profile" {
+  description = "aws profile"
+  default = ""
+}

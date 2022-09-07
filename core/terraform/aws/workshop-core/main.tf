@@ -41,7 +41,7 @@ resource "random_string" "random_string" {
   special = false
   upper = false
   lower = true
-  number = false
+  numeric = false
 }
 
 data "template_file" "aws_ws_iam_name" {
@@ -93,10 +93,15 @@ EOF
   }
 }
 
+data "aws_vpc" "default" {
+  default = true
+}
+
 resource "aws_security_group" "instance" {
 
   name = "${var.name}-security-group"
-  
+  vpc_id = "${data.aws_vpc.default.id}"
+
   ingress {
     from_port   = 22
     to_port     = 22
@@ -241,7 +246,7 @@ resource "null_resource" "vm_provisioners" {
   //Adding AWS Credentials for Connect
   provisioner "file" {
     source      = "aws_credentials.txt"
-    destination = "~/.workshop/docker/.aws/credentials"
+    destination = ".workshop/docker/.aws/credentials"
 
     connection {
       user     = format("dc%02d", count.index + 1)

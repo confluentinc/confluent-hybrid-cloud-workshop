@@ -17,6 +17,8 @@ workshop:
     cloud_provider: aws
     access_key: <access key>
     secret_key: <secret key>
+    credentials_file: <path of credentials file>
+    profile: <profile>
     region: eu-west-2
     vm_type: t2.xlarge
     vm_disk_size: 100
