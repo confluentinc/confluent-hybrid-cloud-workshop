@@ -39,6 +39,11 @@ variable "secret_key" {
   description = "AWS Secret Key"
 }
 
+variable "aws_vpc_id" {
+  description = "AWS VPC ID"
+  default = ""
+}
+
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
   description = "Confluent Cloud username"

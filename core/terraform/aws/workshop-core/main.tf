@@ -100,7 +100,7 @@ data "aws_vpc" "default" {
 resource "aws_security_group" "instance" {
 
   name = "${var.name}-security-group"
-  vpc_id = "${data.aws_vpc.default.id}"
+  vpc_id = var.aws_vpc_id == "" ? data.aws_vpc.default.id : var.aws_vpc_id
 
   ingress {
     from_port   = 22
