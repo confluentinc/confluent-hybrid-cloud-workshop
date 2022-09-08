@@ -72,3 +72,10 @@ variable "feedback_form_url" {
   description = "Feedback Form Url"
   default = ""
 }
+
+variable "availability_zones" {
+  default     = ["ap-southeast-1a", "ap-southeast-1b"]
+  type        = list
+  description = "List of availability zones"
+}
+ 

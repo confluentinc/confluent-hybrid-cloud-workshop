@@ -41,7 +41,7 @@ resource "random_string" "random_string" {
   special = false
   upper = false
   lower = true
-  number = false
+  numeric = false
 }
 
 data "template_file" "aws_ws_iam_name" {
@@ -67,12 +67,95 @@ EOF
   filename = "${path.root}/aws_credentials.txt"
 }
 
+resource "aws_vpc" "default" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+}
+
+resource "aws_internet_gateway" "default" {
+  vpc_id = aws_vpc.default.id
+}
+
+resource "aws_route_table" "private" {
+  count = length(var.private_subnet_cidr_blocks)
+
+  vpc_id = aws_vpc.default.id
+}
+
+resource "aws_route" "private" {
+  count = length(var.private_subnet_cidr_blocks)
+
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.default[count.index].id
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.default.id
+}
+
+resource "aws_route" "public" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.default.id
+}
+
+resource "aws_subnet" "private" {
+  count = length(var.private_subnet_cidr_blocks)
+
+  vpc_id            = aws_vpc.default.id
+  cidr_block        = var.private_subnet_cidr_blocks[count.index]
+  availability_zone = var.availability_zones[count.index]
+}
+
+resource "aws_subnet" "public" {
+  count = length(var.public_subnet_cidr_blocks)
+
+  vpc_id                  = aws_vpc.default.id
+  cidr_block              = var.public_subnet_cidr_blocks[count.index]
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(var.private_subnet_cidr_blocks)
+
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
+}
+
+resource "aws_route_table_association" "public" {
+  count = length(var.public_subnet_cidr_blocks)
+
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+
+# NAT resources: This will create 2 NAT gateways in 2 Public Subnets for 2 different Private Subnets.
+
+resource "aws_eip" "nat" {
+  count = length(var.public_subnet_cidr_blocks)
+
+  vpc = true
+}
+
+resource "aws_nat_gateway" "default" {
+  depends_on = [aws_internet_gateway.default]
+
+  count = length(var.public_subnet_cidr_blocks)
+
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+}
 
 resource "aws_instance" "instance" {
   count         = var.participant_count
   ami           = var.ami
   instance_type = var.vm_type
   vpc_security_group_ids = [aws_security_group.instance.id]
+  subnet_id =  aws_subnet.public[0].id
 
   root_block_device {
     volume_size           = var.vm_disk_size
@@ -96,7 +179,8 @@ EOF
 resource "aws_security_group" "instance" {
 
   name = "${var.name}-security-group"
-  
+  vpc_id = aws_vpc.default.id
+
   ingress {
     from_port   = 22
     to_port     = 22
@@ -238,18 +322,18 @@ resource "null_resource" "vm_provisioners" {
     }
   }
 
-  //Adding AWS Credentials for Connect
-  provisioner "file" {
-    source      = "aws_credentials.txt"
-    destination = "~/.workshop/docker/.aws/credentials"
+  # //Adding AWS Credentials for Connect
+  # provisioner "file" {
+  #   source      = "aws_credentials.txt"
+  #   destination = "~/.workshop/docker/.aws/credentials"
 
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = aws_instance.instance[count.index].public_ip
-    }
-  }
+  #   connection {
+  #     user     = format("dc%02d", count.index + 1)
+  #     password = var.participant_password
+  #     insecure = true
+  #     host     = aws_instance.instance[count.index].public_ip
+  #   }
+  # }
 }
 
 
