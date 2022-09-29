@@ -11,6 +11,9 @@ variable "participant_password" {
   description = "Password for the admin user, to log in from ssh"
 }
 
+variable "owner_email" {
+  description = "Confluent owners email address for resource tagging"
+}
 
 # VM Variables
 variable "vm_type" {

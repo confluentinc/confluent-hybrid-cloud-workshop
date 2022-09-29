@@ -1,5 +1,4 @@
 provider "azurerm" {
-  version         = "=2.0.0"
   subscription_id = var.subscription_id
   client_id       = var.client_id
   client_secret   = var.client_secret
@@ -8,7 +7,6 @@ provider "azurerm" {
 }
 
 provider "random" {
-  version = "~> 2.2"
 }
 
 module "workshop-core" {
@@ -16,6 +14,7 @@ module "workshop-core" {
   name                      = var.name
   participant_count         = var.participant_count
   participant_password      = var.participant_password
+  owner_email               = var.owner_email
   location                  = var.location
   vm_type                   = var.vm_type
   vm_disk_size              = var.vm_disk_size

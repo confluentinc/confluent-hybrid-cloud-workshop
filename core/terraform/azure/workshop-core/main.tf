@@ -2,6 +2,7 @@
 locals {
   common_tags = {
     project  = "workshop-framework"
+    owner_email = var.owner_email
   }
   extra_tags  = {
     workshop-name = "${var.name}"
@@ -55,7 +56,7 @@ resource "azurerm_subnet" "instance" {
   name                 = "internal"
   resource_group_name  = azurerm_resource_group.instance.name
   virtual_network_name = azurerm_virtual_network.instance.name
-  address_prefix       = "10.0.2.0/24"
+  address_prefixes       = ["10.0.2.0/24"]
 }
 
 resource "azurerm_public_ip" "instance" {

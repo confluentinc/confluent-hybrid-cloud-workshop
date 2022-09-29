@@ -37,11 +37,11 @@ data "template_file" "bootstrap_docker" {
 ## Create API Key and Secret for the workshop
 
 resource "random_string" "random_string" {
-  length = 8
+  length  = 12
+  upper   = false
+  numeric  = false
+  lower   = true
   special = false
-  upper = false
-  lower = true
-  numeric = false
 }
 
 data "template_file" "aws_ws_iam_name" {
