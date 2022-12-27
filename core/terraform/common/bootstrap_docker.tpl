@@ -19,7 +19,7 @@ echo "HOSTNAME"=$HOSTNAME >> .env
 echo "DC"=${dc} >> .env
 echo "CCLOUD_TOPICS"=${ccloud_topics} >> .env
 echo "ONPREM_TOPICS"=${onprem_topics} >> .env
-echo "CONFLUENT_DOCKER_TAG"=6.1.1 >> .env
+echo "CONFLUENT_DOCKER_TAG"=7.3.0 >> .env
 
 # select the DC correctly in the database simulator script and schema file.
 sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/db_transaction_simulator/simulate_dbtrans.py

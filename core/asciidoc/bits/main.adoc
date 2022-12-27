@@ -430,9 +430,9 @@ You should see something like this:-
                   =        for stream processing apps       =
                   ===========================================
 
-Copyright 2017-2020 Confluent Inc.
+Copyright 2017-2022 Confluent Inc.
 
-CLI v6.1.1, Server v6.1.1 located at http://ksqldb-server-ccloud:8088
+CLI v7.3.0, Server v7.3.0 located at http://ksqldb-server-ccloud:8088
 
 Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!
 
@@ -886,7 +886,7 @@ SET 'auto.offset.reset'='earliest';
     ct.city customer_city,
     ct.country customer_country
 *FROM* sales_orders o
-*INNER JOIN* sales_order_details od WITHIN 1 SECONDS ON (o.id = od.sales_order_id)
+*INNER JOIN* sales_order_details od WITHIN 1 SECONDS GRACE PERIOD 1 SECONDS ON (o.id = od.sales_order_id)
 *INNER JOIN* customers_tbl ct ON (o.customer_id = ct.rowkey)
 *INNER JOIN* products_tbl pt ON (od.product_id = pt.rowkey);
 ----
@@ -950,7 +950,7 @@ SET 'auto.offset.reset'='earliest';
     st.city supplier_city,
     st.country supplier_country
 *FROM* purchase_orders o
-*INNER JOIN* purchase_order_details od WITHIN 1 SECONDS ON (o.id = od.purchase_order_id)
+*INNER JOIN* purchase_order_details od WITHIN 1 SECONDS GRACE PERIOD 1 SECONDS ON (o.id = od.purchase_order_id)
 *INNER JOIN* suppliers_tbl st ON (o.supplier_id = st.rowkey)
 *INNER JOIN* products_tbl pt ON (od.product_id = pt.rowkey);
 ----

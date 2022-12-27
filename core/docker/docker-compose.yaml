@@ -1,4 +1,4 @@
-version: "2.1"
+version: "3"
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:${CONFLUENT_DOCKER_TAG}
@@ -47,8 +47,10 @@ services:
     ports:
       - "8081:8081"
     environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://broker:29092
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
   kafka-connect-onprem:
     image: confluentinc/cp-enterprise-replicator:${CONFLUENT_DOCKER_TAG}
@@ -59,12 +61,12 @@ services:
       - broker
       - schema-registry
     ports:
-      - 18083:18083
+      - 18083:8083
     healthcheck:
       disable: true
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "broker:29092"
-      CONNECT_REST_PORT: 18083
+      CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: kafka-connect-onprem
       CONNECT_CONFIG_STORAGE_TOPIC: _connect-configs
       CONNECT_OFFSET_STORAGE_TOPIC: _connect-offsets
@@ -117,7 +119,7 @@ services:
       - broker
       - schema-registry
     ports:
-      - 18084:18084
+      - 18084:8084
     healthcheck:
       disable: true
     environment:
@@ -126,7 +128,9 @@ services:
       CONNECT_SECURITY_PROTOCOL: SASL_SSL
       CONNECT_SASL_MECHANISM: PLAIN
       CONNECT_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-      CONNECT_REST_PORT: 18084
+      CONNECT_REST_PORT: 8084
+      CONNECT_REST_ADVERTISED_PORT: 18084
+      CONNECT_LISTENERS: http://0.0.0.0:8084
       CONNECT_GROUP_ID: ${DC}-kafka-connect-ccloud
       CONNECT_KAFKA_HEAP_OPTS: "-Xms256M -Xmx4G"
       CONNECT_CONFIG_STORAGE_TOPIC: _${DC}-connect-configs
@@ -206,8 +210,8 @@ services:
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: "broker:29092"
       CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      CONTROL_CENTER_CONNECT_CONNECT-ONPREM_CLUSTER: "http://kafka-connect-onprem:18083"
-      CONTROL_CENTER_CONNECT_CONNECT-CCLOUD_CLUSTER: "http://kafka-connect-ccloud:18084"
+      CONTROL_CENTER_CONNECT_CONNECT-ONPREM_CLUSTER: "http://kafka-connect-onprem:8083"
+      CONTROL_CENTER_CONNECT_CONNECT-CCLOUD_CLUSTER: "http://kafka-connect-ccloud:8084"
       CONTROL_CENTER_KSQL_KSQLDB-CCLOUD_URL: "http://ksqldb-server-ccloud:8088"
       CONTROL_CENTER_KSQL_KSQLDB-CCLOUD_ADVERTISED_URL: "http://${EXT_IP}:8088"
       CONTROL_CENTER_KSQL_KSQLDB-ONPREM_URL: "http://ksqldb-server-onprem:8088"
@@ -258,7 +262,7 @@ services:
       KSQL_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
       KSQL_SASL_MECHANISM: PLAIN
       KSQL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
-      KSQL_KSQL_CONNECT_URL: http://kafka-connect-ccloud:18084
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect-ccloud:8084
       KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
       KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
       KSQL_KSQL_SERVICE_ID: ${DC}-ksqldbserver_
@@ -309,7 +313,7 @@ services:
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
       KSQL_BOOTSTRAP_SERVERS: "broker:29092"
-      KSQL_KSQL_CONNECT_URL: http://kafka-connect-onprem:18083
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect-onprem:8083
       KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
       KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
       KSQL_KSQL_SERVICE_ID: ${DC}-onprem-ksqldbserver_
@@ -408,8 +412,8 @@ services:
   dbtrans-simulator:
     container_name: db-trans-simulator
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
+      #condition: service_healthy
     command: tail -f /dev/null
     build:
-      context: ./db_transaction_simulator    
+      context: ./db_transaction_simulator

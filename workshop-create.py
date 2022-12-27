@@ -6,12 +6,15 @@ import yaml
 import json
 import shutil
 import fileinput
-import re 
+import re
 import glob
+import boto3
+import botocore
 
 argparse = argparse.ArgumentParser()
 argparse.add_argument('--dir', help="Workshop directory", required=True)
 args = argparse.parse_args()
+sts = boto3.client('sts')
 
 docker_staging=os.path.join(args.dir, ".docker_staging")
 terraform_staging=os.path.join(args.dir, ".terraform_staging")
@@ -22,6 +25,27 @@ with open( os.path.join(args.dir, "workshop.yaml"), 'r') as yaml_file:
         config = yaml.safe_load(yaml_file)
     except yaml.YAMLError as exc:
         print(exc)
+
+
+def check_login():
+    boto3.setup_default_session(profile_name=(config['workshop']['core']['profile']))
+    sts = boto3.client('sts')
+    try:
+        sts.get_caller_identity()
+        return True
+    except botocore.exceptions.UnauthorizedSSOTokenError:
+        return False
+    except botocore.exceptions.ClientError:
+        return False
+
+
+if (config['workshop']['core']['cloud_provider']) == 'aws':
+    if check_login():
+        print("Credentials are valid.")
+    else:
+        print("AWS Credentials are NOT valid. Please refresh your credentials before executing the script.")
+        exit()
+
 
 def copytree(src, dst):
   if not os.path.exists(dst):
@@ -36,12 +60,13 @@ def copytree(src, dst):
     else:
       shutil.copy2(s, d)
 
+
 if int(config['workshop']['participant_count']) > 35:
   print()
-  print("*"*70) 
-  print("WARNING: Make sure your Confluent Cloud cluster has enough free partitions") 
+  print("*"*70)
+  print("WARNING: Make sure your Confluent Cloud cluster has enough free partitions")
   print("to support this many participants. Each participant uses ~50 partitions.")
-  print("*"*70) 
+  print("*"*70)
   print()
   while True:
     val = input('Do You Want To Continue (y/n)? ')
@@ -66,13 +91,16 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
 # Create Terraform tfvars file 
 with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_file:
-    
+
     # Process high level
     for var in config['workshop']:
         if var not in ['core', 'extensions']:
             tfvars_file.write(str(var) + '="' + str(config['workshop'][var]) + "\"\n")
     for var in config['workshop']['core']:
-        if var != 'cloud_provider':
+        print(str(config['workshop']['core'][var]), ':', type(var))
+        if var == 'availability_zones':
+            tfvars_file.write(str(var) + '=' + str(json.dumps(config['workshop']['core'][var])) + "\n")
+        elif var != 'cloud_provider':
             tfvars_file.write(str(var) + '="' + str(config['workshop']['core'][var]) + "\"\n")
     if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
         for extension in config['workshop']['extensions']:
@@ -88,7 +116,7 @@ with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_fi
 # remove stage directory
 if os.path.exists(docker_staging):
     shutil.rmtree(docker_staging)
-    
+
 # Create staging directory and copy the required docker files into it
 os.mkdir(docker_staging)
 os.mkdir(os.path.join(docker_staging, "extensions"))
@@ -102,20 +130,20 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
     # Add each extensions asciidoc file as an include in the main hybrid-cloud-workshop.adoc file
     includes = []
-    include_str="" 
+    include_str=""
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
             includes.append(glob.glob(os.path.join("./extensions", extension, "asciidoc/*.adoc"))[0])
-    
+
     # Build extension include string
     for include in includes:
         include_str += 'include::.' + include + '[]\n'
-    
+
     # Add extension includes to core hybrid-cloud-workshop.adoc
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
-        line=re.sub("^#EXTENSIONS_PLACEHOLDER#",include_str,line)   
+        line=re.sub("^#EXTENSIONS_PLACEHOLDER#",include_str,line)
         print(line.rstrip())
-    
+
     # Copy extension asciidoc files to docker staging
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
@@ -135,12 +163,12 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
                 for var in config['workshop']['extensions'][extension]:
                     with open(os.path.join(docker_staging, "extensions", extension, "docker/.env"), 'a') as env_file:
                         env_file.write(var + '=' + config['workshop']['extensions'][extension][var] + "\n")
-else:  
+else:
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
-        line=re.sub("^#EXTENSIONS_PLACEHOLDER#","",line)   
+        line=re.sub("^#EXTENSIONS_PLACEHOLDER#","",line)
         print(line.rstrip())
-              
-       
+
+
 #-----------------
 # Create Workshop
 #-----------------

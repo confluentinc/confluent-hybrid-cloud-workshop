@@ -30,9 +30,9 @@ You should see something like this:-
                   =        for stream processing apps       =
                   ===========================================
 
-Copyright 2017-2020 Confluent Inc.
+Copyright 2017-2022 Confluent Inc.
 
-CLI v6.1.1, Server v6.1.1 located at http://ksqldb-server-onprem:8088
+CLI v7.3.0, Server v7.3.0 located at http://ksqldb-server-onprem:8088
 Server Status: RUNNING
 
 Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!

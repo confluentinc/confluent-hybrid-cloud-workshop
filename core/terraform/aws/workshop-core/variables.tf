@@ -53,3 +53,19 @@ variable "onprem_topics" {
 variable "feedback_form_url" {
   description = "Feedback Form Url"
 }
+
+variable "vpc_cidr_block" {
+  default     = "10.0.0.0/16"
+  description = "VPC CIDR block"
+}
+
+variable "public_subnet_cidr_blocks" {
+  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+  description = "List of public subnet CIDR blocks"
+}
+
+variable "availability_zones" {
+  default     = ["eu-west-2a", "eu-west-2b"]
+  type        = list
+  description = "List of availability zones"
+}
