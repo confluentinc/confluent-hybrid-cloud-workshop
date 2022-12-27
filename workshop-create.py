@@ -16,11 +16,11 @@ argparse.add_argument('--dir', help="Workshop directory", required=True)
 args = argparse.parse_args()
 sts = boto3.client('sts')
 
-docker_staging=os.path.join(args.dir, ".docker_staging")
-terraform_staging=os.path.join(args.dir, ".terraform_staging")
+docker_staging = os.path.join(args.dir, ".docker_staging")
+terraform_staging = os.path.join(args.dir, ".terraform_staging")
 
 # Open and parse configuration file
-with open( os.path.join(args.dir, "workshop.yaml"), 'r') as yaml_file:
+with open(os.path.join(args.dir, "workshop.yaml"), 'r') as yaml_file:
     try:
         config = yaml.safe_load(yaml_file)
     except yaml.YAMLError as exc:
@@ -48,36 +48,36 @@ if (config['workshop']['core']['cloud_provider']) == 'aws':
 
 
 def copytree(src, dst):
-  if not os.path.exists(dst):
-    os.makedirs(dst)
-    shutil.copystat(src, dst)
-  lst = os.listdir(src)
-  for item in lst:
-    s = os.path.join(src, item)
-    d = os.path.join(dst, item)
-    if os.path.isdir(s):
-      copytree(s, d)
-    else:
-      shutil.copy2(s, d)
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+        shutil.copystat(src, dst)
+    lst = os.listdir(src)
+    for item in lst:
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            copytree(s, d)
+        else:
+            shutil.copy2(s, d)
 
 
 if int(config['workshop']['participant_count']) > 35:
-  print()
-  print("*"*70)
-  print("WARNING: Make sure your Confluent Cloud cluster has enough free partitions")
-  print("to support this many participants. Each participant uses ~50 partitions.")
-  print("*"*70)
-  print()
-  while True:
-    val = input('Do You Want To Continue (y/n)? ')
-    if val == 'y':
-      break
-    elif val =='n':
-      exit()
+    print()
+    print("*" * 70)
+    print("WARNING: Make sure your Confluent Cloud cluster has enough free partitions")
+    print("to support this many participants. Each participant uses ~50 partitions.")
+    print("*" * 70)
+    print()
+    while True:
+        val = input('Do You Want To Continue (y/n)? ')
+        if val == 'y':
+            break
+        elif val == 'n':
+            exit()
 
-#----------------------------------------
+# ----------------------------------------
 # Create the Terraform staging directory 
-#----------------------------------------
+# ----------------------------------------
 
 # Copy core terraform files to terraform staging
 copytree(os.path.join("./core/terraform", config['workshop']['core']['cloud_provider']), terraform_staging)
@@ -91,27 +91,26 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
 # Create Terraform tfvars file 
 with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_file:
-
     # Process high level
     for var in config['workshop']:
         if var not in ['core', 'extensions']:
             tfvars_file.write(str(var) + '="' + str(config['workshop'][var]) + "\"\n")
     for var in config['workshop']['core']:
-        print(str(config['workshop']['core'][var]), ':', type(var))
         if var == 'availability_zones':
             tfvars_file.write(str(var) + '=' + str(json.dumps(config['workshop']['core'][var])) + "\n")
         elif var != 'cloud_provider':
             tfvars_file.write(str(var) + '="' + str(config['workshop']['core'][var]) + "\"\n")
-    if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
+    if 'extensions' in config['workshop'] and config['workshop']['extensions'] is not None:
         for extension in config['workshop']['extensions']:
             if os.path.exists(os.path.join("./extensions", extension, "terraform")):
-                if config['workshop']['extensions'][extension] != None:
+                if config['workshop']['extensions'][extension] is not None:
                     for var in config['workshop']['extensions'][extension]:
-                        tfvars_file.write(str(var) + '="' + str(config['workshop']['extensions'][extension][var]) + "\"\n")
+                        tfvars_file.write(
+                            str(var) + '="' + str(config['workshop']['extensions'][extension][var]) + "\"\n")
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Create the Docker staging directory, this directory is uploaded to each VM 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 # remove stage directory
 if os.path.exists(docker_staging):
@@ -126,11 +125,11 @@ copytree("./core/docker/", docker_staging)
 copytree(os.path.join("./core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
 
 # Deal with extensions
-if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
+if 'extensions' in config['workshop'] and config['workshop']['extensions'] is not None:
 
     # Add each extensions asciidoc file as an include in the main hybrid-cloud-workshop.adoc file
     includes = []
-    include_str=""
+    include_str = ""
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
             includes.append(glob.glob(os.path.join("./extensions", extension, "asciidoc/*.adoc"))[0])
@@ -141,37 +140,39 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] != No
 
     # Add extension includes to core hybrid-cloud-workshop.adoc
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
-        line=re.sub("^#EXTENSIONS_PLACEHOLDER#",include_str,line)
+        line = re.sub("^#EXTENSIONS_PLACEHOLDER#", include_str, line)
         print(line.rstrip())
 
     # Copy extension asciidoc files to docker staging
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc")):
-            copytree(os.path.join("./extensions", extension, "asciidoc"), os.path.join(docker_staging, "extensions", extension, "asciidoc"))
+            copytree(os.path.join("./extensions", extension, "asciidoc"),
+                     os.path.join(docker_staging, "extensions", extension, "asciidoc"))
 
     # Copy extension images to docker staging
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "asciidoc/images")):
-            copytree(os.path.join("./extensions", extension, "asciidoc/images"), os.path.join(docker_staging, "asciidoc/images"))
+            copytree(os.path.join("./extensions", extension, "asciidoc/images"),
+                     os.path.join(docker_staging, "asciidoc/images"))
 
     # Copy extension docker files to docker staging and create docker .env file
     for extension in config['workshop']['extensions']:
         if os.path.isdir(os.path.join("./extensions", extension, "docker")):
-            copytree(os.path.join("./extensions", extension, "docker"), os.path.join(docker_staging, "extensions", extension, "docker"))
+            copytree(os.path.join("./extensions", extension, "docker"),
+                     os.path.join(docker_staging, "extensions", extension, "docker"))
             # Create .env file for docker
-            if config['workshop']['extensions'][extension] != None:
+            if config['workshop']['extensions'][extension] is not None:
                 for var in config['workshop']['extensions'][extension]:
                     with open(os.path.join(docker_staging, "extensions", extension, "docker/.env"), 'a') as env_file:
                         env_file.write(var + '=' + config['workshop']['extensions'][extension][var] + "\n")
 else:
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
-        line=re.sub("^#EXTENSIONS_PLACEHOLDER#","",line)
+        line = re.sub("^#EXTENSIONS_PLACEHOLDER#", "", line)
         print(line.rstrip())
 
-
-#-----------------
+# -----------------
 # Create Workshop
-#-----------------
+# -----------------
 
 os.chdir(terraform_staging)
 
@@ -195,6 +196,6 @@ if os.path.exists("workshop_details.out"):
         print('=SPLIT("SSH USERNAME,GETTING STARTED URL,PARTICIPANT NAME/EMAIL",",")')
         for id, ip_address in enumerate(ip_addresses, start=1):
             print('=SPLIT("dc{:02d},http://{}", ",")'.format(id, ip_address))
-            #print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
+            # print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
 
     os.remove("workshop_details.out")

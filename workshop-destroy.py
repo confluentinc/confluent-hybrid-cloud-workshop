@@ -13,7 +13,7 @@ args = argparse.parse_args()
 workshop_home = args.dir
 
 # Open and parse configuration file
-with open( os.path.join(workshop_home, "workshop.yaml"), 'r') as yaml_file:
+with open(os.path.join(workshop_home, "workshop.yaml"), 'r') as yaml_file:
     try:
         config = yaml.safe_load(yaml_file)
     except yaml.YAMLError as exc:
@@ -39,9 +39,8 @@ if (config['workshop']['core']['cloud_provider']) == 'aws':
         print("AWS Credentials are NOT valid. Please refresh your credentials before executing the script.")
         exit()
 
-
-terraform_staging=os.path.join(args.dir, ".terraform_staging" )
-docker_staging=os.path.join(args.dir, ".docker_staging")
+terraform_staging = os.path.join(args.dir, ".terraform_staging")
+docker_staging = os.path.join(args.dir, ".docker_staging")
 
 # Terraform Destroy
 owd = os.getcwd()
@@ -53,7 +52,4 @@ if os.path.exists(terraform_staging):
 
 # Delete Docker staging area
 if os.path.exists(docker_staging):
-     shutil.rmtree(docker_staging)
-
-
-
+    shutil.rmtree(docker_staging)
