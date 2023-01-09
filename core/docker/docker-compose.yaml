@@ -94,8 +94,8 @@ services:
       - |
         apt-get -qq update
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
-        confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
-        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.4.0
+        confluent-hub install --no-prompt debezium/debezium-connector-mysql:latest
+        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.6.0
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
         curl -k -SL "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.37.tar.gz" | tar -xzf -
@@ -171,16 +171,16 @@ services:
       - |
         apt-get -qq update
         apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs:5.5.5
-        confluent-hub install --no-prompt wepay/kafka-connect-bigquery:1.6.1
-        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:1.0.7
-        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.4.0
-        confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.1.1
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcs:10.1.1
+        confluent-hub install --no-prompt wepay/kafka-connect-bigquery:2.4.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-gcp-bigtable:2.0.4
+        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.8.1
+        confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:1.6.11
         confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
-        confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.0
-        confluent-hub install --no-prompt confluentinc/kafka-connect-aws-dynamodb:1.2.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.3.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-aws-dynamodb:1.3.1
         cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
-        curl -k -L "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.41.1065/RedshiftJDBC42-no-awssdk-1.2.41.1065.jar" -o RedshiftJDBC42-no-awssdk-1.2.41.1065.jar
+        curl -k -L "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/2.1.0.10/redshift-jdbc42-2.1.0.10.jar" -o redshift-jdbc42-2.1.0.10.jar
         
         #
         echo "Launching Kafka Connect worker"

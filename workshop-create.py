@@ -55,7 +55,8 @@ if int(config['workshop']['participant_count']) > 35:
 #----------------------------------------
 
 # Copy core terraform files to terraform staging
-copytree(os.path.join("./core/terraform", config['workshop']['core']['cloud_provider']), terraform_staging)
+copytree("./core/terraform/confluent", terraform_staging) # put confluent into root folder 
+copytree(os.path.join("./core/terraform", config['workshop']['core']['cloud']), os.path.join(terraform_staging, "modules", "cloud"))
 copytree("./core/terraform/common", os.path.join(terraform_staging, "common"))
 
 # Copy extension terraform files to terraform staging
@@ -72,8 +73,7 @@ with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_fi
         if var not in ['core', 'extensions']:
             tfvars_file.write(str(var) + '="' + str(config['workshop'][var]) + "\"\n")
     for var in config['workshop']['core']:
-        if var != 'cloud_provider':
-            tfvars_file.write(str(var) + '="' + str(config['workshop']['core'][var]) + "\"\n")
+        tfvars_file.write(str(var) + '="' + str(config['workshop']['core'][var]) + "\"\n")
     if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
         for extension in config['workshop']['extensions']:
             if os.path.exists(os.path.join("./extensions", extension, "terraform")):

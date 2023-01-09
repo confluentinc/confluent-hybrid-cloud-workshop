@@ -14,7 +14,7 @@ sudo apt-get install \
     software-properties-common -y
 
 echo "--- Installing Docker ---"
-curl -L https://download.docker.com/linux/static/stable/x86_64/docker-19.03.4.tgz -o docker.tgz
+curl -L https://download.docker.com/linux/static/stable/x86_64/docker-20.10.9.tgz -o docker.tgz
 sudo tar xvf docker.tgz -C /usr/bin --wildcards 'docker/*' --strip 1
 rm docker.tgz
 sudo groupadd docker

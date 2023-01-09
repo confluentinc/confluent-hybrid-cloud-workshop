@@ -9,7 +9,7 @@ resource "aws_redshift_cluster" "instance" {
   number_of_nodes     = 1
   skip_final_snapshot = true
   publicly_accessible = false
-  vpc_security_group_ids = [module.workshop-core.security_group_id]
+  #vpc_security_group_ids = [module.workshop-core.security_group_id]
 }
 
 resource "local_file" "redshift_cluster_endpoint" {
