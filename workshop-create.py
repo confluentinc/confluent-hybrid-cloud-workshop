@@ -84,7 +84,7 @@ copytree(os.path.join("./core/terraform", config['workshop']['core']['cloud_prov
 copytree("./core/terraform/common", os.path.join(terraform_staging, "common"))
 
 # Copy extension terraform files to terraform staging
-if 'extensions' in config['workshop'] and config['workshop']['extensions'] != None:
+if 'extensions' in config['workshop'] and config['workshop']['extensions'] is not None:
     for extension in config['workshop']['extensions']:
         if os.path.exists(os.path.join("./extensions", extension, "terraform")):
             copytree(os.path.join("./extensions", extension, "terraform"), terraform_staging)

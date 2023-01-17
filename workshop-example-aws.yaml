@@ -15,8 +15,9 @@ workshop:
 
     # The workshop cloud provider & VM configuration
     cloud_provider: aws
-    #access_key: <access key>
-    #secret_key: <secret key>
+    #profile: default
+    #region: eu-west-2
+    #availability_zones: ["eu-west-2a", "eu-west-2b"]
     profile: <AWS profile>
     region: <AWS preferred region>
     availability_zones: <list of availability zones>
