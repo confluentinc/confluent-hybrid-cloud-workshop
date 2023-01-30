@@ -41,7 +41,7 @@ resource "random_string" "random_string" {
   special = false
   upper = false
   lower = true
-  number = false
+  numeric = false
 }
 
 data "template_file" "aws_ws_iam_name" {
@@ -67,12 +67,51 @@ EOF
   filename = "${path.root}/aws_credentials.txt"
 }
 
+/*==== The VPC ======*/
+resource "aws_vpc" "workshop-vpc" {
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+}
+
+/*==== Subnets ======*/
+/* Internet gateway for the public subnet */
+resource "aws_internet_gateway" "workshop-ig" {
+  vpc_id = aws_vpc.workshop-vpc.id
+}
+
+/* Public subnet */
+resource "aws_subnet" "workshop-public-subnet" {
+  count = length(var.public_subnet_cidr_blocks)
+
+  vpc_id                  = aws_vpc.workshop-vpc.id
+  cidr_block              = var.public_subnet_cidr_blocks[count.index]
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
+}
+
+resource "aws_route_table" "workshop-public-route-table" {
+  vpc_id = aws_vpc.workshop-vpc.id
+}
+
+resource "aws_route" "workshop-public-route" {
+  route_table_id         = aws_route_table.workshop-public-route-table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.workshop-ig.id
+}
+
+resource "aws_route_table_association" "workshop-public-route-table-association" {
+  count = length(var.public_subnet_cidr_blocks)
+  subnet_id      = aws_subnet.workshop-public-subnet[count.index].id
+  route_table_id = aws_route_table.workshop-public-route-table.id
+}
 
 resource "aws_instance" "instance" {
   count         = var.participant_count
   ami           = var.ami
   instance_type = var.vm_type
   vpc_security_group_ids = [aws_security_group.instance.id]
+  subnet_id =  aws_subnet.workshop-public-subnet[0].id
 
   root_block_device {
     volume_size           = var.vm_disk_size
@@ -96,7 +135,8 @@ EOF
 resource "aws_security_group" "instance" {
 
   name = "${var.name}-security-group"
-  
+  vpc_id = aws_vpc.workshop-vpc.id
+
   ingress {
     from_port   = 22
     to_port     = 22
@@ -241,7 +281,7 @@ resource "null_resource" "vm_provisioners" {
   //Adding AWS Credentials for Connect
   provisioner "file" {
     source      = "aws_credentials.txt"
-    destination = "~/.workshop/docker/.aws/credentials"
+    destination = ".workshop/docker/.aws/credentials"
 
     connection {
       user     = format("dc%02d", count.index + 1)

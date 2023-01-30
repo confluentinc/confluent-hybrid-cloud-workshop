@@ -1,12 +1,14 @@
 provider "aws" {
   region     = var.region
-  access_key = var.access_key
-  secret_key = var.secret_key
+  #access_key = var.access_key #because gimme-aws-creds doesnt require this
+  #secret_key = var.secret_key #because gimme-aws-creds doesnt require this
+  profile    = var.profile
   default_tags {
       tags = {
           owner_email = var.owner_email
           purpose = var.purpose
           ref_link = var.ref_link
+          Deployed_By: "Terraform"
       }
   }
 }

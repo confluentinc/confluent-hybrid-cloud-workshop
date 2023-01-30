@@ -15,9 +15,12 @@ workshop:
 
     # The workshop cloud provider & VM configuration
     cloud_provider: aws
-    access_key: <access key>
-    secret_key: <secret key>
-    region: eu-west-2
+    #profile: default
+    #region: eu-west-2
+    #availability_zones: ["eu-west-2a", "eu-west-2b"]
+    profile: <AWS profile>
+    region: <AWS preferred region>
+    availability_zones: <list of availability zones>
     vm_type: t2.xlarge
     vm_disk_size: 100
     # EU - does not exist in SG

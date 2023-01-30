@@ -48,13 +48,13 @@ cd ~/confluent-hybrid-cloud-workshop
 To start provisioning the workshop, run `workshop-create.py` and pass in your workshop directory
 
 ```
-python workshop-create.py --dir ~/myworkshop
+python3 workshop-create.py --dir ~/myworkshop
 ```
 
 When you are finished with the workshop you can destroy it using `workshop-destroy.py`
 
 ```
-python workshop-destroy.py --dir ~/myworkshop
+python3 workshop-destroy.py --dir ~/myworkshop
 ```
 
 ## Troubleshooting

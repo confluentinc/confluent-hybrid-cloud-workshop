@@ -31,13 +31,13 @@ variable "ami" {
   description = "Amazon Machine Image"
 }
 
-variable "access_key" {
-  description = "AWS Access Key"
-}
+#variable "access_key" {
+#  description = "AWS Access Key"
+#}
 
-variable "secret_key" {
-  description = "AWS Secret Key"
-}
+#variable "secret_key" {
+#  description = "AWS Secret Key"
+#}
 
 // Confluent Cloud variables
 variable "ccloud_bootstrap_servers" {
@@ -65,14 +65,25 @@ variable "feedback_form_url" {
   default = ""
 }
 
-variable "owner_email" {
-  description = "Workshop owner email tag"
+variable "profile" {
+  description = "AWS Profile to use"
 }
 
 variable "purpose" {
   description = "Workshop purpose tag"
 }
 
+variable "availability_zones" {
+  default     = ["eu-west-2a", "eu-west-2b"]
+  type        = list
+  description = "List of availability zones"
+}
+
 variable "ref_link" {
   description = "Workshop github repo tag"
+  default = ""
+}
+
+variable "owner_email" {
+   description = "Confluent owners email address for resource tagging"
 }
