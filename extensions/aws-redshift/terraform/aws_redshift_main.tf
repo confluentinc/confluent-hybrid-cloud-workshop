@@ -1,3 +1,9 @@
+resource "aws_redshift_subnet_group" "workshop-public-subnet-group" {
+  name       = "workshop-public-subnet-group"
+  subnet_ids = module.workshop-core.subnet
+
+}
+
 resource "aws_redshift_cluster" "instance" {
   cluster_identifier  = "${var.name}-rs-cluster"
   database_name       = "${var.name}db"
@@ -9,7 +15,7 @@ resource "aws_redshift_cluster" "instance" {
   number_of_nodes     = 1
   skip_final_snapshot = true
   publicly_accessible = false
-  cluster_subnet_group_name = module.workshop-core.subnet_group_id
+  cluster_subnet_group_name = aws_redshift_subnet_group.workshop-public-subnet-group.id
   vpc_security_group_ids = [module.workshop-core.security_group_id]
 }
 

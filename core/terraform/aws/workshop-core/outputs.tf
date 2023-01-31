@@ -6,8 +6,8 @@ output "security_group_id" {
   value = aws_security_group.instance.id
 }
 
-output "subnet_group_id" {
-  value = aws_redshift_subnet_group.workshop-public-subnet-group.id
+output "subnet" {
+  value = aws_subnet.workshop-public-subnet.*.id
 }
 
 output "ws_iam_user_name" {

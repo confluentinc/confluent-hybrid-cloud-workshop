@@ -90,12 +90,6 @@ resource "aws_subnet" "workshop-public-subnet" {
   map_public_ip_on_launch = true
 }
 
-resource "aws_redshift_subnet_group" "workshop-public-subnet-group" {
-  name       = "workshop-public-subnet-group"
-  subnet_ids = aws_subnet.workshop-public-subnet.*.id
-
-}
-
 resource "aws_route_table" "workshop-public-route-table" {
   vpc_id = aws_vpc.workshop-vpc.id
 }

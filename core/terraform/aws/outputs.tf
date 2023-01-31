@@ -6,8 +6,8 @@ output "security_group_id" {
   value = module.workshop-core.security_group_id
 }
 
-output "subnet_group_id" {
-  value = module.workshop-core.subnet_group_id
+output "subnet" {
+  value = module.workshop-core.subnet
 }
 
 output "topic" {
