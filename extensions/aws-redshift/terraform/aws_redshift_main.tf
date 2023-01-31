@@ -9,6 +9,7 @@ resource "aws_redshift_cluster" "instance" {
   number_of_nodes     = 1
   skip_final_snapshot = true
   publicly_accessible = false
+  cluster_subnet_group_name = module.workshop-core.subnet_group_id
   vpc_security_group_ids = [module.workshop-core.security_group_id]
 }
 
@@ -40,7 +41,7 @@ resource "null_resource" "redshift_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cat /tmp/rs_jdbc_url.txt >> ~/.workshop/docker/.env",
+      "cat /tmp/rs_jdbc_url.txt >> .workshop/docker/.env",
       "rm /tmp/rs_jdbc_url.txt"
     ]
 

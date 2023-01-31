@@ -4,7 +4,7 @@ resource "random_string" "s3_random_string" {
   special = false
   upper = false
   lower = true
-  number = false
+  numeric = false
 }
 
 data "template_file" "s3_bucket_name" {
@@ -13,13 +13,19 @@ data "template_file" "s3_bucket_name" {
 
 resource "aws_s3_bucket" "bucket" {
   bucket   = "tf-bucket-${data.template_file.s3_bucket_name.rendered}"
-  acl      = "private"
   force_destroy = true
+}
 
-  versioning {
-    enabled = false
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.bucket.id
+  versioning_configuration {
+    status = "Disabled"
   }
-
 }
 
 
@@ -98,7 +104,7 @@ resource "null_resource" "s3_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cat /tmp/s3_bucket_info.txt >> ~/.workshop/docker/.env",
+      "cat /tmp/s3_bucket_info.txt >> .workshop/docker/.env",
       "rm /tmp/s3_bucket_info.txt"
     ]
 

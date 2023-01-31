@@ -2,6 +2,7 @@
 locals {
   common_tags = {
     project  = "workshop-framework"
+    deployed_By = "Terraform"
   }
   extra_tags  = {
     workshop-name = "${var.name}"
@@ -37,9 +38,9 @@ resource "null_resource" "add_vars_azure_storage" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo 'AZURE_STORAGE_ACCOUNT_NAME=${data.azurerm_storage_account.instance.name}' >> ~/.workshop/docker/.env",
-      "echo 'AZURE_STORAGE_ACCOUNT_KEY=${data.azurerm_storage_account.instance.primary_access_key}' >> ~/.workshop/docker/.env",
-      "echo 'AZURE_STORAGE_CONTAINER=${azurerm_storage_container.instance.name}' >> ~/.workshop/docker/.env"
+      "echo 'AZURE_STORAGE_ACCOUNT_NAME=${data.azurerm_storage_account.instance.name}' >> .workshop/docker/.env",
+      "echo 'AZURE_STORAGE_ACCOUNT_KEY=${data.azurerm_storage_account.instance.primary_access_key}' >> .workshop/docker/.env",
+      "echo 'AZURE_STORAGE_CONTAINER=${azurerm_storage_container.instance.name}' >> .workshop/docker/.env"
     ]
 
     connection {

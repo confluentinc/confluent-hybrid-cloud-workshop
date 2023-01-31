@@ -1,7 +1,11 @@
 
 locals {
   common_tags = {
-    project  = "workshop-framework"
+    project     = "workshop-framework"
+    owner_email = var.owner_email
+    purpose     = var.purpose
+    ref_link    = var.ref_link
+    deployed_By = "Terraform"
   }
   extra_tags  = {
     workshop-name = "${var.name}"
@@ -27,7 +31,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
-    ccloud_topics           = var.ccloud_topics
+#    ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "azure"
@@ -55,7 +59,7 @@ resource "azurerm_subnet" "instance" {
   name                 = "internal"
   resource_group_name  = azurerm_resource_group.instance.name
   virtual_network_name = azurerm_virtual_network.instance.name
-  address_prefix       = "10.0.2.0/24"
+  address_prefixes     = ["10.0.2.0/24"]
 }
 
 resource "azurerm_public_ip" "instance" {

@@ -22,7 +22,7 @@ data "template_file" "bootstrap_docker" {
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
-    ccloud_topics           = var.ccloud_topics
+#    ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "aws"
@@ -88,6 +88,12 @@ resource "aws_subnet" "workshop-public-subnet" {
   cidr_block              = var.public_subnet_cidr_blocks[count.index]
   availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = true
+}
+
+resource "aws_redshift_subnet_group" "workshop-public-subnet-group" {
+  name       = "workshop-public-subnet-group"
+  subnet_ids = aws_subnet.workshop-public-subnet.*.id
+
 }
 
 resource "aws_route_table" "workshop-public-route-table" {

@@ -352,19 +352,19 @@ services:
     volumes:
       - ./asciidoc:/usr/share/nginx/html
  
-  create-cloud-topics:
-    image: confluentinc/cp-kafka:${CONFLUENT_DOCKER_TAG}
-    hostname: create-cloud-topics
-    container_name: create-cloud-topics
-    volumes:
-      - ./ccloud.properties:/ccloud.properties
-      - ./util_functions.sh:/util_functions.sh
-    command: "bash -c 'source /util_functions.sh; create_ccloud_topics ${CCLOUD_TOPICS} ${DC}'"
-    environment:
+#  create-cloud-topics:
+#    image: confluentinc/cp-kafka:${CONFLUENT_DOCKER_TAG}
+#    hostname: create-cloud-topics
+#    container_name: create-cloud-topics
+#    volumes:
+#      - ./ccloud.properties:/ccloud.properties
+#      - ./util_functions.sh:/util_functions.sh
+#    command: "bash -c 'source /util_functions.sh; create_ccloud_topics ${CCLOUD_TOPICS} ${DC}'"
+#    environment:
       # The following settings are listed here only to satisfy the image’s requirements.
       # We override the image’s command anyways, hence this container will not start a broker.
-      KAFKA_BROKER_ID: ignored
-      KAFKA_ZOOKEEPER_CONNECT: ignored
+#      KAFKA_BROKER_ID: ignored
+#      KAFKA_ZOOKEEPER_CONNECT: ignored
 
   create-onprem-topics:
     image: confluentinc/cp-kafka:${CONFLUENT_DOCKER_TAG}

@@ -50,9 +50,9 @@ variable "ccloud_api_secret" {
   description = "Confluent Cloud Provider"
 }
 
-variable "ccloud_topics" {
-  description = "Confluent Cloud topics to precreate"
-}
+#variable "ccloud_topics" {
+#  description = "Confluent Cloud topics to precreate"
+#}
 
 variable "onprem_topics" {
   description = "Confluent Server on-prem topics to precreate"
@@ -60,4 +60,17 @@ variable "onprem_topics" {
 
 variable "feedback_form_url" {
   description = "Feedback Form Url"
+}
+
+variable "purpose" {
+  description = "Workshop purpose tag"
+}
+
+variable "ref_link" {
+  description = "Workshop github repo tag"
+  default = ""
+}
+
+variable "owner_email" {
+  description = "Confluent owners email address for resource tagging"
 }

@@ -17,7 +17,6 @@ echo "CCLOUD_API_KEY=${ccloud_api_key}" >> .env
 echo "CCLOUD_API_SECRET=${ccloud_api_secret}" >> .env
 echo "HOSTNAME"=$HOSTNAME >> .env
 echo "DC"=${dc} >> .env
-echo "CCLOUD_TOPICS"=${ccloud_topics} >> .env
 echo "ONPREM_TOPICS"=${onprem_topics} >> .env
 echo "CONFLUENT_DOCKER_TAG"=7.3.0 >> .env
 

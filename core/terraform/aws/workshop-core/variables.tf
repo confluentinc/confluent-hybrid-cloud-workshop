@@ -42,9 +42,9 @@ variable "ccloud_api_secret" {
   description = "Confluent Cloud Provider"
 }
 
-variable "ccloud_topics" {
-  description = "Confluent Cloud topics to precreate"
-}
+#variable "ccloud_topics" {
+#  description = "Confluent Cloud topics to precreate"
+#}
 
 variable "onprem_topics" {
   description = "Confluent Server local on-prem to precreate"
@@ -65,7 +65,6 @@ variable "public_subnet_cidr_blocks" {
 }
 
 variable "availability_zones" {
-  default     = ["eu-west-2a", "eu-west-2b"]
   type        = list
   description = "List of availability zones"
 }

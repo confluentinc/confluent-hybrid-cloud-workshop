@@ -61,8 +61,8 @@ resource "null_resource" "vm_provisioners_atlas" {
   provisioner "remote-exec" {
     inline = [
       "sleep 30",
-      "echo 'MONGODBATLAS_SRV_ADDRESS=${local.mongodbatlas_srv_address}' >> ~/.workshop/docker/.env",
-      "echo 'MONGODBATLAS_MONGO_URI=${data.mongodbatlas_cluster.confluent.mongo_uri}' >> ~/.workshop/docker/.env"
+      "echo 'MONGODBATLAS_SRV_ADDRESS=${local.mongodbatlas_srv_address}' >> .workshop/docker/.env",
+      "echo 'MONGODBATLAS_MONGO_URI=${data.mongodbatlas_cluster.confluent.mongo_uri}' >> .workshop/docker/.env"
     ]
 
     connection {
@@ -134,7 +134,7 @@ resource "null_resource" "vm_provisioners_atlas_realm_app" {
   provisioner "file" {
     content      = templatefile("${path.module}/add_realm_url_to_docs.tpl", { 
       mongodbatlas_realm_app_id   = self.triggers.realm_app_id
-      asciidoc_index_path  = "~/.workshop/docker/asciidoc/hybrid-cloud-workshop.html"
+      asciidoc_index_path  = ".workshop/docker/asciidoc/hybrid-cloud-workshop.html"
     })
     destination = "/tmp/add_realm_url_to_docs.sh"
 
