@@ -28,4 +28,5 @@ module "workshop-core" {
   ccloud_topics            = var.ccloud_topics
   onprem_topics            = var.onprem_topics
   feedback_form_url        = var.feedback_form_url
+  availability_zones       = var.availability_zones
 }
