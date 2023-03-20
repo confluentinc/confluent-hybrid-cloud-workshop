@@ -40,9 +40,9 @@ variable "vm_disk_size" {
 }
 
 // Confluent Cloud variables
-variable "ccloud_bootstrap_servers" {
-  description = "Confluent Cloud username"
-}
+#variable "ccloud_bootstrap_servers" {
+#  description = "Confluent Cloud username"
+#}
 
 variable "ccloud_api_key" {
   description = "Confluent Cloud password"
@@ -63,4 +63,44 @@ variable "onprem_topics" {
 variable "feedback_form_url" {
   description = "Feedback Form Url"
   default = ""
+}
+
+variable "purpose" {
+  description = "Workshop purpose tag"
+}
+
+variable "ref_link" {
+  description = "Workshop github repo tag"
+  default = ""
+}
+
+variable "owner_email" {
+  description = "Confluent owners email address for resource tagging"
+}
+
+variable "ccloud_env_name" {
+  description = "Confluent cloud environment name"
+}
+
+variable "ccloud_cluster_name" {
+  description = "Confluent cloud cluster name"
+}
+
+variable "ccloud_cluster_availability_type" {
+  description = "Confluent cloud cluster type availability_type"
+  default = "SINGLE_ZONE"
+}
+
+variable "ccloud_sr_region" {
+  description = "Schema registry region"
+  default = "eu-central-1"
+}
+
+variable "ccloud_package_sg" {
+  description = "Stream Governance package type"
+  default = "ESSENTIALS"
+}
+
+variable "cloud_provider" {
+  description = "Cloud provider"
 }

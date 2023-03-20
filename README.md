@@ -20,8 +20,15 @@ Each workshop participant will work through a series of Labs to create the follo
 * Terraform 0.12.20 or later
 * Python + [Yaml](https://pyyaml.org/wiki/PyYAML)
 * A GCP/AWS/Azure account with the appropriate privileges
+* For setting AWS credentials, please check the following link: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where
 * A Confluent Cloud Account
 * [MongoDB Realm CLI](https://docs.mongodb.com/realm/deploy/realm-cli-reference/#installation) (required if you use the MongoDB Atlas extension)
+
+## Things to know before starting
+
+This repository is going to create the required  Confluent Cloud features (Environment, Cluster, API keys...).
+The cluster type by default is Basic. If it is necessary to use Standard or Dedicated cluster, please check this link to make the required changes:
+https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/confluent_kafka_cluster .
 
 ## Provisioning a Workshop
 
@@ -49,6 +56,13 @@ To start provisioning the workshop, run `workshop-create.py` and pass in your wo
 
 ```
 python3 workshop-create.py --dir ~/myworkshop
+```
+Maybe you will need to execute the following commands before executing the previous script:
+```
+python3 -m pip install boto3
+python3 -m pip install google
+python3 -m pip install google-api-python-client
+python3 -m pip install azure-cli
 ```
 
 When you are finished with the workshop you can destroy it using `workshop-destroy.py`

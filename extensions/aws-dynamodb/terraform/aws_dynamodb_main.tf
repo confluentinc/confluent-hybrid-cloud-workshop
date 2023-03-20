@@ -4,7 +4,7 @@ resource "random_string" "dynamodb_random_string" {
   special = false
   upper = false
   lower = true
-  number = false
+  numeric = false
 }
 
 data "template_file" "dynamodb_table_name" {
@@ -91,7 +91,7 @@ resource "null_resource" "dynamodb_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cat /tmp/dynamodb_conn_info.txt >> ~/.workshop/docker/.env",
+      "cat /tmp/dynamodb_conn_info.txt >> .workshop/docker/.env",
       "rm /tmp/dynamodb_conn_info.txt"
     ]
 

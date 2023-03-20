@@ -6,6 +6,10 @@ output "security_group_id" {
   value = aws_security_group.instance.id
 }
 
+output "subnet" {
+  value = aws_subnet.workshop-public-subnet.*.id
+}
+
 output "ws_iam_user_name" {
   value = aws_iam_user.ws.name
 }

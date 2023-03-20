@@ -23,13 +23,14 @@ data "template_file" "bootstrap_docker" {
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
-    ccloud_topics           = var.ccloud_topics
+#    ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "gcp"
   }
 }
-
+data "google_project" "project" {
+}
 /*
  Resources
 */
@@ -47,6 +48,7 @@ resource "google_compute_firewall" "workshop-firewall" {
     protocol = "tcp"
     ports    = ["22", "9021", "80", "8088", "8089","18088"]
   }
+  source_ranges = ["0.0.0.0/0"]
 }
 
 resource "google_compute_address" "instance" {
@@ -96,6 +98,7 @@ SCRIPT
       password = var.participant_password
       insecure = true
       host     = element(google_compute_address.instance.*.address, count.index)
+      type     = "ssh"
     }
   }
 
@@ -111,6 +114,7 @@ SCRIPT
       password = var.participant_password
       insecure = true
       host     = element(google_compute_address.instance.*.address, count.index)
+      type     = "ssh"
     }
   }
 

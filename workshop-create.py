@@ -10,6 +10,9 @@ import re
 import glob
 import boto3
 import botocore
+import google
+from google.oauth2 import service_account
+from azure.cli.core import get_default_cli
 
 argparse = argparse.ArgumentParser()
 argparse.add_argument('--dir', help="Workshop directory", required=True)
@@ -27,7 +30,7 @@ with open(os.path.join(args.dir, "workshop.yaml"), 'r') as yaml_file:
         print(exc)
 
 
-def check_login():
+def check_aws_login():
     boto3.setup_default_session(profile_name=(config['workshop']['core']['profile']))
     sts = boto3.client('sts')
     try:
@@ -39,12 +42,51 @@ def check_login():
         return False
 
 
-if (config['workshop']['core']['cloud_provider']) == 'aws':
-    if check_login():
-        print("Credentials are valid.")
-    else:
-        print("AWS Credentials are NOT valid. Please refresh your credentials before executing the script.")
-        exit()
+def check_gcp_login():
+    try:
+        credentials = service_account.Credentials.from_service_account_file(
+            config['workshop']['core']['credentials_file_path'])
+        print(credentials)
+        return True
+    except Exception as e:
+        return False
+
+
+def check_azure_login():
+    try:
+        az_cli = get_default_cli()
+        auth = az_cli.invoke(['login', '--service-principal', '-u', config['workshop']['core']['client_id'], '-p',
+                              config['workshop']['core']['client_secret'],'--tenant',
+                              config['workshop']['core']['tenant_id']])
+        print(auth)
+        assert auth == 0, "Auth error."
+        return True
+    except Exception as e:
+        return False
+
+
+if config['workshop']['core']['cloud_provider'] is not None:
+
+    if (config['workshop']['core']['cloud_provider']) == 'aws':
+        if check_aws_login():
+            print("Credentials are valid.")
+        else:
+            print("AWS Credentials are NOT valid. Please refresh your credentials before executing the script.")
+            exit()
+    elif (config['workshop']['core']['cloud_provider']) == 'gcp':
+        if check_gcp_login():
+            print("Credentials are valid.")
+        else:
+            print("GCP Credentials are NOT valid. Please refresh your credentials before executing the script.")
+            exit()
+    elif (config['workshop']['core']['cloud_provider']) == 'azure':
+        if check_azure_login():
+            print("Credentials are valid.")
+        else:
+            print("Azure Credentials are NOT valid. Please refresh your credentials before executing the script.")
+            exit()
+else:
+    print("You must specify cloud provider in the yaml file.")
 
 
 def copytree(src, dst):
@@ -98,7 +140,7 @@ with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_fi
     for var in config['workshop']['core']:
         if var == 'availability_zones':
             tfvars_file.write(str(var) + '=' + str(json.dumps(config['workshop']['core'][var])) + "\n")
-        elif var != 'cloud_provider':
+        else:
             tfvars_file.write(str(var) + '="' + str(config['workshop']['core'][var]) + "\"\n")
     if 'extensions' in config['workshop'] and config['workshop']['extensions'] is not None:
         for extension in config['workshop']['extensions']:

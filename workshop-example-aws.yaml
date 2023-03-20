@@ -31,9 +31,15 @@ workshop:
     #ami: ami-0b9064170e32bde34
 
     # The workshop Confluent Cloud configuration
-    ccloud_bootstrap_servers: <CCloud Bootstrap Server>
+    # ccloud_bootstrap_servers: <CCloud Bootstrap Server>
     ccloud_api_key: <CCloud API Key>
     ccloud_api_secret: <CCloud API Secret>
+    ccloud_env_name: <CCloud Environment Name>
+    ccloud_cluster_name: <CCloud Cluster Name>
+    #ccloud_cluster_availability_type: SINGLE_ZONE
+    ccloud_cluster_availability_type: <CCloud Cluster Availability Type>
+    ccloud_sr_region: eu-central-1
+    ccloud_package_sg: ESSENTIALS
 
     # List of ccloud topics to pre-create
     ccloud_topics: sales_orders,sales_order_details,purchase_orders,purchase_order_details,customers,suppliers,products

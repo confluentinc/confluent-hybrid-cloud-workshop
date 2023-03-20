@@ -40,9 +40,9 @@ variable "ami" {
 #}
 
 // Confluent Cloud variables
-variable "ccloud_bootstrap_servers" {
-  description = "Confluent Cloud username"
-}
+#variable "ccloud_bootstrap_servers" {
+#  description = "Confluent Cloud username"
+#}
 
 variable "ccloud_api_key" {
   description = "Confluent Cloud password"
@@ -74,7 +74,6 @@ variable "purpose" {
 }
 
 variable "availability_zones" {
-  default     = ["eu-west-2a", "eu-west-2b"]
   type        = list
   description = "List of availability zones"
 }
@@ -86,4 +85,31 @@ variable "ref_link" {
 
 variable "owner_email" {
    description = "Confluent owners email address for resource tagging"
+}
+
+variable "ccloud_env_name" {
+   description = "Confluent cloud environment name"
+}
+
+variable "ccloud_cluster_name" {
+   description = "Confluent cloud cluster name"
+}
+
+variable "ccloud_cluster_availability_type" {
+   description = "Confluent cloud cluster type availability_type"
+   default = "SINGLE_ZONE"
+}
+
+variable "ccloud_sr_region" {
+  description = "Schema registry region"
+  default = "eu-central-1"
+}
+
+variable "ccloud_package_sg" {
+  description = "Stream Governance package type"
+  default = "ESSENTIALS"
+}
+
+variable "cloud_provider" {
+  description = "Cloud provider"
 }
