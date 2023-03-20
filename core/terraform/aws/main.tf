@@ -31,9 +31,6 @@ module "workshop-core" {
   availability_zones       = var.availability_zones
 }
 
-
-
-
 module "workshop-confluent-core" {
   source                   = "././common/confluent-cloud"
   ccloud_api_key           = var.ccloud_api_key
