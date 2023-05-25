@@ -16,6 +16,14 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.bucket.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_acl" "bucket_acl" {
   bucket = aws_s3_bucket.bucket.id
   acl    = "private"
@@ -104,7 +112,7 @@ resource "null_resource" "s3_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cat /tmp/s3_bucket_info.txt >> .workshop/docker/.env",
+      "cat /tmp/s3_bucket_info.txt >> ~/.workshop/docker/.env",
       "rm /tmp/s3_bucket_info.txt"
     ]
 

@@ -21,7 +21,7 @@ provider "confluent" {
 }
 
 resource "confluent_environment" "hybrid-workshop" {
-  display_name = "${var.name}-${var.ccloud_cluster_name}"
+  display_name = "${var.name}-${var.ccloud_env_name}"
 
 }
 

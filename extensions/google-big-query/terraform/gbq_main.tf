@@ -52,9 +52,9 @@ resource "null_resource" "gbq_provisioners" {
   provisioner "remote-exec" {
     inline = [
       "sleep 180",
-      "echo 'GBQ_CREDENTIALS_PATH=/tmp/gbq_creds.json' >> .workshop/docker/.env",
-      "echo 'GBQ_DATASET=${var.name}_dataset' >> .workshop/docker/.env",
-      "echo 'GBQ_PROJECT=${var.gbq_project}' >> .workshop/docker/.env",
+      "echo 'GBQ_CREDENTIALS_PATH=/tmp/gbq_creds.json' >> ~/.workshop/docker/.env",
+      "echo 'GBQ_DATASET=${var.name}_dataset' >> ~/.workshop/docker/.env",
+      "echo 'GBQ_PROJECT=${var.gbq_project}' >> ~/.workshop/docker/.env",
       "docker cp /tmp/gbq_creds.json kafka-connect-ccloud:/tmp",
       "rm /tmp/gbq_creds.json"
     ]

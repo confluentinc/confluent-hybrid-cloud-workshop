@@ -7,6 +7,10 @@ variable "ccloud_api_secret" {
   description = "Confluent Cloud Provider"
 }
 
+variable "ccloud_env_name" {
+  description = "Confluent cloud cluster name"
+}
+
 variable "ccloud_cluster_name" {
   description = "Confluent cloud cluster name"
 }

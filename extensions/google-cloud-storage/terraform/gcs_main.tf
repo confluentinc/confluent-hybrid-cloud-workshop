@@ -61,8 +61,8 @@ resource "null_resource" "vm_provisioners" {
   provisioner "remote-exec" {
     inline = [
       "sleep 180",
-      "echo 'GCS_BUCKET_NAME=${var.name}-gcssink-bucket' >> .workshop/docker/.env",
-      "echo 'GCS_CREDENTIALS_PATH=/tmp/gcs_creds.json' >> .workshop/docker/.env",
+      "echo 'GCS_BUCKET_NAME=${var.name}-gcssink-bucket' >> ~/.workshop/docker/.env",
+      "echo 'GCS_CREDENTIALS_PATH=/tmp/gcs_creds.json' >> ~/.workshop/docker/.env",
       "docker cp /tmp/gcs_creds.json kafka-connect-ccloud:/tmp",
       "rm /tmp/gcs_creds.json"
     ]
