@@ -91,7 +91,7 @@ resource "null_resource" "dynamodb_provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      "cat /tmp/dynamodb_conn_info.txt >> .workshop/docker/.env",
+      "cat /tmp/dynamodb_conn_info.txt >> ~/.workshop/docker/.env",
       "rm /tmp/dynamodb_conn_info.txt"
     ]
 

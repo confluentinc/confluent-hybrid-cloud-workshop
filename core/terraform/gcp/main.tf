@@ -34,6 +34,7 @@ module "workshop-confluent-core" {
   ccloud_api_key           = var.ccloud_api_key
   ccloud_api_secret        = var.ccloud_api_secret
   ccloud_cluster_name      = var.ccloud_cluster_name
+  ccloud_env_name          = var.ccloud_env_name
   region                   = var.region
   participant_count        = var.participant_count
   ccloud_topics            = var.ccloud_topics

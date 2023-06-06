@@ -1,5 +1,6 @@
 FROM python:3-alpine
-RUN apk add --no-cache mariadb-connector-c-dev ;\
+RUN PATH=$PATH:/root/.local/bin;\
+    apk add --no-cache mariadb-connector-c-dev ;\
     apk add --no-cache --virtual .build-deps \
     build-base \
     mariadb-dev ;\

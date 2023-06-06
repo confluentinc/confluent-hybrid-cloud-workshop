@@ -18,11 +18,12 @@ resource "mongodbatlas_cluster" "confluent" {
   replication_factor           = 3
   backup_enabled               = false
   auto_scaling_disk_gb_enabled = false
-  mongo_db_major_version       = var.mongodbatlas_mongo_db_major_version
+  #mongo_db_major_version       = var.mongodbatlas_mongo_db_major_version
 
   //Provider Settings "block"
-  provider_name               = var.mongodbatlas_provider_name
-  disk_size_gb                = var.mongodbatlas_disk_size_gb
+  provider_name = "TENANT"
+  backing_provider_name =  var.mongodbatlas_provider_name
+  #disk_size_gb                = var.mongodbatlas_disk_size_gb
   provider_instance_size_name = var.mongodbatlas_provider_instance_size_name
   provider_region_name        = var.mongodbatlas_provider_region_name
 }
@@ -46,7 +47,7 @@ resource "mongodbatlas_database_user" "confluent" {
   }
 }
 
-resource "mongodbatlas_project_ip_whitelist" "confluent" {
+resource "mongodbatlas_project_ip_access_list" "confluent" {
   depends_on = [module.workshop-core]
   count      = var.participant_count
   project_id = mongodbatlas_cluster.confluent.project_id
@@ -61,8 +62,8 @@ resource "null_resource" "vm_provisioners_atlas" {
   provisioner "remote-exec" {
     inline = [
       "sleep 30",
-      "echo 'MONGODBATLAS_SRV_ADDRESS=${local.mongodbatlas_srv_address}' >> .workshop/docker/.env",
-      "echo 'MONGODBATLAS_MONGO_URI=${data.mongodbatlas_cluster.confluent.mongo_uri}' >> .workshop/docker/.env"
+      "echo 'MONGODBATLAS_SRV_ADDRESS=${local.mongodbatlas_srv_address}' >> ~/.workshop/docker/.env",
+      "echo 'MONGODBATLAS_MONGO_URI=${data.mongodbatlas_cluster.confluent.mongo_uri}' >> ~/.workshop/docker/.env"
     ]
 
     connection {
@@ -116,15 +117,15 @@ resource "null_resource" "provisioner_install_realm_app" {
 
 data "external" "realm_app_id" {
   depends_on = [null_resource.provisioner_install_realm_app]
-  program = ["sh", "-c", "jq '. | {name: .name, app_id: .app_id}' ${path.module}/tmp/${var.name}/realm_checkout/config.json"]
+  program = ["sh", "-c", "jq '. | {name: .name, app_id: .client_app_id}' ${path.module}/tmp/${var.name}/realm_checkout/app.json"]
 }
-
 
 output "realm_app_id" {
   value = local.mongodbatlas_realm_app_id
 }
 
 resource "null_resource" "vm_provisioners_atlas_realm_app" {
+  depends_on = [module.workshop-core]
   count      = var.participant_count
 
   triggers = {
@@ -134,7 +135,7 @@ resource "null_resource" "vm_provisioners_atlas_realm_app" {
   provisioner "file" {
     content      = templatefile("${path.module}/add_realm_url_to_docs.tpl", { 
       mongodbatlas_realm_app_id   = self.triggers.realm_app_id
-      asciidoc_index_path  = ".workshop/docker/asciidoc/hybrid-cloud-workshop.html"
+      asciidoc_index_path  = "~/.workshop/docker/asciidoc/hybrid-cloud-workshop.html"
     })
     destination = "/tmp/add_realm_url_to_docs.sh"
 
@@ -149,7 +150,7 @@ resource "null_resource" "vm_provisioners_atlas_realm_app" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/add_realm_url_to_docs.sh",
-      "/tmp/add_realm_url_to_docs.sh"
+      "/tmp/add_realm_url_to_docs.sh",
     ]
 
     connection {
@@ -165,6 +166,7 @@ terraform {
   required_providers {
     mongodbatlas = {
       source  = "mongodb/mongodbatlas"
+      version = "1.9.0"
     }
   }
 }
