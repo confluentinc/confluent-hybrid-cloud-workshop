@@ -1,0 +1,83 @@
+[[fromcloud-toonprem]]
+== Optional Lab {counter:labs}: Replicate Events to On-Premise Kafka
+
+The next step is to replicate the `out_of_stock_events` topic to our on-premise cluster.
+
+image::./5_replicate_to_onprem.png[]
+
+Before we do that, let's create the target topic in our on-premise Kafka cluster using link:http://{externalip}:9021[Confluent Control Center, window=_blank]
+Select your on-premise cluster from the home, select _"topics"_ and then click on _"Add a Topic"_.
+
+[IMPORTANT]
+====
+image::./c3_80.png[]
+
+Name the topic `{dc}_out_of_stock_events` with one partition and click _"Customize settings"_	,
+
+image::./c3_90.png[]
+
+choose Custom availability settings and use replication_factor=1 and min_insync_replicas=1
+
+image::./c3_91.png[]
+
+Click on  _"Save & create"_
+
+We are now ready to replicate this topic from Confluent Cloud to your on-premise cluster.
+====
+
+=== Submit the Replicator Connector Config
+
+Execute the following to create the Replicator Connector.
+
+Exit the ksqlDB cli
+
+[IMPORTANT]
+====
+exit
+====
+
+Create the connector using the cURL command.
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+curl -i -X POST -H "Accept:application/json" \
+    -H  "Content-Type:application/json" http://localhost:18083/connectors/ \
+    -d '{
+        "name": "replicator-ccloud-to-{dc}",
+        "config": {
+          "connector.class": "io.confluent.connect.replicator.ReplicatorSourceConnector",
+          "key.converter": "io.confluent.connect.replicator.util.ByteArrayConverter",
+          "value.converter": "io.confluent.connect.replicator.util.ByteArrayConverter",
+          "topic.config.sync": "false",
+          "topic.whitelist": "{dc}_out_of_stock_events",
+          "dest.kafka.bootstrap.servers": "broker:29092",
+          "dest.kafka.replication.factor": 1,
+          "src.kafka.bootstrap.servers": "${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}",
+          "src.kafka.security.protocol": "SASL_SSL",
+          "src.kafka.sasl.mechanism": "PLAIN",
+          "src.kafka.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${file:/secrets.properties:CCLOUD_API_KEY}\" password=\"${file:/secrets.properties:CCLOUD_API_SECRET}\";",
+          "src.consumer.group.id": "replicator-ccloud-to-{dc}",
+          "src.consumer.interceptor.classes": "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor",
+          "src.consumer.confluent.monitoring.interceptor.bootstrap.servers": "${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}",
+          "src.kafka.timestamps.producer.interceptor.classes": "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor",
+          "src.kafka.timestamps.producer.confluent.monitoring.interceptor.bootstrap.servers": "${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}",
+          "tasks.max": "1"
+        }
+    }'
+----
+====
+
+Notice that we've specified only to replicate the `{dc}_out_of_stock_events` topic by configuring `"topic.whitelist": "{dc}_out_of_stock_events"`
+
+We can confirm that the `{dc}_out_of_stock_events` is being replicated from Confluent Cloud to our on-premise cluster by checking for messages in link:http://{externalip}:9021[Confluent Control Center, window=_blank]
+
+image::./c3_100.png[]
+
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/index.html[Confluent Replicator]
+* link:https://docs.confluent.io/current/connect/kafka-connect-replicator/configuration_options.html[Confluent Replicator Configuration Properties]
+====

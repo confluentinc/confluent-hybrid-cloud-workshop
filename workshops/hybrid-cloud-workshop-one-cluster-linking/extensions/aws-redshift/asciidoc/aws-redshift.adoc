@@ -1,0 +1,92 @@
+== Optional Lab: Stream Sales & Purchases to AWS Redshift
+
+We can use the JDBC Sink Connector to stream changes from our topics to AWS Redshift.
+
+To do this we'll use the ksqlDB CLI to create the connector.
+
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+====
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to AWS Redshift:
+
+[source,bash,subs=attributes]
+----
+{dc}_sales_orders
+{dc}_sales_order_details
+{dc}_purchase_orders
+{dc}_purchase_order_details
+{dc}_products
+{dc}_customers
+{dc}_suppliers 
+----
+
+Then you can create the connector
+
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+CREATE SINK CONNECTOR {dc}_redshift_sink WITH (  
+  'connector.class'='io.confluent.connect.jdbc.JdbcSinkConnector',
+  'topics'='{dc}_sales_orders,{dc}_sales_order_details,{dc}_purchase_orders,{dc}_purchase_order_details,{dc}_products,{dc}_customers,{dc}_suppliers',
+  'connection.url'='${file:/secrets.properties:RS_JDBC_URL}',
+  'connection.user'='${file:/secrets.properties:RS_USERNAME}',
+  'connection.password'='${file:/secrets.properties:RS_PASSWORD}',
+  'insert.mode'='INSERT',
+  'batch.size'='20',
+  'auto.create'='true',
+  'key.converter'='org.apache.kafka.connect.storage.StringConverter',
+  'dialect.name'='PostgreSqlDatabaseDialect'
+);
+----
+====
+
+We can list our current connectors using the following command
+
+[source,subs=attributes]
+----
+show connectors;
+----
+
+[source,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_REDSHIFT_SINK        | SINK   | io.confluent.connect.jdbc.JdbcSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,subs=attributes]
+----
+describe connector {dc}_redshift_sink;
+----
+
+And here an example result
+
+[source,subs=attributes]
+----
+Name                 : {dc}_REDSHIFT_SINK
+Class                : io.confluent.connect.jdbc.JdbcSinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the AWS account where the Redshift cluster is hosted.
+

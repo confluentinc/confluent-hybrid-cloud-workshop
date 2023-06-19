@@ -1,0 +1,156 @@
+== Optional Lab: Stream Sales & Purchases to Google Big Query
+
+We can use the BigQuery Sink Connector to stream changes from a topics to Google BigQuery.
+
+To do this we'll use the ksqlDB CLI to create the connector.
+
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+====
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will stream the following topics to Google BigQuery:-
+
+[source,subs=attributes]
+----
+{dc}_sales_orders
+{dc}_sales_order_details
+{dc}_purchase_orders
+{dc}_purchase_order_details
+{dc}_products
+{dc}_customers
+{dc}_suppliers 
+----
+
+[IMPORTANT]
+====
+[source,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_gbq_sink WITH (
+  'connector.class'='com.wepay.kafka.connect.bigquery.BigQuerySinkConnector',
+  'schemaRetriever'='com.wepay.kafka.connect.bigquery.schemaregistry.schemaretriever.SchemaRegistrySchemaRetriever',
+  'schemaRegistryLocation'= 'http://schema-registry:8081',
+  'topics'= '{dc}_sales_orders,{dc}_sales_order_details,{dc}_purchase_orders,{dc}_purchase_order_details,{dc}_products,{dc}_customers,{dc}_suppliers',
+  'tasks.max'='1',
+  'sanitizeTopics'='true',
+  'autoCreateTables'='true',
+  'autoUpdateSchemas'='true',
+  'project'='${file:/secrets.properties:GBQ_PROJECT}',
+  'datasets'='.*=${file:/secrets.properties:GBQ_DATASET}',
+  'keyfile'='${file:/secrets.properties:GBQ_CREDENTIALS_PATH}'
+);
+----
+====
+
+We can list our current connectors using the following command
+
+[source,subs=attributes]
+----
+show connectors;
+----
+
+[source,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_gbq_sink             | SINK   | com.wepay.kafka.connect.bigquery.BigQuerySinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,subs=attributes]
+----
+describe connector {dc}_GBQ_SINK;
+----
+[source,subs=attributes]
+----
+Name                 : {dc}_GBQ_SINK
+Class                : com.wepay.kafka.connect.bigquery.BigQuerySinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the GCP account where the BigQuery dataset is held.
+
+=== Visualize your Data in Google Data Studio 
+
+Now that your Data is in BigQuery, you can use Google Datastudio to visualize it.
+
+Open link:https://datastudio.google.com[Goodle Data Studio, window=_blank] and create a new Report.
+Add new Datasources and select BigQuery. 
+You can use the queries below for your convenience (look for the Custom Query in the left sidebar).
+
+In the queries replace the following according to your environment: 
+
+* `gcp-project-id`: your GCP project ID, where BigQuery stores the data
+* `bigquery_dataset`: Your Big Query dataset name
+
+Product Query
+[source,sql,subs=attributes]
+----
+SELECT 
+  SUM(OD.quantity) as order_quantity,
+  AVG(P.price) as avg_product_price,
+  P.name as product_name
+FROM `gcp-project-id.bigquery_dataset.{dc}_sales_order_details` OD 
+INNER JOIN `gcp-project-id.bigquery_dataset.{dc}_products` P ON OD.product_id = P.id and P.sourcedc="{dc}"
+WHERE 
+OD.sourcedc="{dc}"
+GROUP BY  P.name
+----
+
+Top customers
+[source,sql,subs=attributes]
+----
+SELECT
+  COUNT(DISTINCT O.id) as order_count,
+  SUM(OD.quantity) as order_quantity,
+  SUM(OD.price) as order_price,
+  C.first_name || " " || C.last_name as customer_name
+FROM `gcp-project-id.bigquery_dataset.{dc}_sales_orders` O
+INNER JOIN `gcp-project-id.bigquery_dataset.{dc}_sales_order_details` OD ON O.id = OD.sales_order_id and OD.sourcedc="{dc}"
+INNER JOIN `gcp-project-id.bigquery_dataset.{dc}_customers` C ON O.customer_id = C.id and C.sourcedc="{dc}"
+WHERE 
+O.sourcedc="{dc}"
+GROUP BY customer_name
+----
+
+Top suppliers
+[source,sql,subs=attributes]
+----
+SELECT
+  COUNT(DISTINCT O.id) as order_count,
+  SUM(OD.quantity) as order_quantity,
+  SUM(OD.price) as order_price,
+  S.name AS supplier_name
+FROM `gcp-project-id.bigquery_dataset.{dc}_sales_orders` O
+INNER JOIN `gcp-project-id.bigquery_dataset.{dc}_sales_order_details` OD ON O.id = OD.sales_order_id and OD.sourcedc="{dc}"
+INNER JOIN `gcp-project-id.bigquery_dataset.{dc}_suppliers` S ON O.customer_id = S.id and S.sourcedc="{dc}"
+WHERE 
+O.sourcedc="{dc}"
+GROUP BY supplier_name
+----
+
+This is an example of a report you can build:
+
+image::./../../datastudio_report.png[Google DataStudio Report]
+
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/index.html[Google BigQuery Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-bigquery/kafka_connect_bigquery_config.html[Google BigQuery Sink Connector Configuration Properties]
+====

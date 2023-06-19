@@ -1,0 +1,88 @@
+== Optional Lab: Stream Sales & Purchases to Google Cloud Storage
+
+We can use the Google Cloud Storage Sink Connector to stream changes from a topics to Google Cloud Storage, from here the data can be consumed other Google Cloud Platform services.
+
+To do this we'll use the ksqlDB CLI to create the connector.
+
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+====
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to Google Cloud Storage.
+
+[IMPORTANT]
+====
+[source,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_gcs_sink WITH (
+  'connector.class' = 'io.confluent.connect.gcs.GcsSinkConnector',
+  'tasks.max'= '1',
+  'gcs.bucket.name' = '${file:/secrets.properties:GCS_BUCKET_NAME}',
+  'gcs.part.size' = '5242880',
+  'gcs.credentials.path' = '${file:/secrets.properties:GCS_CREDENTIALS_PATH}',
+  'flush.size'= '10',
+  'storage.class'= 'io.confluent.connect.gcs.storage.GcsStorage',
+  'format.class'= 'io.confluent.connect.gcs.format.avro.AvroFormat',
+  'partitioner.class'= 'io.confluent.connect.storage.partitioner.DefaultPartitioner',
+  'schema.compatibility'= 'NONE',
+  'topics' = '{dc}_sales_enriched,{dc}_purchases_enriched',
+  'confluent.topic.bootstrap.servers'= '${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}',
+  'confluent.topic.security.protocol' = 'SASL_SSL',
+  'confluent.topic.sasl.mechanism' = 'PLAIN',
+  'confluent.topic.sasl.jaas.config' = 'org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${file:/secrets.properties:CCLOUD_API_KEY}\" password=\"${file:/secrets.properties:CCLOUD_API_SECRET}\";',
+  'confluent.topic.replication.factor'= '3',
+  'producer.interceptor.classes' = 'io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor',
+  'key.converter'= 'org.apache.kafka.connect.storage.StringConverter'
+);
+----
+====
+
+We can list our current connectors using the following command
+
+[source,subs=attributes]
+----
+show connectors;
+----
+
+[source,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_GCS_SINK             | SINK   | io.confluent.connect.gcs.GcsSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,subs=attributes]
+----
+describe connector {dc}_GCS_SINK;
+----
+[source,subs=attributes]
+----
+Name                 : {dc}_GCS_SINK
+Class                : io.confluent.connect.gcs.GcsSinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the GCP account where the storage bucket is held.
+
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-gcs/index.html#google-cloud-storage-sink-connector-for-cp[Google Cloud Storage Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-gcs/configuration_options.html[Google Cloud Storage Sink Connector Configuration Properties]
+====

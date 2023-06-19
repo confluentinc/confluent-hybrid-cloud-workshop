@@ -1,0 +1,102 @@
+== Lab {counter:labs}: Distance calculation
+
+This use case is useful for fleet management. Typically you will calculate EAT (expected arrival time) and for this you need to calculate the distnace between two locations.
+
+=== Step {counter:steps-uc2}: Start the ksqlDB CLI
+
+To start the ksqlDB CLI run the following command:-
+
+[IMPORTANT]
+====
+[source,subs="attributes"]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-onprem:8088
+----
+====
+
+
+=== Step {counter:steps-uc2}: Inspect a topic\'s contents
+
+To inspect the contents of a topic run the following:-
+
+```
+PRINT 'uc_atm_locations' from beginning limit 6;
+```
+
+You should see something similar:-
+
+[source,subs="attributes"]
+----
+ksql> PRINT 'uc_atm_locations' from beginning limit 6;
+Key format: JSON or KAFKA_STRING
+Value format: JSON or KAFKA_STRING
+rowtime: 2021/04/30 17:12:03.036 Z, key: "a746", value: {"id":"a746","atm":"NatWest","location1":{"lat":"53.7982284","lon":"-1.5469429"},"location2":{"lat":"53.796226","lon":"-1.5426083"}}
+rowtime: 2021/04/30 17:12:03.055 Z, key: "a674", value: {"id":"a674","atm":"Co Operative Bank","location1":{"lat":"53.6914382","lon":"-1.7997313"},"location2":{"lat":"53.7986913","lon":"-1.2518281"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a189", value: {"id":"a189","atm":"RBS","location1":{"lat":"53.5540984","lon":"-1.4816161"},"location2":{"lat":"53.7015283","lon":"-1.4630307"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a357", value: {"id":"a357","atm":"NatWest","location1":{"lat":"53.798281","lon":"-1.5469429"},"location2":{"lat":"53.8018075","lon":"-1.5442589"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a906", value: {"id":"a906","atm":"Halifax Building Society","location1":{"lat":"53.9056907","lon":"-1.694482"},"location2":{"lat":"53.8687467","lon":"-1.9042448"}}
+rowtime: 2021/04/30 17:12:03.056 Z, key: "a906", value: {"id":"a906","atm":"Post Office","location1":{"lat":"53.8127993","lon":"-1.6712572"},"location2":{"lat":"53.8134854","lon":"-1.6021803"}}
+Topic printing ceased
+----
+
+=== Step {counter:steps-uc2}: Create ATM Locations Stream
+
+Create Streams on topic:-
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+SET 'auto.offset.reset'='earliest';
+*CREATE STREAM* atm_locations_stream (
+    id VARCHAR,
+    atm VARCHAR,
+    location1 STRUCT&lt;lon DOUBLE,lat DOUBLE&gt;,
+    location2 STRUCT&lt;lon DOUBLE,lat DOUBLE&gt;)
+  *WITH* (KAFKA_TOPIC='uc_atm_locations',VALUE_FORMAT='JSON');
+----
+====
+
+Check your creation with describe and select. 
+
+[source]
+----
+describe atm_locations_stream;
+----
+
+[source]
+----
+set 'auto.offset.reset'='earliest';
+select * from atm_locations_stream emit changes;
+----
+
+=== Step {counter:steps-uc2}: Calculate distance
+
+Now, we can select the data and use a scalar function rto calculate the distance:-
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+*SELECT* 
+  ID,
+  CAST(GEO_DISTANCE(
+    location1->lat, 
+    location1->lon, 
+    location2->lat, 
+    location2->lon, 
+    'KM') *AS* INT) *AS* DISTANCE_BETWEEN_1and2_KM
+*FROM*   atm_locations_stream 
+EMIT CHANGES;
+----
+====
+
+Exit the ksqlDB cli 
+
+[IMPORTANT]
+====
+[source,subs="quotes,attributes"]
+----
+exit
+----
+====

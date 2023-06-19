@@ -1,0 +1,86 @@
+== Optional Lab: Stream Sales & Purchases to Azure Blob Storage
+
+We can use the Azure Blob Storage Sink Connector to stream changes from a topics to Azure Blob Storage, from here the data can be consumed by other Azure services.
+
+To do this we'll use the ksqlDB CLI to create the connector.
+
+[IMPORTANT]
+====
+Start a ksqlDB CLI session
+[source,subs=attributes]
+----
+docker exec -it ksqldb-cli ksql http://ksqldb-server-ccloud:8088
+----
+====
+
+And run the following `CREATE SINK CONNECTOR` command. This will create a connector that will sink the `{dc}_sales_enriched` and the `{dc}_purchases_enriched` topics to Azure Blob Storage.
+
+[IMPORTANT]
+====
+[source,subs=attributes]
+----
+CREATE SINK CONNECTOR {dc}_azure_blob_sink WITH (
+  'connector.class'= 'io.confluent.connect.azure.blob.AzureBlobStorageSinkConnector',
+  'tasks.max'= '1',
+  'topics'= '{dc}_sales_enriched,{dc}_purchases_enriched',
+  'topics.dir'= '{dc}_topics',
+  'flush.size'= '20',
+  'azblob.account.name'= '${file:/secrets.properties:AZURE_STORAGE_ACCOUNT_NAME}',
+  'azblob.account.key'= '${file:/secrets.properties:AZURE_STORAGE_ACCOUNT_KEY}',
+  'azblob.container.name'= '${file:/secrets.properties:AZURE_STORAGE_CONTAINER}',
+  'format.class'= 'io.confluent.connect.azure.blob.format.avro.AvroFormat',
+  'confluent.topic.bootstrap.servers'= '${file:/secrets.properties:CCLOUD_CLUSTER_ENDPOINT}',
+  'confluent.topic.security.protocol' = 'SASL_SSL',
+  'confluent.topic.sasl.mechanism' = 'PLAIN',
+  'confluent.topic.sasl.jaas.config' = 'org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${file:/secrets.properties:CCLOUD_API_KEY}\" password=\"${file:/secrets.properties:CCLOUD_API_SECRET}\";',
+  'confluent.topic.replication.factor'= '3',
+  'key.converter'='org.apache.kafka.connect.storage.StringConverter'
+);
+----
+====
+
+We can list our current connectors using the following command
+
+[source,subs=attributes]
+----
+show connectors;
+----
+
+[source,subs=attributes]
+----
+ Connector Name            | Type   | Class
+------------------------------------------------------------------------------------------------
+ {dc}_AZURE_BLOB_SINK      | SINK   | io.confluent.connect.azure.blob.AzureBlobStorageSinkConnector
+ replicator-{dc}-to-ccloud | SOURCE | io.confluent.connect.replicator.ReplicatorSourceConnector
+------------------------------------------------------------------------------------------------
+----
+
+We can also describe a connector and view its status using the `describe connector` statement.
+
+[source,subs=attributes]
+----
+describe connector {dc}_AZURE_BLOB_SINK;
+----
+[source,subs=attributes]
+----
+Name                 : {dc}_AZURE_BLOB_SINK
+Class                : io.confluent.connect.gcs.GcsSinkConnector
+Type                 : sink
+State                : RUNNING
+WorkerId             : kafka-connect:18084
+
+ Task ID | State   | Error Trace
+---------------------------------
+ 0       | RUNNING |
+---------------------------------
+----
+
+Depending on who's hosting the workshop, you may or may not have access to the Azure account where the storage bucket is held.
+
+.Further Reading
+[TIP]
+====
+* link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/index.html[Azure Blob Storage Sink Connector]
+* link:https://docs.confluent.io/current/connect/kafka-connect-azure-blob-storage/configuration_options.html#configuration-properties[Azure Blob Storage Sink Connector Configuration Properties]
+====
+

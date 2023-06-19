@@ -1,0 +1,16 @@
+{
+    "config_version": 20180301,
+    "name": "checkout",
+    "location": "IE",
+    "deployment_model": "LOCAL",
+    "security": {},
+    "hosting": {
+        "enabled": true
+    },
+    "custom_user_data_config": {
+        "enabled": false
+    },
+    "sync": {
+        "development_mode_enabled": false
+    }
+}
