@@ -304,7 +304,7 @@ image::./3_replicate_to_ccloud.png[]
 
 === Set up the cluster link
 
-*Note*: if you are interested in how replicator works you can go to link:replicator-tocloud.adoc[Replicator from on-prem to Cloud] and execute replicator just for testing purposes.
+*Note*: if you are interested in how replicator works you can go to link:replicator-tocloud.html[Replicator from on-prem to Cloud] and execute replicator just for testing purposes.
 
 Take into account that this workshop works with the topics created by cluster linking in the following step.
 
@@ -480,8 +480,6 @@ So it will be required just to create only one source initiated link for all use
 
 So both halves of the cluster link: the first half on Confluent Cloud, the second half on Confluent Platform (HQ) will be created by the instructor or one of the users, but *just 1 person needs to execute the following command*.
 
-*Note*: another approach could be pointing to your own Confluent Cloud cluster so in that case you will need to execute both halves to create your own link . (Link to how to create your own cluster)
-
 As a result you will see all topics being replicated from your and the other user's data centers to Confluent Cloud. To see just your topics, type your data center name, {dc}, into the search box at the top to filter.
 
 Run the following from the command line to create the first half on Confluent Cloud. *This command is only required to be executed once, either by the instructor or by one of the users.*
@@ -491,7 +489,7 @@ Run the following from the command line to create the first half on Confluent Cl
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links?link_name=clusterlink-to-cc' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links?link_name=clusterlink-hq-to-cc' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -522,7 +520,7 @@ Confirm that Cluster Link is in a `ACTIVE` state
 
 [source,subs="attributes"]
 ----
-curl -s --request GET   --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc' --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET''|jq .
+curl -s --request GET   --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc' --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET''|jq .
 ----
 
 You should see an output like this:
@@ -532,11 +530,11 @@ You should see an output like this:
 {
   "kind": "KafkaLinkData",
   "metadata": {
-    "self": "https://pkc-xxxx1.us-east-2.aws.confluent.cloud/kafka/v3/clusters/lkc-qrkqn2/links/clusterlink-to-cc"
+    "self": "https://pkc-xxxx1.us-east-2.aws.confluent.cloud/kafka/v3/clusters/lkc-qrkqn2/links/clusterlink-hq-to-cc"
   },
   "source_cluster_id": "xxxxxxxxxxxxxxxxxx",
   "destination_cluster_id": null,
-  "link_name": "clusterlink-to-cc",
+  "link_name": "clusterlink-hq-to-cc",
   "link_id": "xxxxxx-xxxx-xxxx-xxxx-xxxxxx",
   "cluster_link_id": "xxxxxxxxx",
   "topic_names": [],
@@ -553,7 +551,7 @@ Run the following from the command line to create the second half on Confluent P
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url ''${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links?link_name=clusterlink-to-cc' \
+  --url ''${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links?link_name=clusterlink-hq-to-cc' \
   --header 'Content-Type: application/json' \
   --data '{
     "destination_cluster_id": "'${CCLOUD_CLUSTER_ID}'",
@@ -597,7 +595,7 @@ You should see an output like this:
 
 [source,subs="attributes"]
 ----
-curl -s --request GET --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-to-cc|jq .
+curl -s --request GET --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-hq-to-cc|jq .
 ----
 
 [source,subs="attributes"]]
@@ -612,11 +610,11 @@ curl -s --request GET --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_
     {
       "kind": "KafkaLinkData",
       "metadata": {
-        "self": "http://localhost:8090/kafka/v3/clusters/xxxxxxxxx/links/clusterlink-to-cc"
+        "self": "http://localhost:8090/kafka/v3/clusters/xxxxxxxxx/links/clusterlink-hq-to-cc"
       },
       "source_cluster_id": null,
       "destination_cluster_id": "lkc-xxxxx",
-      "link_name": "clusterlink-to-cc",
+      "link_name": "clusterlink-hq-to-cc",
       "link_id": "xxxx-xxxx-xxxx-xxxxx-xxxxx",
       "cluster_link_id": "xxxxx",
       "topic_names": []
@@ -636,7 +634,7 @@ Run the following from the command line to add your user's topics. *This command
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -645,7 +643,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -654,7 +652,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -663,7 +661,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -672,7 +670,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -681,7 +679,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -690,7 +688,7 @@ curl --request POST \
     ]
 }'
 curl --request POST \
-  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-to-cc/mirrors' \
+  --url ''${CCLOUD_REST_ENDPOINT}'/kafka/v3/clusters/'${CCLOUD_CLUSTER_ID}'/links/clusterlink-hq-to-cc/mirrors' \
   --header 'Authorization: Basic '$ENCODED_API_KEY_SECRET'' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -705,8 +703,6 @@ curl --request POST \
 === Confirm that Messages are Arriving in Confluent Cloud
 
 Jump back to link:http://{externalip}:9021[Confluent Control Center, window=_blank]
-
-*Note*: In case you created the link in your own Confluent Cloud Cluster you need to check if the messages are arriving in the Confluent Cloud UI.
 
 You can always reach back the home by clicking on the confluent logo on the top left, or by clicking ont the HOME in the top navigation bar.
 Select the "ccloud" cluster and then select "Topics".
@@ -738,8 +734,6 @@ image::./4_ksql_application.png[]
 Below is an illustration of the completed Supply & Demand ksqlDB Application, over the next few labs you will be building this step-by-step.
 
 image::./ksqlDB_topology.png[]
-
-*Note*: if you are using your own Confluent cloud cluster you must use your own ksqldb cluster in the cloud. (How to create Confluent Cloud ksqldb cluster)
 
 === Start the ksqlDB CLI
 
@@ -1102,7 +1096,7 @@ ksqlDB tables allow you to work the data in topics as key/value pairs, with a si
 
 === Creating Tables
 
-We want to create tables over our `customers`, `suppliers` and `products` streams so we can look up the current state for each customer, supplier and product. Later on we'll be joining these tables to other streams. To successfully join to a table in ksqlDB you need to ensure that the table is keyed on the column you are going to use in the join. Our underlying topics already have the correct key set thanks to the Debezium MySQL connector configuration so we just need to use the `PRIMARY KEY` clause when we create each table.
+We want to create tables over our `customers`, `suppliers` and `products` topics so we can look up the current state for each customer, supplier and product. Later on we'll be joining these tables to other streams. To successfully join to a table in ksqlDB you need to ensure that the table is keyed on the column you are going to use in the join. Our underlying topics already have the correct key set thanks to the Debezium MySQL connector configuration so we just need to use the `PRIMARY KEY` clause when we create each table.
 
 Create your 3 ksqlDB tables.
 
@@ -1788,6 +1782,8 @@ When we query the `out_of_stock_events` stream...
 
 == Lab {counter:labs}: Mirror Event from Confluent Cloud to On-Premises Confluent Platform HQ
 
+*Note*: if you are interested in how replicator works you can go to link:replicator-toonprem.html[Replicator from on-prem to Cloud] and execute replicator just for testing purposes.
+
 The next step is to replicate the `out_of_stock_events` topic to  on-premises HQ cluster.
 
 image::./5_replicate_to_onprem.png[]	
@@ -1795,8 +1791,6 @@ image::./5_replicate_to_onprem.png[]
 === Submit the Cluster Linking Config
 
 Execute the following commands to create a destination-initiated cluster link.
-
-*Note*: If you are using your own Confluent Cloud Cluster, please adapt the command to use your cluster information.
 
 Exit the ksqlDB cli 
 
@@ -1812,7 +1806,7 @@ Create the cluster link using the cURL command.
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url ''http://${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links?link_name=clusterlink-cp-hq-to-cp-edge-{dc}' \
+  --url ''http://${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links?link_name=clusterlink-cloud-to-hq-{dc}' \
   --header 'Content-Type: application/json' \
   --data '{
     "source_cluster_id": "'${CCLOUD_CLUSTER_ID}'",
@@ -1842,7 +1836,7 @@ Confirm that Cluster Link is successfully created
 
 [source,subs="attributes"]
 ----
-curl -s --request GET   --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-cp-hq-to-cp-edge-{dc} | jq .
+curl -s --request GET   --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-cloud-to-hq-{dc} | jq .
 ----
 
 You should see an output like this:
@@ -1852,11 +1846,11 @@ You should see an output like this:
 {
   "kind": "KafkaLinkData",
   "metadata": {
-    "self": "http://${HQ_EXT_IP}:8090/kafka/v3/clusters/hXFos4xuT_KypQik_Hgyag/links/clusterlink-cp-hq-to-cp-edge-{dc}"
+    "self": "http://${HQ_EXT_IP}:8090/kafka/v3/clusters/hXFos4xuT_KypQik_Hgyag/links/clusterlink-cloud-to-hq-{dc}"
   },
   "source_cluster_id": "lkc-xxxxx",
   "destination_cluster_id": null,
-  "link_name": "clusterlink-cp-hq-to-cp-edge-{dc}",
+  "link_name": "clusterlink-cloud-to-hq-{dc}",
   "link_id": "xxxxx-xxxx-xxxxx-xxxxx-xxxxx",
   "cluster_link_id": xxxxxxxxxxxx",
   "topic_names": []
@@ -1870,7 +1864,7 @@ Run the following from the command line to create the mirror topic.
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url ''http://${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links/clusterlink-cp-hq-to-cp-edge-{dc}/mirrors' \
+  --url ''http://${HQ_EXT_IP}:8090'/kafka/v3/clusters/'${ONPREM_HQ_CLUSTER_ID}'/links/clusterlink-cloud-to-hq-{dc}/mirrors' \
   --header 'Content-Type: application/json' \
   --data '{
     "source_topic_name": "{dc}_out_of_stock_events",
@@ -1900,7 +1894,7 @@ Create the cluster link using the cURL command.
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url 'http://localhost:8090/kafka/v3/clusters/'${ONPREM_CLUSTER_ID}'/links?link_name=clusterlink-cp-hq-to-cp-edge' \
+  --url 'http://localhost:8090/kafka/v3/clusters/'${ONPREM_CLUSTER_ID}'/links?link_name=clusterlink-hq-to-edge' \
   --header 'Content-Type: application/json' \
   --data '{
     "source_cluster_id": "'${ONPREM_HQ_CLUSTER_ID}'",
@@ -1918,7 +1912,7 @@ Confirm that Cluster Link is successfully created
 
 [source,subs="attributes"]
 ----
-curl -s --request GET   --url http://localhost:8090/kafka/v3/clusters/${ONPREM_CLUSTER_ID}/links/clusterlink-cp-hq-to-cp-edge | jq .
+curl -s --request GET   --url http://localhost:8090/kafka/v3/clusters/${ONPREM_CLUSTER_ID}/links/clusterlink-hq-to-edge | jq .
 ----
 
 You should see an output like this:
@@ -1928,11 +1922,11 @@ You should see an output like this:
 {
   "kind": "KafkaLinkData",
   "metadata": {
-    "self": "http://localhost:8090/kafka/v3/clusters/xxxxxxxxxxx/links/clusterlink-cp-hq-to-cp-edge"
+    "self": "http://localhost:8090/kafka/v3/clusters/xxxxxxxxxxx/links/clusterlink-hq-to-edge"
   },
   "source_cluster_id": "lkc-xxxxx",
   "destination_cluster_id": null,
-  "link_name": "clusterlink-cp-hq-to-cp-edge",
+  "link_name": "clusterlink-hq-to-edge",
   "link_id": "xxxxx-xxxx-xxxxx-xxxxx-xxxxx",
   "cluster_link_id": xxxxxxxxxxxx",
   "topic_names": []
@@ -1946,7 +1940,7 @@ Run the following from the command line to create the mirror topic.
 [source,subs="attributes"]
 ----
 curl --request POST \
-  --url 'http://localhost:8090/kafka/v3/clusters/'${ONPREM_CLUSTER_ID}'/links/clusterlink-cp-hq-to-cp-edge/mirrors' \
+  --url 'http://localhost:8090/kafka/v3/clusters/'${ONPREM_CLUSTER_ID}'/links/clusterlink-hq-to-edge/mirrors' \
   --header 'Content-Type: application/json' \
   --data '{
     "source_topic_name": "{dc}_out_of_stock_events",
