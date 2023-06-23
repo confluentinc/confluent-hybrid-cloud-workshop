@@ -3,7 +3,7 @@
 
 The primary data source for this workshop is a MySQL database running in your data center. Connected to this database is a orders application which we will discuss shortly.
 
-image::./1_mysql.png[]
+image::./1_mysql_cl_w_hq.png[]
 
 === Database Schema
 
@@ -176,7 +176,7 @@ We now have `sales_order` and `sales_order_details` rows being created for us by
 
 Now that we have data being automatically created in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
 
-image::./2_mysql_source_connector.png[]
+image::./2_mysql_source_connector_cl_w_hq.png[]
 
 === Create the MySQL source connector
 
@@ -300,7 +300,7 @@ image::./c3_50.png[]
 
 Now that your on-premise (Edge) Kafka cluster is receiving events from your MySQL Database let's use Cluster Linking to stream those messages to Confluent Platform (HQ)
 
-image::./3_replicate_to_ccloud.png[]
+image::./3_replicate_to_ccloud_cl_w_hq.png[]
 
 === Set up the cluster link
 
@@ -729,7 +729,7 @@ image::./c3_71.png[]
 
 We now have all the data we need being streamed, in realtime, to Confluent Cloud. You have a ksqlDB Server running inside a docker container that is configured to point to our Confluent Cloud cluster. In a real world deployment, it is likely that this ksqlDB Server would be running closer to Confluent Cloud but for the purposes of this workshop it is not important.
 
-image::./4_ksql_application.png[]
+image::./4_ksql_application_cl_w_hq.png[]
 
 Below is an illustration of the completed Supply & Demand ksqlDB Application, over the next few labs you will be building this step-by-step.
 
@@ -1786,7 +1786,7 @@ When we query the `out_of_stock_events` stream...
 
 The next step is to replicate the `out_of_stock_events` topic to  on-premises HQ cluster.
 
-image::./5_replicate_to_onprem.png[]	
+image::./5_replicate_to_onprem_cl_w_hq.png[]
 
 === Submit the Cluster Linking Config
 
@@ -1965,7 +1965,7 @@ image::./c3_11.png[]
 
 Finally we need to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the on-premise application will then process these events and create purchase order for us.
 
-image::./6_jdbc_sink.png[]
+image::./6_jdbc_sink_cl_w_hq.png[]
 
 But before we do that, let's open a couple more terminal sessions and start the ksqlDB CLI in each.
 

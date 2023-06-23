@@ -168,16 +168,21 @@ copytree(os.path.join("core/asciidoc"), os.path.join(docker_staging, "asciidoc")
 
 # Depending on workshop including the correct documentation.
 include_cl_str_main = ""
+include_cl_str_intro = ""
 if 'cluster_linking' in config['workshop']['core'] and config['workshop']['core']['cluster_linking'] is not None:
     if (config['workshop']['core']['cluster_linking']) == 0:
         include_cl_str_main += 'include::bits/main-cl.adoc[]\n'
+        include_cl_str_intro += 'include::bits/intro.adoc[]\n'
     elif (config['workshop']['core']['cluster_linking']) == 1:
         include_cl_str_main += 'include::bits/main-cl-edges-hq.adoc[]\n'
+        include_cl_str_intro += 'include::bits/intro-cl-edges-hq.adoc[]\n'
 else:
     include_cl_str_main += 'include::bits/main.adoc[]\n'
+    include_cl_str_intro += 'include::bits/intro.adoc[]\n'
 
 for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
     line = re.sub("^#CLUSTER_LINKING_PLACEHOLDER2#", include_cl_str_main, line)
+    line = re.sub("^#CLUSTER_LINKING_PLACEHOLDER1#", include_cl_str_intro, line)
     print(line.rstrip())
 
 # Deal with extensions

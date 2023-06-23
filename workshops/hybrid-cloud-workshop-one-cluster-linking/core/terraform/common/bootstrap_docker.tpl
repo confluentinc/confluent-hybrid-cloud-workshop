@@ -1,6 +1,19 @@
 #!/bin/bash
 
 cd ~/.workshop/docker
+
+#cluster_linking=1
+if [[ ${cluster_linking} -eq 1 ]]; then
+ # rename the old and copy the correct docker-compose file depending which cluster linking workshop have been chosen
+  cp ~/.workshop/docker/docker-compose.yaml ~/.workshop/docker/old-docker-compose.yaml
+  cp ~/.workshop/docker/edges/docker-compose.yaml ~/.workshop/docker/docker-compose.yaml
+
+ # rename the old and copy the correct index adoc file depending which cluster linking workshop have been chosen
+   cp ~/.workshop/docker/asciidoc/index.adoc ~/.workshop/docker/asciidoc/index-old.adoc
+   cp ~/.workshop/docker/asciidoc/index-cl-edges-hq.adoc ~/.workshop/docker/asciidoc/index.adoc
+
+fi
+
 # Create ccloud.properties file
 echo "ssl.endpoint.identification.algorithm=https" >> ccloud.properties
 echo "sasl.mechanism=PLAIN" >> ccloud.properties
@@ -28,7 +41,7 @@ sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/data/mysql/mysql_schema.sql
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
-asciidoctor index.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
+asciidoctor index-cl-edges-hq.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
 asciidoctor hybrid-cloud-workshop.adoc -o hybrid-cloud-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
 asciidoctor ksqldb-workshop.adoc -o ksqldb-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
 asciidoctor ksqldb-advanced-topics.adoc -o ksqldb-advanced-topics.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
@@ -51,13 +64,6 @@ mkdir ~/.workshop/docker/.aws
 
 # startup the containers
 cd ~/.workshop/docker/
-
-#cluster_linking=1
-if [[ ${cluster_linking} -eq 1 ]]; then
- # rename the old and copy the correct docker-compose file depending which wcluster linking workshop have been chosen
-  cp ~/.workshop/docker/docker-compose.yaml ~/.workshop/docker/old-docker-compose.yaml
-  cp ~/.workshop/docker/edges/docker-compose.yaml ~/.workshop/docker/docker-compose.yaml
-fi
 
 docker-compose up -d
 

@@ -16,4 +16,4 @@ In addition to Hybrid and Multi cloud architectures, organizations are also look
 
 In this workshop we will explore how the Confluent Platform and Confluent Cloud can enable these architectures by building a real time supply and demand appplication using ksqlDB.
 
-image::./architecture-cl.png[Workshop Architecture Diagram]
+image::./architecture-cl-w-hq.png[Workshop Architecture Diagram]

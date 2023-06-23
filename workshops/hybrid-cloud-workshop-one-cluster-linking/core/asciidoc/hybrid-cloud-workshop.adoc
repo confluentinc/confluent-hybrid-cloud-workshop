@@ -13,7 +13,7 @@
 :env-name: workshop
 
 
-include::bits/intro.adoc[]
+#CLUSTER_LINKING_PLACEHOLDER1#
 
 include::bits/workshop-env.adoc[]
 

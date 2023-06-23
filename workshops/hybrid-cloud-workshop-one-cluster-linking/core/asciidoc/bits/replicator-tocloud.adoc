@@ -40,10 +40,7 @@ curl -i -X POST -H "Accept:application/json" \
           "src.consumer.confluent.monitoring.interceptor.bootstrap.servers": "broker:29092",
           "src.kafka.timestamps.producer.interceptor.classes": "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor",
           "src.kafka.timestamps.producer.confluent.monitoring.interceptor.bootstrap.servers": "broker:29092",
-          "transforms": "topicRename",
-          "transforms.topicRename.type":  "org.apache.kafka.connect.transforms.RegexRouter",
-          "transforms.topicRename.regex": "(.*)",
-          "transforms.topicRename.replacement": "$1-replicator",
+          "topic.rename.format": "${topic}-replicator",
           "tasks.max": "1"
         }
     }'
