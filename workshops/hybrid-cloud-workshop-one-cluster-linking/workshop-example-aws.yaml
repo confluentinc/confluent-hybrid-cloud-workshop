@@ -47,8 +47,8 @@ workshop:
     onprem_topics: uc_orders,uc_shipments,uc_inventory,uc_shipment_status,uc_transactions,uc_atm_locations
 
     #cluster linking scenario->
-    #0: 1 step with direct cluster linking from confluent platform;
-    #1: 2 steps with cluster linking between confluent platforms and second 1 cluster linking between confluent platform and confluent cloud
+    #0: 1 step with direct cluster linking from confluent platform to cloud: limit of 5 links;
+    #1: 2 steps with cluster linking between confluent platforms (Edge CP-> hq CP) and second 1 cluster linking between confluent platform and confluent cloud
     cluster_linking: 1
 
     #Feedback Form url (Optional)

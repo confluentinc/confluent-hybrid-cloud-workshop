@@ -1,5 +1,5 @@
 [[fromonprem-tocloud]]
-== Optional Lab {counter:labs}: Stream Events to Confluent Cloud
+== Optional Lab: Stream Events to Confluent Cloud
 ifdef::env-name[:relfilesuffix: .adoc]
 
 Now that your on-premise Kafka cluster is receiving events from your MySQL Database let's use Confluent Replicator to stream those messages to Confluent Cloud
@@ -43,7 +43,7 @@ curl -i -X POST -H "Accept:application/json" \
           "transforms": "topicRename",
           "transforms.topicRename.type":  "org.apache.kafka.connect.transforms.RegexRouter",
           "transforms.topicRename.regex": "(.*)",
-          "transforms.topicRename.replacement": "replicator-$1",
+          "transforms.topicRename.replacement": "$1-replicator",
           "tasks.max": "1"
         }
     }'

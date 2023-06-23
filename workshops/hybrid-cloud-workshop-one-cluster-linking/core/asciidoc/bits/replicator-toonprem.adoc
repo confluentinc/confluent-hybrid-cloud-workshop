@@ -1,5 +1,5 @@
 [[fromcloud-toonprem]]
-== Optional Lab {counter:labs}: Replicate Events to On-Premise Kafka
+== Optional Lab : Replicate Events to On-Premise Kafka
 
 The next step is to replicate the `out_of_stock_events` topic to our on-premise cluster.
 
@@ -12,7 +12,7 @@ Select your on-premise cluster from the home, select _"topics"_ and then click o
 ====
 image::./c3_80.png[]
 
-Name the topic `{dc}_out_of_stock_events` with one partition and click _"Customize settings"_	,
+Name the topic `{dc}_out_of_stock_events-replicator` with one partition and click _"Customize settings"_	,
 
 image::./c3_90.png[]
 
@@ -66,7 +66,7 @@ curl -i -X POST -H "Accept:application/json" \
           "transforms": "topicRename",
           "transforms.topicRename.type":  "org.apache.kafka.connect.transforms.RegexRouter",
           "transforms.topicRename.regex": "(.*)",
-          "transforms.topicRename.replacement": "replicator-$1",
+          "transforms.topicRename.replacement": "$1-replicator",
           "tasks.max": "1"
         }
     }'

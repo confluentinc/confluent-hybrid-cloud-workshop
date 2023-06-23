@@ -89,20 +89,20 @@ resource "confluent_api_key" "hybrid-manager-kafka-api-key" {
 }
 
 
-/*resource "confluent_kafka_topic" "topic" {
+resource "confluent_kafka_topic" "topic" {
   count           = length(local.product)
 
   kafka_cluster {
     id = confluent_kafka_cluster.hybrid-cluster.id
   }
-  topic_name = format("dc%02d_%s",element(local.product, count.index)[0],element(local.product, count.index)[1])
+  topic_name = format("dc%02d_%s%s",element(local.product, count.index)[0],element(local.product, count.index)[1],"-replicator")
   partitions_count   = 1
   rest_endpoint      = confluent_kafka_cluster.hybrid-cluster.rest_endpoint
   credentials {
     key    = confluent_api_key.hybrid-manager-kafka-api-key.id
     secret = confluent_api_key.hybrid-manager-kafka-api-key.secret
   }
-}*/
+}
 
 resource "confluent_kafka_acl" "hybrid-manager-write-on-topic" {
   kafka_cluster {
