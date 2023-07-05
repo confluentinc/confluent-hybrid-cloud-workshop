@@ -2,13 +2,13 @@
 
 ## Overview
 
-This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider GCP, AWS or Azure. Each workshop participant connects to their own virtual machine and is intended to act as a psuedo on-premise datacenter. A single Confluent Cloud cluster is shared by all workshop participants.
+This repository allows you to configure and provision a cloud-based workshop using your preferred cloud provider GCP, AWS or Azure. Each workshop participant connects to their own virtual machine and is intended to act as a psuedo on-premise datacenter. A single Confluent Platform acting as middle step between each user data center and the cloud, and a single Confluent Cloud cluster is shared by all workshop participants.
 
 For a single workshop participant, the logical architecture looks like this.
 
-![workshop](core/asciidoc/images/hybrid-cloud-ws/default/architecture.png) 
+![workshop](core/asciidoc/images/hybrid-cloud-ws/default/architecture-cl-w-hq.png) 
 
-From a physical architecture point of view, each component, except for Confluent Cloud, is hosted on the participant's virtual machine. 
+From a physical architecture point of view, each component, except for Confluent Cloud, is hosted on the participant's virtual machine. README.md
 
 Each workshop participant will work through a series of Labs to create the following ksqlDB Supply & Demand Application.
 
@@ -26,9 +26,9 @@ Each workshop participant will work through a series of Labs to create the follo
 
 ## Things to know before starting
 
-This repository is going to create the required  Confluent Cloud features (Environment, Cluster, API keys...).
-The cluster type by default is Basic. If it is necessary to use Standard or Dedicated cluster, please check this link to make the required changes:
-https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/confluent_kafka_cluster .
+This repository is going to create the required  Confluent Cloud features (Environment, Cluster, API keys...) using Terraform.
+The Confluent Cloud Cluster type by default is Dedicated as during the labs you will create a bridge to Cloud using Cluster linking.
+https://registry.terraform.io/providers/confluentinc/confluent/latest/docs.
 
 ## Provisioning a Workshop
 
@@ -49,7 +49,7 @@ Edit `~/myworkshop/workshop.yaml` and make the required changes.
 Change your current directory to the root of the repository
 
 ```
-cd ~/confluent-hybrid-cloud-workshop
+cd ~/hybrid-cloud-workshop-one-cluster-linking
 ```
 
 To start provisioning the workshop, run `workshop-create.py` and pass in your workshop directory

@@ -41,7 +41,7 @@ sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/data/mysql/mysql_schema.sql
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
-asciidoctor index-cl-edges-hq.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
+asciidoctor index.adoc -o index.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
 asciidoctor hybrid-cloud-workshop.adoc -o hybrid-cloud-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/hybrid-cloud-ws/${cloud_provider}
 asciidoctor ksqldb-workshop.adoc -o ksqldb-workshop.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws
 asciidoctor ksqldb-advanced-topics.adoc -o ksqldb-advanced-topics.html -a stylesheet=stylesheet.css -a externalip=${ext_ip} -a dc=${dc} -a "feedbackformurl=${feedback_form_url}" -a imagesdir=./images/ksqlws

@@ -300,7 +300,7 @@ image::./c3_50.png[]
 
 Now that your on-premise (Edge) Kafka cluster is receiving events from your MySQL Database let's use Cluster Linking to stream those messages to Confluent Platform (HQ)
 
-image::./3_replicate_to_ccloud_cl_w_hq.png[]
+image::./3_replicate_to_cloud_cl_w_hq.png[]
 
 === Set up the cluster link
 
@@ -473,12 +473,13 @@ image::./c3_64.png[]
 * link:https://docs.confluent.io/platform/current/multi-dc-deployments/cluster-linking/configs.html[Cluster Linking Configuration Properties]
 ====
 
-== Lab {counter:labs}: Stream Events to Confluent Cloud
+== Lab {counter:labs}: Mirror topics to Confluent Cloud
 
-As these Confluent Platform (HQ) and  Confluent Cloud Instances involved in this step are being shared by other users of the workshop, all the topics to be mirrored are together in on-premise (HQ) cluster with different dc* prefix name.
-So it will be required just to create only one source initiated link for all users, and then each user would add their own topics to be mirrored executing another command.
+As these Confluent Platform (HQ) and  Confluent Cloud Instances involved in this step are being shared by other users of the workshop, all the topics to be mirrored are together in on-premise (HQ) cluster with different dc* prefix in their name as they has been previously mirrored by the cluster link that you have created in the step before.
+*So it will be required just to create only one source initiated link for all users*, and then each user will be able add to the link their own topics to be mirrored executing another command in the next step.
 
-So both halves of the cluster link: the first half on Confluent Cloud, the second half on Confluent Platform (HQ) will be created by the instructor or one of the users, but *just 1 person needs to execute the following command*.
+So both halves of the cluster link: the first half on Confluent Cloud, the second half on Confluent Platform (HQ) will be created by the instructor or one of the users, *they will be only executed by one person*.
+(You must decide who is in charge of the execution during the workshop).
 
 As a result you will see all topics being replicated from your and the other user's data centers to Confluent Cloud. To see just your topics, type your data center name, {dc}, into the search box at the top to filter.
 
@@ -623,9 +624,11 @@ curl -s --request GET --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_
 }
 ----
 
+== Lab {counter:labs}: Stream Events to Confluent Cloud
+
 Now that you have confirmed that the link has been successfully created you may have noticed that the link just created did not include a filter to enable automatic creation of mirror topics.
 
-So if the "auto.create.mirror.topics.enable" and "auto.create.mirror.topics.filters" configs are not configured each user has to add their own topics.
+So if the  "auto.create.mirror.topics.filters" configs is not configured each user has to add their own topics.
 
 Run the following from the command line to add your user's topics. *This command is required for every user*.
 
