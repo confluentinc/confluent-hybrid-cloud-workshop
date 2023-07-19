@@ -1,0 +1,21 @@
+= Kafka Connect Workshop
+:doctype: book
+:toc:
+:toc-title: Table of Contents
+:toclevels: 1
+:experimental:
+:icons: font
+:imagesdir: ./images
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+:nofooter:
+:env-name: workshop
+
+
+
+include::bits/workshop-env.adoc[]
+
+include::bits/main.adoc[]
+
+include::bits/outro.adoc[]

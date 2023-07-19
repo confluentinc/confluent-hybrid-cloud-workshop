@@ -1,0 +1,23 @@
+= Confluent workshops
+:doctype: book
+:!toc:
+:nofooter:
+:experimental:
+:icons: font
+:imagesdir: ./images
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+
+[cols="1,5a"]
+|===
+|Name |Description
+
+|link:kafka-connect-workshop.html[Kafka Connect Workshop]
+|Kafka Connect is a free, open-source component of Apache Kafka® that serves as a centralized data hub for simple data integration between databases, key-value stores, search indexes, and file systems. You can use Kafka Connect to stream data between Apache Kafka® and other data systems and quickly create connectors that move large data sets in and out of Kafka.
+
+In this workshop you can learn about how Kafka Connect works, how connectors work for streaming data integration between systems and how to use converters and transformations going through some hands-on exercises.
+
+image::./architecture.png[Workshop Architecture Diagram]
+
+|===
