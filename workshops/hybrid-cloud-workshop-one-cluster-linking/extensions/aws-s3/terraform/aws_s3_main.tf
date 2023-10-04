@@ -17,6 +17,7 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "s3_controls" {
+  depends_on = [aws_s3_bucket_acl.bucket_acl]
   bucket = aws_s3_bucket.bucket.id
 
   rule {

@@ -300,7 +300,7 @@ image::./c3_50.png[]
 
 Now that your on-premise (Edge) Kafka cluster is receiving events from your MySQL Database let's use Cluster Linking to stream those messages to Confluent Platform (HQ)
 
-image::./3_replicate_to_cloud_cl_w_hq.png[]
+image::./3_replicate_to_ccloud_cl_w_hq.png[]
 
 === Set up the cluster link
 

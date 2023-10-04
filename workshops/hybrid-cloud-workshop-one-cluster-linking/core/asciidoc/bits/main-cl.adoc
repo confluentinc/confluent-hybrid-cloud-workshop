@@ -3,7 +3,7 @@
 
 The primary data source for this workshop is a MySQL database running in your data center. Connected to this database is a orders application which we will discuss shortly.
 
-image::./1_mysql.png[]
+image::./1_mysql_cl.png[]
 
 === Database Schema
 
@@ -176,7 +176,7 @@ We now have `sales_order` and `sales_order_details` rows being created for us by
 
 Now that we have data being automatically created in our MySQL database it's time to stream those changes into your on-premise Kafka cluster. We can do this using the link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html[Debezium MySQL Source connector , window=_blank]
 
-image::./2_mysql_source_connector.png[]
+image::./2_mysql_source_connector_cl.png[]
 
 === Create the MySQL source connector
 
@@ -300,11 +300,11 @@ image::./c3_50.png[]
 
 Now that your on-premise Kafka cluster is receiving events from your MySQL Database let's use Cluster Linking to stream those messages to Confluent Cloud
 
-image::./3_replicate_to_ccloud.png[]
+image::./3_replicate_to_ccloud_cl.png[]
 
 === Set up the cluster link
 
-Note: if you are interested in how replicator works you can go to xref:replicator-tocloud.adoc[Replicator fron on-prem to Cloud] and execute replicator just for testing purposes.
+*Note:* if you are interested in how replicator works you can go to link:replicator-tocloud.html[Replicator from on-prem to Cloud] and execute replicator just for testing purposes.
 Take into account that this workshop works with the topics created by cluster linking in the following step.
 
 Cluster Linking enables you to directly connect clusters and mirror topics from one cluster to another. Cluster Linking makes it easy to build multi-datacenter, multi-region, and hybrid cloud deployments. It is secure, performant, tolerant of network latency, and built into Confluent Server and Confluent Cloud.
@@ -484,7 +484,7 @@ image::./c3_71.png[]
 
 We now have all the data we need being streamed, in realtime, to Confluent Cloud. You have a ksqlDB Server running inside a docker container that is configured to point to our Confluent Cloud cluster. In a real world deployment, it is likely that this ksqlDB Server would be running closer to Confluent Cloud but for the purposes of this workshop it is not important.
 
-image::./4_ksql_application.png[]
+image::./4_ksql_application_cl.png[]
 
 Below is an illustration of the completed Supply & Demand ksqlDB Application, over the next few labs you will be building this step-by-step.
 
@@ -851,7 +851,7 @@ ksqlDB tables allow you to work the data in topics as key/value pairs, with a si
 
 === Creating Tables
 
-We want to create tables over our `customers`, `suppliers` and `products` streams so we can look up the current state for each customer, supplier and product. Later on we'll be joining these tables to other streams. To successfully join to a table in ksqlDB you need to ensure that the table is keyed on the column you are going to use in the join. Our underlying topics already have the correct key set thanks to the Debezium MySQL connector configuration so we just need to use the `PRIMARY KEY` clause when we create each table.
+We want to create tables over our `customers`, `suppliers` and `products` topics so we can look up the current state for each customer, supplier and product. Later on we'll be joining these tables to other streams. To successfully join to a table in ksqlDB you need to ensure that the table is keyed on the column you are going to use in the join. Our underlying topics already have the correct key set thanks to the Debezium MySQL connector configuration so we just need to use the `PRIMARY KEY` clause when we create each table.
 
 Create your 3 ksqlDB tables.
 
@@ -1537,9 +1537,11 @@ When we query the `out_of_stock_events` stream...
 
 == Lab {counter:labs}: Mirror Event from Confluent Cloud to On-Premises Kafka
 
+*Note*: if you are interested in how replicator works you can go to link:replicator-toonprem.html[Replicator from on-prem to Cloud] and execute replicator just for testing purposes.
+
 The next step is to replicate the `out_of_stock_events` topic to our on-premises cluster.
 
-image::./5_replicate_to_onprem.png[]	
+image::./5_replicate_to_onprem_cl.png[]
 
 === Submit the Cluster Linking Config
 
@@ -1640,7 +1642,7 @@ image::./c3_101.png[]
 
 Finally we need to sink the `{dc}_out_of_stock_events` topic into a MySQL database table, the on-premise application will then process these events and create purchase order for us.
 
-image::./6_jdbc_sink.png[]
+image::./6_jdbc_sink_cl.png[]
 
 But before we do that, let's open a couple more terminal sessions and start the ksqlDB CLI in each.
 

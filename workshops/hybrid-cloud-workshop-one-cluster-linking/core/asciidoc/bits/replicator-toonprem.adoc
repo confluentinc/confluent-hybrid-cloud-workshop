@@ -10,11 +10,11 @@ Select your on-premise cluster from the home, select _"topics"_ and then click o
 
 [IMPORTANT]
 ====
-image::./c3_80.png[]
+image::./c3_80_replicator.png[]
 
 Name the topic `{dc}_out_of_stock_events-replicator` with one partition and click _"Customize settings"_	,
 
-image::./c3_90.png[]
+image::./c3_90_replicator.png[]
 
 choose Custom availability settings and use replication_factor=1 and min_insync_replicas=1
 
@@ -74,7 +74,7 @@ Notice that we've specified only to replicate the `{dc}_out_of_stock_events` top
 
 We can confirm that the `{dc}_out_of_stock_events` is being replicated from Confluent Cloud to our on-premise cluster by checking for messages in link:http://{externalip}:9021[Confluent Control Center, window=_blank]
 
-image::./c3_100.png[]
+image::./c3_100_replicator.png[]
 
 .Further Reading
 [TIP]

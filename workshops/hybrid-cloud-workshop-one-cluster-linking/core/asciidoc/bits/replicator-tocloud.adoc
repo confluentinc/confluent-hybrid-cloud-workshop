@@ -1,6 +1,5 @@
 [[fromonprem-tocloud]]
 == Optional Lab: Stream Events to Confluent Cloud
-ifdef::env-name[:relfilesuffix: .adoc]
 
 Now that your on-premise Kafka cluster is receiving events from your MySQL Database let's use Confluent Replicator to stream those messages to Confluent Cloud
 
@@ -82,15 +81,15 @@ Select the "ccloud" cluster and then select "Topics".
 
 This Confluent Cloud Instance is being shared by other users of the workshop and as a result you will see topics being replicated from other data centers. To see just your topics, type your data center name, {dc}, into the search box at the top to filter.
 
-image::./c3_60.png[]
+image::./c3_60_replicator.png[]
 
-Select the `{dc}_sales_order_details` topic and finally the "Messages" tab under the topic heading. You should see messages streaming in from your on-premise Kafka cluster.
+Select the `{dc}_sales_order_details-replicator` topic and finally the "Messages" tab under the topic heading. You should see messages streaming in from your on-premise Kafka cluster.
 
-image::./c3_70.png[]
+image::./c3_70_replicator.png[]
 
 We can also view the status of Replicator in Confluent Control Center by selecting "Replicators" on the left-hand navigation pane. Here we can see throughput and latency statistics.
 
-image::./c3_72.png[]
+image::./c3_72_replicator.png[]
 
 .Further Reading
 [TIP]
