@@ -32,6 +32,7 @@ module "workshop-core" {
   feedback_form_url        = var.feedback_form_url
   availability_zones       = var.availability_zones
   cluster_linking          = var.cluster_linking
+  replicator              = var.replicator
 }
 
 module "workshop-confluent-core" {

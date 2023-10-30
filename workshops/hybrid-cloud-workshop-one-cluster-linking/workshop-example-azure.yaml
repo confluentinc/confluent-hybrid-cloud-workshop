@@ -38,7 +38,12 @@ workshop:
     ccloud_topics: sales_orders,sales_order_details,purchase_orders,purchase_order_details,customers,suppliers,products
     # List of local topics to pre-create
     onprem_topics: uc_orders,uc_shipments,uc_inventory,uc_shipment_status,uc_transactions,uc_atm_locations
-    
+
+    #cluster linking scenario->
+    #0: 1 step with direct cluster linking from confluent platform to cloud: limit of 5 links;
+    #1: 2 steps with cluster linking between confluent platforms (Edge CP-> hq CP) and second 1 cluster linking between confluent platform and confluent cloud
+    cluster_linking: 1
+
     #Feedback Form url (Optional)
     #feedback_form_url: "<Feedback Form Url>"
 

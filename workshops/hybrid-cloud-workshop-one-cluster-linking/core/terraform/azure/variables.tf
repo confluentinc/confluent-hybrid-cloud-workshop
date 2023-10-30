@@ -106,3 +106,19 @@ variable "ccloud_package_sg" {
 variable "cloud_provider" {
   description = "Cloud provider"
 }
+
+variable "cluster_linking" {
+  description = "cluster linking scenario to deploy"
+  type        = number
+  default     = 1
+  validation {
+    condition = contains([1, 0], var.cluster_linking)
+    error_message = "Valid value is one of the following: 1, 0."
+  }
+}
+
+variable "replicator" {
+  description = "If set to true and var.cluster_linking is set to 0, it will create the workshop with replicator"
+  type        = bool
+  default     = false
+}

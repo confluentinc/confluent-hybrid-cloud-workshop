@@ -20,15 +20,17 @@ data "template_file" "bootstrap_docker" {
   vars = {
     dc                      = format("dc%02d", count.index + 1)
     ext_ip                  = element(google_compute_address.instance.*.address, count.index)
+    hq_ext_ip               = var.cluster_linking == 1  ? element(google_compute_address.hq_instance.*.address, 0) : 0
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
     ccloud_rest_endpoint    = var.ccloud_rest_endpoint
     ccloud_cluster_id       = var.ccloud_cluster_id
-#    ccloud_topics           = var.ccloud_topics
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "gcp"
+    cluster_linking         = var.cluster_linking
+    replicator              = var.replicator
   }
 }
 data "google_project" "project" {
@@ -48,7 +50,7 @@ resource "google_compute_firewall" "workshop-firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "9021", "80", "8088", "8089","18088"]
+    ports    = ["22", "9021", "80", "8088", "8089","18088","9092","8081","8090","18083"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
@@ -68,7 +70,7 @@ resource "google_compute_instance" "instance" {
   boot_disk {
     initialize_params {
       type  = "pd-standard"
-      image = "ubuntu-1804-lts"
+      image = "ubuntu-2004-lts"
       size  = var.vm_disk_size
     }
   }

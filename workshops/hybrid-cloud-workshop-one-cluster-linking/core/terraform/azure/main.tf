@@ -10,7 +10,7 @@ provider "random" {
 }
 
 module "workshop-core" {
-  source                    = "workshop-core"
+  source                    = "./workshop-core"
   name                      = var.name
   participant_count         = var.participant_count
   participant_password      = var.participant_password
@@ -28,6 +28,8 @@ module "workshop-core" {
   owner_email               = var.owner_email
   purpose                   = var.purpose
   ref_link                  = var.ref_link
+  cluster_linking          = var.cluster_linking
+  replicator              = var.replicator
 }
 
 

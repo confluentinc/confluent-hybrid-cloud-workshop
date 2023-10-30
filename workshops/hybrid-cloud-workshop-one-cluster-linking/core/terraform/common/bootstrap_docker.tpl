@@ -5,12 +5,19 @@ cd ~/.workshop/docker
 #cluster_linking=1
 if [[ ${cluster_linking} -eq 1 ]]; then
  # rename the old and copy the correct docker-compose file depending which cluster linking workshop have been chosen
-  cp ~/.workshop/docker/docker-compose.yaml ~/.workshop/docker/old-docker-compose.yaml
-  cp ~/.workshop/docker/edges/docker-compose.yaml ~/.workshop/docker/docker-compose.yaml
+   printf 'Adding asciidocs for workshop with direct cluster linking'
+   cp ~/.workshop/docker/docker-compose.yaml ~/.workshop/docker/old-docker-compose.yaml
+   cp ~/.workshop/docker/edges/docker-compose.yaml ~/.workshop/docker/docker-compose.yaml
 
  # rename the old and copy the correct index adoc file depending which cluster linking workshop have been chosen
    cp ~/.workshop/docker/asciidoc/index.adoc ~/.workshop/docker/asciidoc/index-old.adoc
    cp ~/.workshop/docker/asciidoc/index-cl-edges-hq.adoc ~/.workshop/docker/asciidoc/index.adoc
+
+elif [ ${cluster_linking} -eq 0 ] && ! ${replicator} ; then
+   # rename the old and copy the correct index adoc file depending which cluster linking workshop have been chosen
+   printf 'Adding asciidocs for workshop with two cluster linking'
+   cp ~/.workshop/docker/asciidoc/index.adoc ~/.workshop/docker/asciidoc/index-old.adoc
+   cp ~/.workshop/docker/asciidoc/index-cl.adoc ~/.workshop/docker/asciidoc/index.adoc
 
 fi
 
@@ -33,7 +40,6 @@ echo "DC"=${dc} >> .env
 echo "ONPREM_TOPICS"=${onprem_topics} >> .env
 echo "CONFLUENT_DOCKER_TAG"=7.3.3 >> .env
 echo "HQ_EXT_IP=${hq_ext_ip}" >> .env
-echo "HQ_INT_IP=${hq_int_ip}" >> .env
 
 # select the DC correctly in the database simulator script and schema file.
 sed -i 's/dcxx/${dc}/g' ~/.workshop/docker/db_transaction_simulator/simulate_dbtrans.py
@@ -80,16 +86,18 @@ echo "export EXT_IP=${ext_ip}" >> .bashrc
 echo "export HQ_EXT_IP=${hq_ext_ip}" >> .bashrc
 
 until $(curl --output /dev/null -sk --head --fail http://localhost:8090/kafka/v3/clusters); do
-    printf '.'
+    printf '. Waiting for the cluster to be ready'
     sleep 5
 done
 echo "export ONPREM_CLUSTER_ID=`curl -sk http://localhost:8090/kafka/v3/clusters|jq --raw-output .data[].cluster_id`" >> .bashrc
 
-until $(curl --output /dev/null -sk --head --fail http://${hq_ext_ip}:8090/kafka/v3/clusters); do
-    printf '. waiting for HQ cluster to be ready.'
-    sleep 5
-done
-echo "export ONPREM_HQ_CLUSTER_ID=`curl -sk http://${hq_ext_ip}:8090/kafka/v3/clusters|jq --raw-output .data[].cluster_id`" >> .bashrc
+if [[ ${cluster_linking} -eq 1 ]]; then
+    until $(curl --output /dev/null -sk --head --fail http://${hq_ext_ip}:8090/kafka/v3/clusters); do
+        printf '. Waiting for HQ cluster to be ready.'
+        sleep 5
+    done
+    echo "export ONPREM_HQ_CLUSTER_ID=`curl -sk http://${hq_ext_ip}:8090/kafka/v3/clusters|jq --raw-output .data[].cluster_id`" >> .bashrc
+fi
 
 
 cd ~/.workshop/docker/extensions

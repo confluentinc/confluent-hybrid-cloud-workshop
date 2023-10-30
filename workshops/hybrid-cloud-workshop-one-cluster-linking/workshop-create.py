@@ -166,19 +166,24 @@ copytree("core/docker/", docker_staging)
 # Copy asciidoc directory to .docker_staging
 copytree(os.path.join("core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
 
-# Depending on workshop including the correct documentation.
+# Depending on workshop it includes the correct documentation.
 include_cl_str_main = ""
 include_cl_str_intro = ""
 if 'cluster_linking' in config['workshop']['core'] and config['workshop']['core']['cluster_linking'] is not None:
     if (config['workshop']['core']['cluster_linking']) == 0:
-        include_cl_str_main += 'include::bits/main-cl.adoc[]\n'
-        include_cl_str_intro += 'include::bits/intro.adoc[]\n'
+        if 'replicator' in config['workshop']['core'] and config['workshop']['core']['replicator'] == 'true':
+            include_cl_str_main += 'include::bits/main.adoc[]\n'
+            include_cl_str_intro += 'include::bits/intro.adoc[]\n'
+        else:
+            include_cl_str_main += 'include::bits/main-cl.adoc[]\n'
+            include_cl_str_intro += 'include::bits/intro-cl.adoc[]\n'
+
     elif (config['workshop']['core']['cluster_linking']) == 1:
         include_cl_str_main += 'include::bits/main-cl-edges-hq.adoc[]\n'
         include_cl_str_intro += 'include::bits/intro-cl-edges-hq.adoc[]\n'
 else:
-    include_cl_str_main += 'include::bits/main.adoc[]\n'
-    include_cl_str_intro += 'include::bits/intro.adoc[]\n'
+    print("Please provide cluster_linking variable in the yaml file.")
+    exit()
 
 for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
     line = re.sub("^#CLUSTER_LINKING_PLACEHOLDER2#", include_cl_str_main, line)

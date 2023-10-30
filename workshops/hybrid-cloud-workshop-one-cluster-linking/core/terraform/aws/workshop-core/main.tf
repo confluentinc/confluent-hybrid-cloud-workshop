@@ -14,14 +14,12 @@ data "template_file" "bootstrap_vm" {
 
 // Template for docker bootstrap and startup
 data "template_file" "bootstrap_docker" {
-  #depends_on = [aws_instance.hq_instance]
   template = file("./common/bootstrap_docker.tpl")
   count    = var.participant_count
   vars = {
     dc                      = format("dc%02d", count.index + 1)
     ext_ip                  = aws_instance.instance[count.index].public_ip
-    hq_ext_ip               = length(aws_instance.hq_instance[*]) > 0 ? aws_instance.hq_instance[0].public_ip : null
-    hq_int_ip               = length(aws_instance.hq_instance[*]) > 0 ? aws_instance.hq_instance[0].private_ip : null
+    hq_ext_ip               = length(aws_instance.hq_instance[*]) > 0 ? aws_instance.hq_instance[0].public_ip : 0
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
@@ -32,6 +30,7 @@ data "template_file" "bootstrap_docker" {
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "aws"
     cluster_linking         = var.cluster_linking
+    replicator              = var.replicator
   }
 }
 

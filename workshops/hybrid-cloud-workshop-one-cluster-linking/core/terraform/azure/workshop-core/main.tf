@@ -8,7 +8,7 @@ locals {
     deployed_By = "Terraform"
   }
   extra_tags  = {
-    workshop-name = "${var.name}"
+    workshop-name = var.name
   }
 }
 
@@ -28,6 +28,7 @@ data "template_file" "bootstrap_docker" {
   vars = {
     dc                      = format("dc%02d", count.index + 1)
     ext_ip                  = element(data.azurerm_public_ip.instance.*.ip_address, count.index)
+    hq_ext_ip               = var.cluster_linking == 1  ? element(data.azurerm_public_ip.hq_instance.*.ip_address, 0) : 0
     ccloud_cluster_endpoint = var.ccloud_bootstrap_servers
     ccloud_api_key          = var.ccloud_api_key
     ccloud_api_secret       = var.ccloud_api_secret
@@ -37,6 +38,8 @@ data "template_file" "bootstrap_docker" {
     onprem_topics           = var.onprem_topics
     feedback_form_url       = var.feedback_form_url
     cloud_provider          = "azure"
+    cluster_linking         = var.cluster_linking
+    replicator              = var.replicator
   }
 }
 
