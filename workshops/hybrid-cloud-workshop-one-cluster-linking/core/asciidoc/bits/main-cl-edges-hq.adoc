@@ -2004,7 +2004,7 @@ FROM  purchases_enriched
 EMIT CHANGES;
 ----
 
-You now have a real time view of the current product stock levels in the first ksqlDB session and the purchases being made to replenish the stock in second. Not that the second query isn't returning anything yet.
+You now have a real time view of the current product stock levels in the first ksqlDB session and the purchases being made to replenish the stock in second. Note that the second query isn't returning anything yet.
 
 Let's now sink the _out of stock events_ to the MySQL database using the JDBC Connector. Once the events start arriving in the database, the orders application will process them and start generating the required purchase orders.
 
