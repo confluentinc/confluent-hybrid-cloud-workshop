@@ -301,18 +301,6 @@ resource "null_resource" "vm_provisioners" {
     }
   }
 
-  //Adding AWS Credentials for Connect
-  provisioner "file" {
-    source      = "aws_credentials.txt"
-    destination = ".workshop/docker/.aws/credentials"
-
-    connection {
-      user     = format("dc%02d", count.index + 1)
-      password = var.participant_password
-      insecure = true
-      host     = aws_instance.instance[count.index].public_ip
-    }
-  }
 }
 
 

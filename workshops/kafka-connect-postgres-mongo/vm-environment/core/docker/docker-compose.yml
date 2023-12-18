@@ -252,7 +252,7 @@ services:
       - 27017:27017
     volumes:
      # - ./mongodb/initdb.d/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ../common-docker/mongodb/initdb.d/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongodb/initdb.d/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
   mongo-express:
     image: mongo-express:0.54.0
@@ -276,7 +276,7 @@ services:
       ME_CONFIG_MONGODB_AUTH_PASSWORD: pass
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_AUTH_DATABASE: demo
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: false
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
       VCAP_APP_PORT: 444
 
   pg_dashboard:
