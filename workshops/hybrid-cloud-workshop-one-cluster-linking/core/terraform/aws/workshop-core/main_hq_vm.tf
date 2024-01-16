@@ -66,7 +66,8 @@ EOF
  Provisioners
 */
 resource "null_resource" "hq_vm_provisioners" {
-  depends_on = [aws_instance.hq_instance, local_file.aws_credentials]
+  #depends_on = [aws_instance.hq_instance, local_file.aws_credentials]
+  depends_on = [aws_instance.hq_instance]
   count      = var.cluster_linking
 
   // Copy bootstrap script to the VM
@@ -136,7 +137,7 @@ resource "null_resource" "hq_vm_provisioners" {
     }
   }
 
-  //Adding AWS Credentials for Connect
+/*  //Adding AWS Credentials for Connect
   provisioner "file" {
     source      = "aws_credentials.txt"
     destination = ".workshop/docker/.aws/credentials"
@@ -147,5 +148,5 @@ resource "null_resource" "hq_vm_provisioners" {
       insecure = true
       host     = aws_instance.hq_instance[count.index].public_ip
     }
-  }
+  }*/
 }

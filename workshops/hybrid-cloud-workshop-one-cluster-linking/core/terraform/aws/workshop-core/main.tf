@@ -49,7 +49,7 @@ resource "random_string" "random_string" {
   numeric = false
 }
 
-data "template_file" "aws_ws_iam_name" {
+/*data "template_file" "aws_ws_iam_name" {
   template = "${var.name}-${random_string.random_string.result}"
 }
 
@@ -70,7 +70,7 @@ aws_access_key_id = ${aws_iam_access_key.ws.id}
 aws_secret_access_key = ${aws_iam_access_key.ws.secret}
 EOF
   filename = "${path.root}/aws_credentials.txt"
-}
+}*/
 
 /*==== The VPC ======*/
 resource "aws_vpc" "workshop-vpc" {
@@ -239,7 +239,8 @@ resource "aws_security_group" "instance" {
  Provisioners
 */
 resource "null_resource" "vm_provisioners" {
-  depends_on = [aws_instance.instance, local_file.aws_credentials]
+  #depends_on = [aws_instance.instance, local_file.aws_credentials]
+  depends_on = [aws_instance.instance]
   count      = var.participant_count
 
   // Copy bootstrap script to the VM
@@ -312,7 +313,7 @@ resource "null_resource" "vm_provisioners" {
   }
 
   //Adding AWS Credentials for Connect
-  provisioner "file" {
+  /*provisioner "file" {
     source      = "aws_credentials.txt"
     destination = ".workshop/docker/.aws/credentials"
 
@@ -322,7 +323,7 @@ resource "null_resource" "vm_provisioners" {
       insecure = true
       host     = aws_instance.instance[count.index].public_ip
     }
-  }
+  }*/
 }
 
 

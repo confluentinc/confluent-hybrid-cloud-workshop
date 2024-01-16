@@ -15,6 +15,6 @@ output "subnet" {
   value = aws_subnet.workshop-public-subnet.*.id
 }
 
-output "ws_iam_user_name" {
+/*output "ws_iam_user_name" {
   value = aws_iam_user.ws.name
-}
+}*/
