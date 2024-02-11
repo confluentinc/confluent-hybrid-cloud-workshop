@@ -82,4 +82,4 @@ See [this blog post](https://rmoff.net/2021/01/13/running-as-root-on-docker-imag
 
 ## License
 
-This project is licensed under the Apache 2.0 - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Apache 2.0 - see the [LICENSE](LICENSE) file for details

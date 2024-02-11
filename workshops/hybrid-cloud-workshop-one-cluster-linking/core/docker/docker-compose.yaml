@@ -345,6 +345,8 @@ services:
       - ksqldb-server-ccloud
     entrypoint: /bin/sh
     tty: true
+    volumes:
+      - ~/.demo/docker/data/ksql/commands.sql:/tmp/commands.sql
 
   workshop-docs:
     container_name: workshop-docs-webserver
