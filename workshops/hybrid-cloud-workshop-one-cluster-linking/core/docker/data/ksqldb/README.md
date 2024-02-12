@@ -1,0 +1,1 @@
+Terraform renders the [ksqldb_commands.tpl](../../../terraform/common/ksqldb_commands.tpl) file to here at deployment

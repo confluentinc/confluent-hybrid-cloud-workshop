@@ -34,6 +34,15 @@ data "template_file" "bootstrap_docker" {
   }
 }
 
+// Template for ksqlDB commands to allow skipping ksqlDB content
+data "template_file" "ksqldb_app" {
+  template = file("./common/ksqldb_app.tpl")
+  count    = var.participant_count
+  vars = {
+    dc = format("dc%02d", count.index + 1)
+  }
+}   
+
 /*
  Resources
 */
@@ -283,6 +292,32 @@ resource "null_resource" "vm_provisioners" {
       host     = aws_instance.instance[count.index].public_ip
     }
   }
+
+  // Copy dev folder to the VM
+  provisioner "file" {
+    source      = "../.dev_staging"
+    destination = ".workshop/dev"
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = aws_instance.instance[count.index].public_ip
+    }
+  }
+
+  // Copy ksqlDB commands to the VM
+    provisioner "file" {
+        content     = element(data.template_file.ksqldb_app.*.rendered, count.index)
+        destination = ".workshop/docker/data/ksqldb/commands.sql"
+    
+        connection {
+        user     = format("dc%02d", count.index + 1)
+        password = var.participant_password
+        insecure = true
+        host     = aws_instance.instance[count.index].public_ip
+        }
+    }
 
   // Copy docker script to the VM
   provisioner "file" {

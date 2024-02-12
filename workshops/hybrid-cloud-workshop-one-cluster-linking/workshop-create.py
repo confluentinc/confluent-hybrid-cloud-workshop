@@ -19,6 +19,7 @@ argparse.add_argument('--dir', help="Workshop directory", required=True)
 args = argparse.parse_args()
 sts = boto3.client('sts')
 
+dev_staging = os.path.join(args.dir, ".dev_staging")
 docker_staging = os.path.join(args.dir, ".docker_staging")
 terraform_staging = os.path.join(args.dir, ".terraform_staging")
 
@@ -154,7 +155,7 @@ with open(os.path.join(terraform_staging, "terraform.tfvars"), 'w') as tfvars_fi
 # Create the Docker staging directory, this directory is uploaded to each VM 
 # ----------------------------------------------------------------------------
 
-# remove stage directory
+# remove docker stage directory if exists
 if os.path.exists(docker_staging):
     shutil.rmtree(docker_staging)
 
@@ -165,6 +166,14 @@ copytree("core/docker/", docker_staging)
 
 # Copy asciidoc directory to .docker_staging
 copytree(os.path.join("core/asciidoc"), os.path.join(docker_staging, "asciidoc"))
+
+# remove dev stage directory if it exists
+if os.path.exists(dev_staging):
+    shutil.rmtree(dev_staging)
+
+# Copy dev directory to .dev_staging
+copytree(os.path.join("core/dev"), dev_staging)
+
 
 # Depending on workshop it includes the correct documentation.
 include_cl_str_main = ""

@@ -201,6 +201,8 @@ services:
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
+    volumes:
+      - ./data/ksqldb/commands.sql:/tmp/commands.sql
 
   workshop-docs:
     container_name: workshop-docs-webserver
