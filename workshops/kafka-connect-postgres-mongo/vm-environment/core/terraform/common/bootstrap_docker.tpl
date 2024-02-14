@@ -9,7 +9,6 @@ echo "DC"=${dc} >> .env
 echo "PASS"=${participant_password} >> .env
 echo "CONFLUENT_DOCKER_TAG"=7.3.0 >> .env
 echo "DC"=${dc} >> .env.dev
-echo "PASS"=${participant_password} >> .env.dev
 
 # Generate html file for the hosted instructions
 cd ~/.workshop/docker/asciidoc
