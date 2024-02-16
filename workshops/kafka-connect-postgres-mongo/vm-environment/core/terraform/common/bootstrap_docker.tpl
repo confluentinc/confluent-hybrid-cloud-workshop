@@ -25,3 +25,7 @@ mkdir ~/.workshop/docker/.aws
 cd ~/.workshop/docker/
 docker-compose up -d
 
+# create environment variables
+cd ~
+echo "export DC=${dc}" >> .bashrc
+echo "export PASS=${participant_password}" >> .bashrc

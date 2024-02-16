@@ -91,6 +91,8 @@ services:
       #CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       #CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
       #CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+      DC: ${DC}
+      PASS: ${PASS}
     command:
       - bash
       - -c
@@ -147,7 +149,34 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       CONTROL_CENTER_CONNECT_HEALTHCHECK_ENDPOINT: '/connectors'
+      CONTROL_CENTER_REST_AUTHENTICATION_METHOD: BASIC
+      CONTROL_CENTER_REST_AUTHENTICATION_REALM: c3
+      CONTROL_CENTER_REST_AUTHENTICATION_ROLES: Administrators,Restricted
+      CONTROL_CENTER_AUTH_RESTRICTED_ROLES: Restricted
+      CONTROL_CENTER_AUTH_SESSION_EXPIRATION_MS: 6000000
+      CONTROL_CENTER_OPTS: "-Djava.security.auth.login.config=/tmp/c3/propertyfile.jaas"
+      # Workaround for MMA-3564
+      CONTROL_CENTER_METRICS_TOPIC_MAX_MESSAGE_BYTES: 8388608
       PORT: 9021
+      DC: ${DC}
+      PASS: ${PASS}
+    user: root
+    command:
+      - bash
+      - -c
+      - |
+        echo y | yum install sudo
+        echo "--- Creating C3 auth files ---"
+        sudo chmod +x /tmp/c3/
+        echo "$DC: $PASS,Administrators" > /tmp/c3/login.properties
+        echo "disallowed: no_access" >> /tmp/c3/login.properties
+        echo 'c3 { org.eclipse.jetty.jaas.spi.PropertyFileLoginModule required file="/tmp/c3/login.properties"; };' > /tmp/c3/propertyfile.jaas
+        echo "Launching control center"
+        /etc/confluent/docker/run & 
+        #
+        sleep infinity
+    volumes:
+      - c3:/tmp/c3
 
   ksqldb-server:
     image: confluentinc/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
@@ -162,6 +191,7 @@ services:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "broker:29092"
       KSQL_HOST_NAME: ksqldb-server
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
@@ -199,12 +229,12 @@ services:
 
   db:
     image: postgres:14.1-alpine
-    hostname: postgres-db
+    hostname: postgres
     restart: always
-    container_name: postgres-db
+    container_name: postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${DC}
+      - POSTGRES_PASSWORD=${PASS}
       - POSTGRES_DB=postgres
     ports:
       - '5432:5432'
@@ -241,8 +271,8 @@ services:
       #- 4321:4321
       - 444:444
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: user
-      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+      #ME_CONFIG_MONGODB_ADMINUSERNAME: user
+      #ME_CONFIG_MONGODB_ADMINPASSWORD: pass
       #ME_CONFIG_MONGODB_SERVER: mongodb
       #ME_CONFIG_MONGODB_PORT: 27017
       #ME_CONFIG_MONGODB_URL: mongodb://user:pass@mymongodb:27017/?authMechanism=DEFAULT&authSource=demo
@@ -251,7 +281,9 @@ services:
       ME_CONFIG_MONGODB_AUTH_PASSWORD: pass
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_AUTH_DATABASE: demo
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: false
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
+      ME_CONFIG_BASICAUTH_USERNAME: ${DC}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${PASS}
       VCAP_APP_PORT: 444
 
   pg_dashboard:
@@ -276,6 +308,7 @@ services:
       - ./scripts:/docker-entrypoint.d
     environment:
       - DC=${DC}
+      - PASS=${PASS}
 
 #  asciidoc:
 #   container_name: asciidoc
@@ -287,5 +320,6 @@ services:
 
 volumes:
   mongodb_data_container:
+  c3:
   db:
     driver: local

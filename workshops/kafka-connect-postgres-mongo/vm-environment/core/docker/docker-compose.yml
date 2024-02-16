@@ -147,9 +147,17 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       CONTROL_CENTER_CONNECT_HEALTHCHECK_ENDPOINT: '/connectors'
+      CONTROL_CENTER_REST_AUTHENTICATION_METHOD: BASIC
+      CONTROL_CENTER_REST_AUTHENTICATION_REALM: c3
+      CONTROL_CENTER_REST_AUTHENTICATION_ROLES: Administrators,Restricted
+      CONTROL_CENTER_AUTH_RESTRICTED_ROLES: Restricted
+      CONTROL_CENTER_AUTH_SESSION_EXPIRATION_MS: 6000000
+      CONTROL_CENTER_OPTS: "-Djava.security.auth.login.config=/tmp/c3/propertyfile.jaas"
       # Workaround for MMA-3564
       CONTROL_CENTER_METRICS_TOPIC_MAX_MESSAGE_BYTES: 8388608
       PORT: 9021
+    volumes:
+      - /tmp/c3:/tmp/c3
 
   ksqldb-server:
     image: confluentinc/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
@@ -206,12 +214,12 @@ services:
 
   db:
     image: postgres:14.1-alpine
-    hostname: postgres-db
+    hostname: postgres
     restart: always
-    container_name: postgres-db
+    container_name: postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${DC}
+      - POSTGRES_PASSWORD=${PASS}
       - POSTGRES_DB=postgres
     ports:
       - '5432:5432'
@@ -266,8 +274,8 @@ services:
     ports:
       - 444:444
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: user
-      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+      #ME_CONFIG_MONGODB_ADMINUSERNAME: user
+      #ME_CONFIG_MONGODB_ADMINPASSWORD: pass
       #ME_CONFIG_MONGODB_SERVER: mongodb
       #ME_CONFIG_MONGODB_PORT: 27017
       #ME_CONFIG_MONGODB_URL: mongodb://user:pass@mymongodb:27017/?authMechanism=DEFAULT&authSource=demo
@@ -277,6 +285,8 @@ services:
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_AUTH_DATABASE: demo
       ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
+      ME_CONFIG_BASICAUTH_USERNAME: ${DC}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${PASS}
       VCAP_APP_PORT: 444
 
   pg_dashboard:

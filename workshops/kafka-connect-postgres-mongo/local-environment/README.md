@@ -25,7 +25,11 @@ DC=<User name for the workshop>
 PASS=p<User password for the workshop>
 CONFLUENT_DOCKER_TAG=<Docker Confluent images for the workshop>
 ```
+After filling the previous env variables, execute the following command in the local-environment folder:
 
+```
+. ./.env
+```
 Execute the docker-compose.yml file that is on the local-environment folder.
 
 ```

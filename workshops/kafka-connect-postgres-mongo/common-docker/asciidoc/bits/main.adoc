@@ -43,13 +43,13 @@ Use the following and username and password to authenticate to the database:
 [source,subs="attributes"]
 
 ----
-Hostname: postgres-db
+Hostname: postgres
 Maintenance database: postgres
-User: postgres
-Password: postgres
+User: {dc}
+Password: your workshop password
 ----
 
-image::./img_3.png[PgAdmin UI Database Configuration Step 2]
+image::./img_3_3.png[PgAdmin UI Database Configuration Step 2]
 
 
 Once the connection to the database has been successful, we will be able to find the the _Public_ Schema inside the _postgres_ database which will have a _Customers_ table:
@@ -63,6 +63,7 @@ image::./img_4.png[PgAdmin UI Database Configuration Step 3,align="center"]
 Now that the Postgres is configured, let's check if we have access to our local Kafka cluster.
 
 We can use link:http://{externalip}:9021[Confluent Control Center, window=_blank] to confirm this.
+Use your user {dc} and your workshop password to log in.
 
 On the landing page we can see that Confluent Control Center is monitoring our Kafka Cluster.
 
@@ -87,8 +88,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -216,8 +217,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -279,8 +280,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -326,8 +327,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -433,8 +434,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -483,8 +484,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
@@ -535,8 +536,8 @@ curl -i -X PUT -H "Accept:application/json" \
                "tasks.max": "1",
                "database.hostname": "db",
                "database.port": "5432",
-               "database.user": "postgres",
-               "database.password": "postgres",
+               "database.user": "{dc}",
+               "database.password": "'${PASS}'",
                "database.dbname" : "postgres",
                "schema.include.list": "public",
                "table.include.list": "public.customers",
