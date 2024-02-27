@@ -16,7 +16,7 @@ Every folder is a different workshop, please read the README file of the worksho
 * A GCP/AWS/Azure account with the appropriate privileges
 * For setting AWS credentials, please check the following link: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where
 * A Confluent Cloud Account
-* [MongoDB Realm CLI](https://docs.mongodb.com/realm/deploy/realm-cli-reference/#installation) (required if you use the MongoDB Atlas extension)
+* [MongoDB Realm CLI](https://www.npmjs.com/package/mongodb-realm-cli) (required if you use the MongoDB Atlas extension)
 * Docker installed
 
 Please check README file of the workshop that you want to provision where you will find more detailed information.

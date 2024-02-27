@@ -305,6 +305,21 @@ resource "null_resource" "vm_provisioners" {
       host     = aws_instance.instance[count.index].public_ip
     }
   }
+  ## change permissions and symlink
+    provisioner "remote-exec" {
+    inline = [
+      "chmod +x .workshop/dev/*.sh",
+      "cp .workshop/dev/create-ksql-application.sh .",
+      
+    ]
+
+    connection {
+      user     = format("dc%02d", count.index + 1)
+      password = var.participant_password
+      insecure = true
+      host     = aws_instance.instance[count.index].public_ip
+    }
+  }
 
   // Copy ksqlDB commands to the VM
     provisioner "file" {
@@ -337,6 +352,7 @@ resource "null_resource" "vm_provisioners" {
     inline = [
       "chmod +x /tmp/bootstrap_docker.sh",
       "/tmp/bootstrap_docker.sh",
+
     ]
 
     connection {

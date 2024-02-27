@@ -16,6 +16,7 @@ from azure.cli.core import get_default_cli
 
 argparse = argparse.ArgumentParser()
 argparse.add_argument('--dir', help="Workshop directory", required=True)
+argparse.add_argument('--dry-run', help="Only create staging files - don't actually run terraform commands", required=False, default=False, action='store_true')
 args = argparse.parse_args()
 sts = boto3.client('sts')
 
@@ -211,7 +212,7 @@ if 'extensions' in config['workshop'] and config['workshop']['extensions'] is no
 
     # Build extension include string
     for include in includes:
-        include_str += 'include::.' + include + '[]\n'
+        include_str += 'include::../' + include + '[]\n'
 
     # Add extension includes to core hybrid-cloud-workshop.adoc
     for line in fileinput.input(os.path.join(docker_staging, "asciidoc/hybrid-cloud-workshop.adoc"), inplace=True):
@@ -249,28 +250,29 @@ else:
 # Create Workshop
 # -----------------
 
-os.chdir(terraform_staging)
+if not args.dry_run:
+    os.chdir(terraform_staging)
 
-# Terraform init
-os.system("terraform init")
+    # Terraform init
+    os.system("terraform init")
 
-# Terraform plan
-os.system("terraform plan")
+    # Terraform plan
+    os.system("terraform plan")
 
-# Terraform apply
-os.system("terraform apply -auto-approve")
+    # Terraform apply
+    os.system("terraform apply -auto-approve")
 
-# Show workshop details
-os.system("terraform output -json external_ip_addresses > workshop_details.out")
-if os.path.exists("workshop_details.out"):
-    with open('workshop_details.out') as wd:
-        ip_addresses = json.load(wd)
-        print("*" * 65)
-        print("\n WORKSHOP DETAILS\n Copy & paste into Google Sheets and share with the participants\n")
-        print("*" * 65)
-        print('=SPLIT("SSH USERNAME,GETTING STARTED URL,PARTICIPANT NAME/EMAIL",",")')
-        for id, ip_address in enumerate(ip_addresses, start=1):
-            print('=SPLIT("dc{:02d},http://{}", ",")'.format(id, ip_address))
-            # print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
+    # Show workshop details
+    os.system("terraform output -json external_ip_addresses > workshop_details.out")
+    if os.path.exists("workshop_details.out"):
+        with open('workshop_details.out') as wd:
+            ip_addresses = json.load(wd)
+            print("*" * 65)
+            print("\n WORKSHOP DETAILS\n Copy & paste into Google Sheets and share with the participants\n")
+            print("*" * 65)
+            print('=SPLIT("SSH USERNAME,GETTING STARTED URL,PARTICIPANT NAME/EMAIL",",")')
+            for id, ip_address in enumerate(ip_addresses, start=1):
+                print('=SPLIT("dc{:02d},http://{}", ",")'.format(id, ip_address))
+                # print('=SPLIT("{}-{},http://{}", ",")'.format(config['workshop']['name'], id, ip_address))
 
-    os.remove("workshop_details.out")
+        os.remove("workshop_details.out")
