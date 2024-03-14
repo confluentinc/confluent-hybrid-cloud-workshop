@@ -308,8 +308,8 @@ resource "null_resource" "vm_provisioners" {
   ## change permissions and symlink
     provisioner "remote-exec" {
     inline = [
-      "chmod +x .workshop/dev/*.sh",
-      "cp .workshop/dev/create-ksql-application.sh .",
+      "chmod +x ~/.workshop/dev/*.sh",
+      "cp ~/.workshop/dev/create-ksqldb-app.sh ~/create-ksqldb-app.sh",
       
     ]
 

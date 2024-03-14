@@ -736,7 +736,7 @@ With this data in place, we're now able to allow our database development team t
 Run the following command to the deploy the application
 [source,subs="attributes"]
 ----
-./create-ksqldb-application.sh
+./create-ksqldb-app.sh
 ----
 ====
 
