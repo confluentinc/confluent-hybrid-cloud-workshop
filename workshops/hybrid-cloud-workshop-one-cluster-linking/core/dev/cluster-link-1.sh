@@ -74,6 +74,10 @@ curl --request POST \
       "name": "acl.sync.enable",
       "value": "false"
     },
++   {
++     "name": "metadata.max.age.ms",
++     "value": "15000"
++   },      
     {
       "name": "auto.create.mirror.topics.enable",
       "value": "true"
@@ -141,6 +145,10 @@ curl --request POST \
       "name": "connection.mode",
       "value": "INBOUND"
     },
++   {
++     "name": "metadata.max.age.ms",
++     "value": "15000"
++   },  
     {
       "name": "acl.sync.enable",
       "value": "false"
