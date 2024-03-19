@@ -336,6 +336,10 @@ curl --request POST \
       "name": "connection.mode",
       "value": "INBOUND"
     },
++   {
++     "name": "metadata.max.age.ms",
++     "value": "15000"
++   },      
     {
       "name": "acl.sync.enable",
       "value": "false"
