@@ -66,7 +66,7 @@ resource "google_compute_instance" "instance" {
   boot_disk {
     initialize_params {
       type  = "pd-standard"
-      image = "ubuntu-1804-lts"
+      image = "ubuntu-2004-lts"
       size  = var.vm_disk_size
     }
   }
