@@ -26,6 +26,7 @@ workshop:
     ccloud_bootstrap_servers: <CCloud Bootstrap Server>
     ccloud_api_key: <CCloud API Key>
     ccloud_api_secret: <CCloud API Secret>
+    ccloud_sr_region: europe-west2
 
     # List of ccloud topics to pre-create
     ccloud_topics: sales_orders,sales_order_details,purchase_orders,purchase_order_details,customers,suppliers,products
