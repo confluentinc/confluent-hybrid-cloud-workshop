@@ -46,9 +46,10 @@ docker_staging = os.path.join(args.dir, ".docker_staging")
 owd = os.getcwd()
 if os.path.exists(terraform_staging):
     os.chdir(terraform_staging)
-    os.system("terraform destroy -auto-approve")
-    os.chdir(owd)
-    shutil.rmtree(terraform_staging)
+    destroy_status = os.system("terraform destroy -auto-approve")
+    if destroy_status == 0:
+        os.chdir(owd)
+        shutil.rmtree(terraform_staging)
 
 # Delete Docker staging area
 if os.path.exists(docker_staging):

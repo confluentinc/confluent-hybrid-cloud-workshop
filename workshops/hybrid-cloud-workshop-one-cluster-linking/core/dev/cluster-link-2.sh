@@ -35,7 +35,7 @@ curl --request POST \
 
 sleep $DELAY_FOR_START
 
-curl --retry $CURL_RETRY_COUNT --retry-delay $CURL_RETRY_DELAY -s --request GET   --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-cloud-to-hq-dc01 | jq .
+curl --retry $CURL_RETRY_COUNT --retry-delay $CURL_RETRY_DELAY -s --request GET   --url http://${HQ_EXT_IP}:8090/kafka/v3/clusters/${ONPREM_HQ_CLUSTER_ID}/links/clusterlink-cloud-to-hq-${DC} | jq .
 
 ## Create mirror topic
 curl --request POST \
@@ -90,7 +90,7 @@ curl -i -X POST -H "Accept:application/json" \
         "name": "jdbc-mysql-sink",
         "config": {
           "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-          "topics": "dc01_out_of_stock_events",
+          "topics": "'${DC}'_out_of_stock_events",
           "connection.url": "jdbc:mysql://mysql:3306/orders",
           "connection.user": "mysqluser",
           "connection.password": "mysqlpw",

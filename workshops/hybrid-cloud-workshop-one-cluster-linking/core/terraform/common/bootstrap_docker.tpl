@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MAX_CLUSTER_WAIT_RETRIES=60
+
 cd ~/.workshop/docker
 
 #cluster_linking=1
@@ -85,16 +87,33 @@ echo "export ENCODED_API_KEY_SECRET=`echo -n "${ccloud_api_key}:${ccloud_api_sec
 echo "export EXT_IP=${ext_ip}" >> .bashrc
 echo "export HQ_EXT_IP=${hq_ext_ip}" >> .bashrc
 
+retry_count=0
+
 until $(curl --output /dev/null -sk --head --fail http://localhost:8090/kafka/v3/clusters); do
     printf '. Waiting for the cluster to be ready'
     sleep 5
+    ((retry_count++))
+
+    if [ $retry_count -eq $MAX_CLUSTER_WAIT_RETRIES ]; then
+        echo "Max retries reached. Exiting..."
+        exit 1
+    fi
 done
+
 echo "export ONPREM_CLUSTER_ID=`curl -sk http://localhost:8090/kafka/v3/clusters|jq --raw-output .data[].cluster_id`" >> .bashrc
+
+retry_count=0
 
 if [[ ${cluster_linking} -eq 1 ]]; then
     until $(curl --output /dev/null -sk --head --fail http://${hq_ext_ip}:8090/kafka/v3/clusters); do
         printf '. Waiting for HQ cluster to be ready.'
         sleep 5
+        ((retry_count++))
+
+        if [ $retry_count -eq $MAX_CLUSTER_WAIT_RETRIES ]; then
+            echo "Max retries reached. Exiting..."
+            exit 1
+        fi
     done
     echo "export ONPREM_HQ_CLUSTER_ID=`curl -sk http://${hq_ext_ip}:8090/kafka/v3/clusters|jq --raw-output .data[].cluster_id`" >> .bashrc
 fi
