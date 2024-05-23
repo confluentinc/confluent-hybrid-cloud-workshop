@@ -176,6 +176,7 @@ services:
       KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/ksqldb/log4j-rolling.properties"
       KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
       KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_ADVERTISED_LISTENERS: "http://${EXT_IP}:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
       KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
@@ -185,7 +186,7 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
       # Producer/Consumer Confluent Monitoring Interceptors for Control Center streams monitoring
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.3.0.jar
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_DOCKER_TAG}.jar
 
   ksqldb-cli:
     image: confluentinc/cp-ksqldb-cli:${CONFLUENT_DOCKER_TAG}
@@ -313,3 +314,4 @@ volumes:
   mongodb_data_container:
   db:
     driver: local
+

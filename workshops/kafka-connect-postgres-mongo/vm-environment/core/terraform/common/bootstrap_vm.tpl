@@ -14,7 +14,7 @@ sudo apt-get install \
     software-properties-common -y
 
 echo "--- Installing Docker ---"
-curl -L https://download.docker.com/linux/static/stable/x86_64/docker-20.10.9.tgz -o docker.tgz
+curl -L https://download.docker.com/linux/static/stable/x86_64/docker-26.0.0.tgz -o docker.tgz
 sudo tar xvf docker.tgz -C /usr/bin --wildcards 'docker/*' --strip 1
 rm docker.tgz
 sudo groupadd docker
@@ -29,9 +29,10 @@ echo 'c3 { org.eclipse.jetty.jaas.spi.PropertyFileLoginModule required file="/tm
 
 
 echo "--- Installing Docker Compose ---"
-sudo chmod +wx /usr/local/bin/
-sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+DOCKER_CONFIG=$HOME/.docker
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
 echo "--- Create workshop staging directory ---"
 mkdir .workshop

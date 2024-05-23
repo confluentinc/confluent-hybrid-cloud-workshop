@@ -22,7 +22,7 @@ There is a file called .env which you need to check before starting in case you 
 
 ```
 DC=<User name for the workshop>
-PASS=p<User password for the workshop>
+PASS=<User password for the workshop>
 CONFLUENT_DOCKER_TAG=<Docker Confluent images for the workshop>
 ```
 After filling the previous env variables, execute the following command in the local-environment folder:

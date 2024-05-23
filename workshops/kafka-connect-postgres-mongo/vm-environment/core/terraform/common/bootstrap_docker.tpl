@@ -7,7 +7,7 @@ echo "EXT_IP=${ext_ip}" >> .env
 echo "HOSTNAME"=$HOSTNAME >> .env
 echo "DC"=${dc} >> .env
 echo "PASS"=${participant_password} >> .env
-echo "CONFLUENT_DOCKER_TAG"=7.3.0 >> .env
+echo "CONFLUENT_DOCKER_TAG"=7.6.0 >> .env
 echo "DC"=${dc} >> .env.dev
 
 # Generate html file for the hosted instructions
@@ -23,7 +23,7 @@ mkdir ~/.workshop/docker/.aws
 
 # startup the containers
 cd ~/.workshop/docker/
-docker-compose up -d
+docker compose up -d
 
 # create environment variables
 cd ~
