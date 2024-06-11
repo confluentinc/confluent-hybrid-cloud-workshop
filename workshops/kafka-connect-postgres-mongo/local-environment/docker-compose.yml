@@ -1,0 +1,325 @@
+---
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:${CONFLUENT_DOCKER_TAG}
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-server:${CONFLUENT_DOCKER_TAG}
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:${CONFLUENT_DOCKER_TAG}
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+  connect:
+    image: confluentinc/cp-kafka-connect:${CONFLUENT_DOCKER_TAG}
+    hostname: connect
+    container_name: connect
+    depends_on:
+      - zookeeper
+      - broker
+      - schema-registry
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      #CONNECT_OFFSET_FLUSH_INTERVAL_MS: 1000
+      #CONNECT_MAX_REQUEST_SIZE: 1000
+      #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      #CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components/"
+      #CLASSPATH required due to CC-2422
+      #CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.3.0.jar
+      #CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      #CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      #CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      #CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+      DC: ${DC}
+      PASS: ${PASS}
+    command:
+      - bash
+      - -c
+      - |
+        apt-get -qq update
+        apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
+        confluent-hub install --no-prompt debezium/debezium-connector-mysql:0.10.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.4.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
+        confluent-hub install --no-prompt debezium/debezium-connector-postgresql:latest
+        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.9.1
+        confluent-hub install --no-prompt debezium/debezium-connector-mongodb:2.0.1
+        confluent-hub install --no-prompt confluentinc/connect-transforms:latest
+        confluent-hub install --no-prompt jcustenborder/kafka-connect-transform-common:latest
+        cd /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
+        curl -k -SL "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.37.tar.gz" | tar -xzf -
+        #
+        # Install Debezium Oracle connector and required libraries
+        # -- Download
+        curl "https://oss.sonatype.org/service/local/repositories/snapshots/content/io/debezium/debezium-connector-oracle/1.2.0-SNAPSHOT/debezium-connector-oracle-1.2.0-20200612.041347-34-plugin.tar.gz" | \
+          tar xvfz - --directory /usr/share/java/
+        # -- Install the required library files
+        apt-get update
+        apt-get install -y --force-yes unzip libaio1
+        wget "https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basiclite-linux.x64-19.6.0.0.0dbru.zip" -O /tmp/ic.zip
+        unzip /tmp/ic.zip -d /usr/share/java/debezium-connector-oracle/
+        echo "Launching Kafka Connect worker"
+        /etc/confluent/docker/run & 
+        #
+        sleep infinity
+    volumes:
+      - .env:/secrets.properties
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:${CONFLUENT_DOCKER_TAG}
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - broker
+      - schema-registry
+      - connect
+      - ksqldb-server
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: "http://connect:8083"
+      CONTROL_CENTER_KSQL_KSQLDB1_URL: "http://ksqldb-server:8088"
+      CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL: "http://localhost:8088"
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_CONNECT_HEALTHCHECK_ENDPOINT: '/connectors'
+      CONTROL_CENTER_REST_AUTHENTICATION_METHOD: BASIC
+      CONTROL_CENTER_REST_AUTHENTICATION_REALM: c3
+      CONTROL_CENTER_REST_AUTHENTICATION_ROLES: Administrators,Restricted
+      CONTROL_CENTER_AUTH_RESTRICTED_ROLES: Restricted
+      CONTROL_CENTER_AUTH_SESSION_EXPIRATION_MS: 6000000
+      CONTROL_CENTER_OPTS: "-Djava.security.auth.login.config=/tmp/c3/propertyfile.jaas"
+      # Workaround for MMA-3564
+      CONTROL_CENTER_METRICS_TOPIC_MAX_MESSAGE_BYTES: 8388608
+      PORT: 9021
+      DC: ${DC}
+      PASS: ${PASS}
+    user: root
+    command:
+      - bash
+      - -c
+      - |
+        echo y | yum install sudo
+        echo "--- Creating C3 auth files ---"
+        sudo chmod +x /tmp/c3/
+        echo "$DC: $PASS,Administrators" > /tmp/c3/login.properties
+        echo "disallowed: no_access" >> /tmp/c3/login.properties
+        echo 'c3 { org.eclipse.jetty.jaas.spi.PropertyFileLoginModule required file="/tmp/c3/login.properties"; };' > /tmp/c3/propertyfile.jaas
+        echo "Launching control center"
+        /etc/confluent/docker/run & 
+        #
+        sleep infinity
+    volumes:
+      - c3:/tmp/c3
+
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    depends_on:
+      - broker
+      - connect
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "broker:29092"
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KSQL_KSQL_CONNECT_URL: "http://connect:8083"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+
+  ksqldb-cli:
+    image: confluentinc/cp-ksqldb-cli:${CONFLUENT_DOCKER_TAG}
+    container_name: ksqldb-cli
+    depends_on:
+      - broker
+      - connect
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:${CONFLUENT_DOCKER_TAG}
+    depends_on:
+      - broker
+      - schema-registry
+    ports:
+      - 8082:8082
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+
+  db:
+    image: postgres:14.1-alpine
+    hostname: postgres
+    restart: always
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${DC}
+      - POSTGRES_PASSWORD=${PASS}
+      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+    command: [ "postgres", "-c", "wal_level=logical"]
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ../common-docker/db/test-init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ../common-docker/db/postgresql.conf:/var/lib/postgresql/postgresql.conf
+
+  mymongodb:
+    image: mongo:4.2.12
+    container_name: mymongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: demo
+
+    ports:
+      - 27017:27017
+    volumes:
+      - ../common-docker/mongodb/initdb.d/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  mongo-express:
+    image: mongo-express:0.54.0
+    container_name: mongo-express
+    restart: unless-stopped
+    depends_on:
+      - mymongodb
+    links:
+      - mymongodb
+
+    ports:
+      #- 4321:4321
+      - 444:444
+    environment:
+      #ME_CONFIG_MONGODB_ADMINUSERNAME: user
+      #ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+      #ME_CONFIG_MONGODB_SERVER: mongodb
+      #ME_CONFIG_MONGODB_PORT: 27017
+      #ME_CONFIG_MONGODB_URL: mongodb://user:pass@mymongodb:27017/?authMechanism=DEFAULT&authSource=demo
+      ME_CONFIG_MONGODB_SERVER: mymongodb
+      ME_CONFIG_MONGODB_AUTH_USERNAME: user
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: pass
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_AUTH_DATABASE: demo
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
+      ME_CONFIG_BASICAUTH_USERNAME: ${DC}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${PASS}
+      VCAP_APP_PORT: 444
+
+  pg_dashboard:
+    image: dpage/pgadmin4:latest
+    container_name: pg_dashboard
+    ports:
+      - 5488:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DC}@mail.com
+      PGADMIN_DEFAULT_PASSWORD: ${PASS}
+      PGADMIN_LISTEN_ADDRESS: 0.0.0.0
+
+  workshop-docs:
+    container_name: workshop-docs-webserver
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    #command: . /tmp/start.sh
+    #command: sh -c "chmod +x /tmp/start.sh && /tmp/start.sh"
+    volumes:
+      - ../common-docker/asciidoc:/usr/share/nginx/html
+      - ./scripts:/docker-entrypoint.d
+    environment:
+      - DC=${DC}
+      - PASS=${PASS}
+
+#  asciidoc:
+#   container_name: asciidoc
+#   image: asciidoctor/docker-asciidoctor
+#   platform: linux/amd64
+#   volumes:
+#     - ../common-docker/asciidoc:/usr/share/nginx/html
+#     - ./images:/usr/share/nginx/html/images
+
+volumes:
+  mongodb_data_container:
+  c3:
+  db:
+    driver: local

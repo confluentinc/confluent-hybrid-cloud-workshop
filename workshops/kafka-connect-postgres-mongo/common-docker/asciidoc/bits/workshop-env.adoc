@@ -1,0 +1,51 @@
+== Lab {counter:labs}: Connecting to your Workshop Environment
+
+Your environment represents an on-premise data center and consists of a virtual machine hosted in the cloud running several docker containers. In a real world implementation, some of the components would be deployed differently but the logical data flow that we will be working on would remain the same.
+You will use a setup that includes a virtual machine in AWS (EC2) configured as a Docker host that will include all the required software to perform the exercises.
+
+To log in to your virtual data center open a terminal session and use the credentials that were assigned to you.
+
+*NOTE: if you are using docker-compose in your computer you don't need to connect with the following ssh command, you will only need to run the commands that are part of the labs locally.*
+
+[source,subs=attributes+]
+----
+ssh {dc}@{externalip} 
+----
+
+Once logged in run the following command to confirm that you have several docker containers running
+[source,subs=attributes+]
+----
+docker ps --format "table {{.ID}}\t{{.Names}}\t{{.RunningFor}}\t{{.Status}}"
+----
+
+You should see something similar to this.
+
+[source,subs=attributes+]
+----
+CONTAINER ID   NAMES                     CREATED              STATUS
+634ebca7c9cc   control-center            40 seconds ago       Up 38 seconds
+0753e6c7c452   ksqldb-cli                40 seconds ago       Up 37 seconds
+b9e35166dc92   ksqldb-server             42 seconds ago       Up 40 seconds
+797f867c6d0a   connect                   43 seconds ago       Up 42 seconds (health: starting)
+9016da9bc202   rest-proxy                43 seconds ago       Up 38 seconds
+e3af8d77c3f8   schema-registry           45 seconds ago       Up 43 seconds
+4c028b5367a7   mongo-express             47 seconds ago       Up 46 seconds
+79a1c2a11dab   broker                    49 seconds ago       Up 45 seconds
+f707b1ed252f   zookeeper                 About a minute ago   Up 48 seconds
+9ef66a7822c7   postgres-db               About a minute ago   Up 52 seconds
+adb07eef2aa7   mymongodb                 About a minute ago   Up 47 seconds
+42ecfd6c153b   pg_dashboard              About a minute ago   Up 49 seconds
+913a296c4ba9   workshop-docs-webserver   About a minute ago   Up 51 seconds
+----
+
+[IMPORTANT]
+====
+Whenever you see this icon it means the step is mandatory. Missing one of these steps will result in the data pipeline not working as expected.
+====
+
+[TIP]
+====
+Take advantage of the copy to clipboard button, it will save you some time!
+
+image::./copypaste.png[]
+====
