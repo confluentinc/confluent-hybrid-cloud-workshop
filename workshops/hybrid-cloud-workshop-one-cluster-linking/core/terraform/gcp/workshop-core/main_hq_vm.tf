@@ -51,7 +51,7 @@ resource "google_compute_instance" "hq_instance" {
   boot_disk {
     initialize_params {
       type  = "pd-standard"
-      image = "ubuntu-2004-lts"
+      image = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
       size  = var.vm_disk_size
     }
   }
@@ -66,11 +66,13 @@ resource "google_compute_instance" "hq_instance" {
 
   metadata_startup_script = <<SCRIPT
 sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo sed -i 's/PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
 sudo service ssh restart
 sudo useradd -m -s /bin/bash ${format("dc%02d", var.participant_count + 1)}
 sudo echo "${format("dc%02d", var.participant_count + 1)} ALL = NOPASSWD : ALL" >> /etc/sudoers
 sudo usermod -aG sudo ${format("dc%02d", var.participant_count + 1)}
-sudo echo "${format("dc%02d", var.participant_count + 1)}:${var.participant_password}" | chpasswd
+sudo echo "${format("dc%02d", var.participant_count + 1)}:${var.participant_password}" | sudo chpasswd
 SCRIPT
 
   // Copy bootstrap script to the VM
